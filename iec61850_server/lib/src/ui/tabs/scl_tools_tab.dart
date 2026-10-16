@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../models/dictionary_service.dart';
@@ -26,51 +27,51 @@ class _SclToolsTabState extends State<SclToolsTab> {
   String _currentLoadedFile = '';
   String _dictSearchResult = '';
 
-  final List<({String title, String filename, String desc})> _templates = const [
+  static const List<({String titleKey, String filename, String descKey})> _templates = [
     (
-      title: '基础模拟量与开关量 I/O',
+      titleKey: 'tplBasicIoTitle',
       filename: 'assets/examples/server_example_basic_io.icd',
-      desc: '包含 GGIO 模拟量遥测 (AnIn1) 与遥信 (Ind1)，配置了 BRCB 与 URCB 报告。',
+      descKey: 'tplBasicIoDesc',
     ),
     (
-      title: '可控开关控制模型 (CSWI / GGIO)',
+      titleKey: 'tplControlTitle',
       filename: 'assets/examples/server_example_control.icd',
-      desc: '支持点控 (SPCSO1~9)，包含 Direct 与 SBO 控前选择与控后操作。',
+      descKey: 'tplControlDesc',
     ),
     (
-      title: 'GOOSE 保护跳闸与变位组播',
+      titleKey: 'tplGooseTitle',
       filename: 'assets/examples/server_example_goose.icd',
-      desc: '配置了 PTRC1 保护跳闸逻辑节点、dsGooseTrip 数据集与 GSEControl。',
+      descKey: 'tplGooseDesc',
     ),
     (
-      title: 'IEC 61400-25 风力发电机模型',
+      titleKey: 'tpl61400Title',
       filename: 'assets/examples/server_example_61400_25.icd',
-      desc: '符合国际风机标准化规约，包含转速、功率、桨距角等专业 LN 节点。',
+      descKey: 'tpl61400Desc',
     ),
     (
-      title: '多定值区切换模型 (SGCB)',
+      titleKey: 'tplSgTitle',
       filename: 'assets/examples/server_example_sg.icd',
-      desc: '包含多套保护定值区配置，演示运行定值区 ActSG 与编辑定值区 EditSG。',
+      descKey: 'tplSgDesc',
     ),
     (
-      title: '复变参数模型 (CA)',
+      titleKey: 'tplCaTitle',
       filename: 'assets/examples/server_example_ca.icd',
-      desc: '复数测量值模型，包含相角、幅值等工程参数。',
+      descKey: 'tplCaDesc',
     ),
     (
-      title: '死区与变化上送 (Deadband)',
+      titleKey: 'tplDeadbandTitle',
       filename: 'assets/examples/server_example_deadband.icd',
-      desc: '遥测死区过滤与积分周期变化上送配置。',
+      descKey: 'tplDeadbandDesc',
     ),
     (
-      title: '综合变电站 IED 模型',
+      titleKey: 'tplSimpleTitle',
       filename: 'assets/examples/server_example_simple.icd',
-      desc: '包含完整的测量与开关综合逻辑节点树。',
+      descKey: 'tplSimpleDesc',
     ),
     (
-      title: '数据替代模型 (Substitution)',
+      titleKey: 'tplSubstTitle',
       filename: 'assets/examples/server_example_substitution.icd',
-      desc: '演示人工置数与自动采集切换的 SubVal / SubQ 替代功能。',
+      descKey: 'tplSubstDesc',
     ),
   ];
 
@@ -107,14 +108,14 @@ class _SclToolsTabState extends State<SclToolsTab> {
       widget.onDataChanged();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('已成功解析并应用 SCL 模型！IED: ${res.iedName}，变量数: ${res.variables.length}'),
+          content: Text('${AppI18n.instance.t("sclAppliedSuccess")} IED: ${res.iedName}, ${AppI18n.instance.t("allVarsCount")}: ${res.variables.length}'),
           backgroundColor: Colors.green[700],
         ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('SCL 解析失败: $e'),
+          content: Text('${AppI18n.instance.t("sclParseFailed")}: $e'),
           backgroundColor: Colors.red[700],
         ),
       );
@@ -135,13 +136,13 @@ class _SclToolsTabState extends State<SclToolsTab> {
     final da = dict.getDataAttribute(q);
 
     final sb = StringBuffer();
-    if (cdc != null) sb.writeln('[公共数据类 CDC] ${cdc.name}: ${cdc.display}');
-    if (ln != null) sb.writeln('[逻辑节点 LN] ${ln.name}: ${ln.display}');
-    if (doItem != null) sb.writeln('[数据对象 DO] ${doItem.name}: ${doItem.display}');
-    if (da != null) sb.writeln('[数据属性 DA] ${da.name}: ${da.display}');
+    if (cdc != null) sb.writeln('[${AppI18n.instance.t("dictCdc")}] ${cdc.name}: ${cdc.display}');
+    if (ln != null) sb.writeln('[${AppI18n.instance.t("dictLnType")}] ${ln.name}: ${ln.display}');
+    if (doItem != null) sb.writeln('[${AppI18n.instance.t("dictDoType")}] ${doItem.name}: ${doItem.display}');
+    if (da != null) sb.writeln('[${AppI18n.instance.t("dictDaType")}] ${da.name}: ${da.display}');
 
     if (sb.isEmpty) {
-      sb.writeln('未在 IEC 61850 标准元数据字典中检索到 "$query"。');
+      sb.writeln('${AppI18n.instance.t("dictNotFound")} "$query"');
     }
 
     setState(() {
@@ -151,6 +152,7 @@ class _SclToolsTabState extends State<SclToolsTab> {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = AppI18n.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Row(
@@ -165,7 +167,7 @@ class _SclToolsTabState extends State<SclToolsTab> {
             child: ListView(
               padding: const EdgeInsets.all(12),
               children: [
-                const Text('内置行业标准 SCL 模板库', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                Text(i18n.t('builtinSclLibrary'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                 const SizedBox(height: 8),
                 ..._templates.map((tpl) {
                   final isLoaded = _currentLoadedFile == tpl.filename;
@@ -188,25 +190,25 @@ class _SclToolsTabState extends State<SclToolsTab> {
                               Icon(Icons.description, size: 16, color: Theme.of(context).colorScheme.primary),
                               const SizedBox(width: 6),
                               Expanded(
-                                child: Text(tpl.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                child: Text(i18n.t(tpl.titleKey), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                               ),
                             ],
                           ),
                           const SizedBox(height: 4),
-                          Text(tpl.desc, style: TextStyle(fontSize: 11, color: isDark ? Colors.grey[400] : Colors.grey[600])),
+                          Text(i18n.t(tpl.descKey), style: TextStyle(fontSize: 11, color: isDark ? Colors.grey[400] : Colors.grey[600])),
                           const SizedBox(height: 8),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               OutlinedButton.icon(
                                 icon: const Icon(Icons.preview, size: 14),
-                                label: const Text('查看代码', style: TextStyle(fontSize: 11)),
+                                label: Text(i18n.t('viewCode'), style: const TextStyle(fontSize: 11)),
                                 onPressed: () => _loadTemplate(tpl.filename),
                               ),
                               const SizedBox(width: 8),
                               FilledButton.tonalIcon(
                                 icon: const Icon(Icons.play_arrow, size: 14),
-                                label: const Text('一键应用', style: TextStyle(fontSize: 11)),
+                                label: Text(i18n.t('applyModelOneClick'), style: const TextStyle(fontSize: 11)),
                                 onPressed: () {
                                   _loadTemplate(tpl.filename);
                                   _applyModel();
@@ -221,12 +223,12 @@ class _SclToolsTabState extends State<SclToolsTab> {
                 }),
                 const Divider(height: 24),
                 // Dictionary Lookup
-                const Text('IEC 61850 标准字典速查', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                Text(i18n.t('sclDictLookup'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                 const SizedBox(height: 8),
                 TextField(
                   controller: _dictSearchCtrl,
                   decoration: InputDecoration(
-                    hintText: '输入 CDC / LN / DO / DA (如 MMXU, Pos, stVal)...',
+                    hintText: i18n.t('sclDictHint'),
                     prefixIcon: const Icon(Icons.search, size: 18),
                     suffixIcon: IconButton(
                       icon: const Icon(Icons.arrow_forward, size: 18),
@@ -266,13 +268,13 @@ class _SclToolsTabState extends State<SclToolsTab> {
                     const Icon(Icons.code, size: 20),
                     const SizedBox(width: 8),
                     Text(
-                      'SCL (ICD/CID/SCD) 文件源代码 [$_currentLoadedFile]',
+                      'SCL (ICD/CID/SCD) [$_currentLoadedFile]',
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                     const Spacer(),
                     FilledButton.icon(
                       icon: const Icon(Icons.check_circle_outline),
-                      label: const Text('解析并更新当前服务器模型'),
+                      label: Text(i18n.t('parseAndUpdateServerModel')),
                       onPressed: _applyModel,
                     ),
                   ],

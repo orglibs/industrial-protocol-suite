@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'package:flutter/material.dart';
 import '../../protocol/modbus_client.dart';
 
@@ -70,7 +71,7 @@ class _WriteSingleCoilDialogState extends State<WriteSingleCoilDialog> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _statusMsg = '写入失败: $e';
+          _statusMsg = '${AppI18n.instance.t('parseError')}: $e';
         });
       }
     } finally {
@@ -82,12 +83,15 @@ class _WriteSingleCoilDialogState extends State<WriteSingleCoilDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.toggle_on, color: Colors.indigo),
-          SizedBox(width: 8),
-          Text('FC 05: 写单个线圈 (Write Single Coil)'),
+          Icon(Icons.toggle_on, color: theme.colorScheme.primary),
+          const SizedBox(width: 8),
+          Text('FC 05: Write Single Coil', style: const TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
       content: SizedBox(
@@ -96,21 +100,21 @@ class _WriteSingleCoilDialogState extends State<WriteSingleCoilDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('从站 Unit ID: $_slaveId  |  线圈地址: $_address (0x${_address.toRadixString(16).padLeft(4, "0").toUpperCase()})'),
+            Text('Unit ID: $_slaveId  |  ${AppI18n.instance.t('colAddr')}: $_address'),
             const SizedBox(height: 16),
-            const Text('设置输出目标值:'),
+            Text('${AppI18n.instance.t('currValue')}:'),
             const SizedBox(height: 8),
             Row(
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _value ? Colors.green.shade600 : Colors.grey.shade200,
-                      foregroundColor: _value ? Colors.white : Colors.black87,
+                      backgroundColor: _value ? Colors.green.shade600 : (isDark ? Colors.grey.shade800 : Colors.grey.shade200),
+                      foregroundColor: _value ? Colors.white : theme.colorScheme.onSurface,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                     icon: const Icon(Icons.check_circle),
-                    label: const Text('置为 ON (1 / 0xFF00)'),
+                    label: const Text('ON (0xFF00)'),
                     onPressed: () => setState(() => _value = true),
                   ),
                 ),
@@ -118,12 +122,12 @@ class _WriteSingleCoilDialogState extends State<WriteSingleCoilDialog> {
                 Expanded(
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: !_value ? Colors.red.shade600 : Colors.grey.shade200,
-                      foregroundColor: !_value ? Colors.white : Colors.black87,
+                      backgroundColor: !_value ? Colors.red.shade600 : (isDark ? Colors.grey.shade800 : Colors.grey.shade200),
+                      foregroundColor: !_value ? Colors.white : theme.colorScheme.onSurface,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                     icon: const Icon(Icons.cancel),
-                    label: const Text('置为 OFF (0 / 0x0000)'),
+                    label: const Text('OFF (0x0000)'),
                     onPressed: () => setState(() => _value = false),
                   ),
                 ),
@@ -139,13 +143,13 @@ class _WriteSingleCoilDialogState extends State<WriteSingleCoilDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(AppI18n.instance.t('cancel')),
         ),
-        ElevatedButton(
+        FilledButton(
           onPressed: _isSending ? null : _send,
           child: _isSending
-              ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
-              : const Text('立即写入'),
+              ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+              : Text(AppI18n.instance.t('confirm')),
         ),
       ],
     );

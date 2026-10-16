@@ -1,3 +1,4 @@
+import "../../i18n/app_i18n.dart";
 import 'package:flutter/material.dart';
 import '../../server/iec104_server.dart';
 import '../../server/station.dart';
@@ -42,7 +43,7 @@ class _EditStationDialogState extends State<EditStationDialog> {
   void _confirmDeleteStation() {
     if (widget.server.stations.length <= 1) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('至少需要保留一个从站，无法删除最后一个从站'), backgroundColor: Colors.orange),
+        const SnackBar(content: Text('At least one station required'), backgroundColor: Colors.orange),
       );
       return;
     }
@@ -50,12 +51,12 @@ class _EditStationDialogState extends State<EditStationDialog> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('确认删除从站?'),
-        content: Text('确定要删除从站 [COA=${widget.station.commonAddress}] "${widget.station.name}" 及其包含的所有 ${widget.station.points.length} 个点位吗？该操作不可撤销。'),
+        title: Text(AppI18n.instance.t('deleteStation')),
+        content: Text('Delete station [COA=${widget.station.commonAddress}] "${widget.station.name}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('取消'),
+            child: Text(AppI18n.instance.t('cancel')),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
@@ -66,10 +67,10 @@ class _EditStationDialogState extends State<EditStationDialog> {
               Navigator.pop(context);
               widget.onStationDeleted?.call();
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('已删除从站 [COA=$deletedCa]'), backgroundColor: Colors.red),
+                SnackBar(content: Text('Deleted station [COA=$deletedCa]'), backgroundColor: Colors.red),
               );
             },
-            child: const Text('确认删除'),
+            child: Text(AppI18n.instance.t('delete')),
           ),
         ],
       ),
@@ -78,14 +79,15 @@ class _EditStationDialogState extends State<EditStationDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final pointCount = widget.station.points.length;
 
     return AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.settings_outlined, color: Colors.blue),
-          SizedBox(width: 8),
-          Text('管理从站配置 (Edit Station)'),
+          Icon(Icons.settings_outlined, color: theme.colorScheme.primary),
+          const SizedBox(width: 8),
+          Text(AppI18n.instance.t('editStation')),
         ],
       ),
       content: SingleChildScrollView(
@@ -100,18 +102,18 @@ class _EditStationDialogState extends State<EditStationDialog> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
+                    color: theme.colorScheme.primaryContainer.withAlpha(50),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.blue.shade200),
+                    border: Border.all(color: theme.colorScheme.primary.withAlpha(80)),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.info_outline, color: Colors.blue, size: 20),
+                      Icon(Icons.info_outline, color: theme.colorScheme.primary, size: 20),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          '当前站包含 $pointCount 个信息体点位。修改从站公共地址 (COA) 将同步更新其下属所有点位的从站归属。',
-                          style: TextStyle(color: Colors.blue.shade900, fontSize: 13),
+                          'Points in station: $pointCount.',
+                          style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 13),
                         ),
                       ),
                     ],
@@ -121,19 +123,19 @@ class _EditStationDialogState extends State<EditStationDialog> {
                 TextFormField(
                   controller: _caCtrl,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: '从站公共地址 (COA / Common Address)',
-                    helperText: '有效范围 1 ~ 65535',
+                  decoration: InputDecoration(
+                    labelText: AppI18n.instance.t('coa'),
+                    helperText: '1 ~ 65535',
                     prefixIcon: Icon(Icons.tag),
                     border: OutlineInputBorder(),
                   ),
                   validator: (val) {
                     final v = int.tryParse(val ?? '');
                     if (v == null || v < 1 || v > 65535) {
-                      return '请输入 1 ~ 65535 之间的有效整数';
+                      return '1 ~ 65535';
                     }
                     if (v != widget.station.commonAddress && widget.server.stations.containsKey(v)) {
-                      return '从站地址 (COA=$v) 已被其他从站占用';
+                      return 'COA=$v already used';
                     }
                     return null;
                   },
@@ -141,20 +143,20 @@ class _EditStationDialogState extends State<EditStationDialog> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _nameCtrl,
-                  decoration: const InputDecoration(
-                    labelText: '从站名称 (Station Name)',
+                  decoration: InputDecoration(
+                    labelText: AppI18n.instance.t('stationName'),
                     prefixIcon: Icon(Icons.edit_note),
                     border: OutlineInputBorder(),
                   ),
                   validator: (val) {
                     if (val == null || val.trim().isEmpty) {
-                      return '从站名称不能为空';
+                      return AppI18n.instance.t('valRequired');
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
-                const Text('快速套用模板:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                const Text('Templates:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
@@ -162,22 +164,22 @@ class _EditStationDialogState extends State<EditStationDialog> {
                   children: [
                     OutlinedButton.icon(
                       icon: const Icon(Icons.electric_bolt, size: 16),
-                      label: const Text('配网工程模板'),
+                      label: const Text('Distribution Template'),
                       onPressed: () {
                         widget.station.applyTemplate('distribution');
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('已导入配网工程模板点位')),
+                          const SnackBar(content: Text('Imported distribution template')),
                         );
                         setState(() {});
                       },
                     ),
                     OutlinedButton.icon(
                       icon: const Icon(Icons.account_balance, size: 16),
-                      label: const Text('变电站工程模板'),
+                      label: const Text('Substation Template'),
                       onPressed: () {
                         widget.station.applyTemplate('substation');
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('已导入变电站工程模板点位')),
+                          const SnackBar(content: Text('Imported substation template')),
                         );
                         setState(() {});
                       },
@@ -194,13 +196,13 @@ class _EditStationDialogState extends State<EditStationDialog> {
           children: [
             TextButton.icon(
               icon: const Icon(Icons.delete_outline, color: Colors.red, size: 18),
-              label: const Text('删除从站', style: TextStyle(color: Colors.red)),
+              label: Text(AppI18n.instance.t('deleteStation'), style: const TextStyle(color: Colors.red)),
               onPressed: widget.server.stations.length > 1 ? _confirmDeleteStation : null,
             ),
             const Spacer(),
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('取消'),
+              child: Text(AppI18n.instance.t('cancel')),
             ),
             const SizedBox(width: 8),
             FilledButton(
@@ -215,13 +217,13 @@ class _EditStationDialogState extends State<EditStationDialog> {
                   widget.onStationChanged?.call(newCa);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('已更新从站: $newName (COA=$newCa)'),
+                      content: Text('Updated station: $newName (COA=$newCa)'),
                       backgroundColor: Colors.green,
                     ),
                   );
                 }
               },
-              child: const Text('保存修改'),
+              child: Text(AppI18n.instance.t('save')),
             ),
           ],
         ),

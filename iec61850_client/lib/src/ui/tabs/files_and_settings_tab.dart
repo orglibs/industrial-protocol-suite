@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../models/scl_models.dart';
@@ -34,14 +35,14 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
     final engine = widget.manager.activeEngine;
     if (engine == null || !engine.isConnected) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请先连接到服务端再查询远端文件')),
+        SnackBar(content: Text(AppI18n.instance.t('connectFirstFiles'))),
       );
       return;
     }
 
     setState(() {
       _isLoadingFiles = true;
-      _statusMsg = '正在查询服务端文件目录 (FileDirectory)...';
+      _statusMsg = AppI18n.instance.t('queryingFiles');
     });
 
     try {
@@ -49,12 +50,12 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
       setState(() {
         _remoteFiles = list;
         _isLoadingFiles = false;
-        _statusMsg = '获取到 ${list.length} 个远端文件';
+        _statusMsg = '${list.length} files';
       });
     } catch (e) {
       setState(() {
         _isLoadingFiles = false;
-        _statusMsg = '查询文件失败: $e';
+        _statusMsg = 'Error: $e';
       });
     }
   }
@@ -70,7 +71,7 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
     final targetPath = '${downloadsDir.path}/$filename';
 
     setState(() {
-      _statusMsg = '正在下载 $filename ...';
+      _statusMsg = 'Downloading $filename...';
     });
 
     final ok = await engine.downloadFile(
@@ -79,7 +80,7 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
       onProgress: (received, total) {
         if (mounted) {
           setState(() {
-            _statusMsg = '正在下载 $filename: $received / $total 字节';
+            _statusMsg = 'Downloading $filename: $received / $total B';
           });
         }
       },
@@ -88,12 +89,12 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(ok ? '文件下载成功，已保存至 $targetPath' : '下载失败，请检查连接或文件权限'),
+          content: Text(ok ? 'Download success: $targetPath' : AppI18n.instance.t('downloadFailedMsg')),
           duration: const Duration(seconds: 3),
         ),
       );
       setState(() {
-        _statusMsg = ok ? '下载完成: $filename' : '下载失败';
+        _statusMsg = ok ? 'Downloaded: $filename' : AppI18n.instance.t('downloadFail');
       });
     }
   }
@@ -102,7 +103,7 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
     final engine = widget.manager.activeEngine;
     if (engine == null || !engine.isConnected) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请先连接到服务端再切换定值区')),
+        SnackBar(content: Text(AppI18n.instance.t('connectFirstSg'))),
       );
       return;
     }
@@ -114,7 +115,7 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(ok ? '定值区成功切换至第 $sgNum 区 (ActSG = $sgNum)' : '定值区切换失败'),
+          content: Text(ok ? 'ActSG -> SG$sgNum' : AppI18n.instance.t('sgSwitchFailed')),
           duration: const Duration(seconds: 2),
         ),
       );
@@ -127,6 +128,7 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = AppI18n.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final engine = widget.manager.activeEngine;
     final scl = engine?.scl;
@@ -159,7 +161,7 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
                       const Icon(Icons.folder_shared, size: 20, color: Colors.blueAccent),
                       const SizedBox(width: 8),
                       const Text(
-                        'MMS 远端文件服务 (File Services: FileDirectory / FileOpen / FileRead)',
+                        i18n.t('remoteFilesService'),
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                       ),
                       const Spacer(),
@@ -171,14 +173,14 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
                                 child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                               )
                             : const Icon(Icons.cloud_download_outlined, size: 16),
-                        label: const Text('查询远端文件列表'),
+                        label: Text(i18n.t('queryRemoteFiles')),
                         onPressed: (engine?.isConnected ?? false) && !_isLoadingFiles ? _queryRemoteFiles : null,
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '支持从远端 IEC 61850 装置浏览并下载录波文件 (COMTRADE .cfg / .dat) 或事件日志文件',
+                    i18n.t('remoteFilesDesc'),
                     style: TextStyle(fontSize: 12, color: isDark ? Colors.grey[400] : Colors.grey[600]),
                   ),
                   if (_statusMsg.isNotEmpty) ...[
@@ -203,7 +205,7 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
                       ),
                       child: const Center(
                         child: Text(
-                          '未查询到文件或尚未进行目录查询\n点击右上角 "查询远端文件列表" 获取远端目录',
+                          i18n.t('emptyRemoteFiles'),
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.grey, fontSize: 12),
                         ),
@@ -236,10 +238,10 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
                               f.name,
                               style: const TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.bold),
                             ),
-                            subtitle: Text('${(f.size / 1024).toStringAsFixed(2)} KB (${f.size} 字节)'),
+                            subtitle: Text('${(f.size / 1024).toStringAsFixed(2)} KB (${f.size} ${i18n.t("bytesUnit")})'),
                             trailing: FilledButton.tonalIcon(
                               icon: const Icon(Icons.download, size: 16),
-                              label: const Text('下载到本地'),
+                              label: Text(i18n.t('downloadToLocal')),
                               onPressed: () => _downloadFile(f.name),
                             ),
                           );
@@ -269,7 +271,7 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
                       const Icon(Icons.tune, size: 20, color: Colors.purpleAccent),
                       const SizedBox(width: 8),
                       const Text(
-                        '定值分组控制区 (SGCB: Setting Group Control Block)',
+                        i18n.t('sgcbTitle'),
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                       ),
                       const Spacer(),
@@ -283,7 +285,7 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '支持切换当前装置活动定值区 (ActSG)，并实时查看定值参数 (FC=SG/SE)',
+                    i18n.t('tplSgDesc'),
                     style: TextStyle(fontSize: 12, color: isDark ? Colors.grey[400] : Colors.grey[600]),
                   ),
                   const SizedBox(height: 16),
@@ -291,7 +293,7 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
                   // Setting Group Selector Buttons
                   Row(
                     children: [
-                      const Text('活动定值区 (ActSG): ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                      Text('${i18n.t("actSgLabel")}: ', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                       const SizedBox(width: 12),
                       Wrap(
                         spacing: 8,
@@ -299,7 +301,7 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
                           final sgNum = i + 1;
                           final isCurrent = _selectedSg == sgNum;
                           return ChoiceChip(
-                            label: Text('第 $sgNum 区 (SG$sgNum)'),
+                            label: Text('SG$sgNum (${i18n.t("nthGroupPrefix")}$sgNum${i18n.t("nthGroupSuffix")})'),
                             selected: isCurrent,
                             selectedColor: Colors.purple.withOpacity(0.3),
                             onSelected: (engine?.isConnected ?? false) && !_isSwitchingSg
@@ -314,7 +316,7 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
                   ),
 
                   const SizedBox(height: 16),
-                  const Text('定值参数列表 (FC=SG/SE):', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  Text(i18n.t('sgParamsList'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                   const SizedBox(height: 8),
                   if (sgVars.isEmpty)
                     Container(
@@ -325,7 +327,7 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
                       ),
                       child: const Center(
                         child: Text(
-                          '当前模型未配置定值变量 (FC=SG/SE)',
+                          i18n.t('noSgVarsConfigured'),
                           style: TextStyle(color: Colors.grey, fontSize: 12),
                         ),
                       ),
@@ -348,10 +350,10 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
                             color: isDark ? const Color(0xFF252526) : const Color(0xFFEBEBEB),
                           ),
                           children: const [
-                            Padding(padding: EdgeInsets.all(8), child: Text('定值参数全称 (Reference)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                            Padding(padding: const EdgeInsets.all(8), child: Text(i18n.t('colSgRef'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
                             Padding(padding: EdgeInsets.all(8), child: Text('FC', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-                            Padding(padding: EdgeInsets.all(8), child: Text('类型', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-                            Padding(padding: EdgeInsets.all(8), child: Text('当前值 (Live Value)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                            Padding(padding: const EdgeInsets.all(8), child: Text(i18n.t('colType'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                            Padding(padding: const EdgeInsets.all(8), child: Text(i18n.t('colVal'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
                           ],
                         ),
                         ...sgVars.map(

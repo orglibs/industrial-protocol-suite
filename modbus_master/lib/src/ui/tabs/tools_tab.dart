@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -68,7 +69,7 @@ class _ToolsTabState extends State<ToolsTab> with SingleTickerProviderStateMixin
     final hex = _crcHexCtrl.text.replaceAll(RegExp(r'[^0-9a-fA-F]'), '');
     if (hex.length % 2 != 0 || hex.isEmpty) {
       setState(() {
-        _calculatedCrc = '请输入成对的十六进制字节 (如 01 03 00 00 00 0A)';
+        _calculatedCrc = AppI18n.instance.t('inputHex');
         _calculatedLrc = '';
         _fullAduHex = '';
       });
@@ -85,7 +86,7 @@ class _ToolsTabState extends State<ToolsTab> with SingleTickerProviderStateMixin
 
     final crcLow = crcVal & 0xFF;
     final crcHigh = (crcVal >> 8) & 0xFF;
-    final crcHexStr = '0x${crcVal.toRadixString(16).padLeft(4, "0").toUpperCase()} (低字节: 0x${crcLow.toRadixString(16).padLeft(2, "0").toUpperCase()}, 高字节: 0x${crcHigh.toRadixString(16).padLeft(2, "0").toUpperCase()})';
+    final crcHexStr = '0x${crcVal.toRadixString(16).padLeft(4, "0").toUpperCase()} (Lo: 0x${crcLow.toRadixString(16).padLeft(2, "0").toUpperCase()}, Hi: 0x${crcHigh.toRadixString(16).padLeft(2, "0").toUpperCase()})';
     final lrcHexStr = '0x${lrcVal.toRadixString(16).padLeft(2, "0").toUpperCase()}';
 
     // RTU ADU = Payload + CRC Low + CRC High
@@ -144,10 +145,10 @@ class _ToolsTabState extends State<ToolsTab> with SingleTickerProviderStateMixin
           labelColor: theme.colorScheme.primary,
           indicatorColor: theme.colorScheme.primary,
           tabs: const [
-            Tab(icon: Icon(Icons.calculate), text: 'CRC16 / LRC 校验计算器'),
-            Tab(icon: Icon(Icons.swap_horiz), text: '数据格式与字节序转换器'),
-            Tab(icon: Icon(Icons.radar), text: '从站与点号自动扫描器'),
-            Tab(icon: Icon(Icons.speed), text: '高频压力与稳定性基准测试'),
+            Tab(icon: const Icon(Icons.calculate), text: AppI18n.instance.t('checkAlgo')), 
+            Tab(icon: const Icon(Icons.swap_horiz), text: AppI18n.instance.t('numByteConvert')), 
+            Tab(icon: const Icon(Icons.radar), text: AppI18n.instance.t('slaveAlias')), 
+            Tab(icon: const Icon(Icons.speed), text: AppI18n.instance.t('refreshRate')), 
           ],
         ),
         Expanded(
@@ -172,13 +173,13 @@ class _ToolsTabState extends State<ToolsTab> with SingleTickerProviderStateMixin
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Modbus RTU CRC-16 与 ASCII LRC 快速校验计算器', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(AppI18n.instance.t('checkAlgo'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
           TextField(
             controller: _crcHexCtrl,
             decoration: const InputDecoration(
-              labelText: '输入十六进制数据流 (以空格或连续hex输入)',
-              hintText: '如 01 03 00 00 00 0A',
+              labelText: AppI18n.instance.t('inputHex'),
+              hintText: '01 03 00 00 00 0A',
               border: OutlineInputBorder(),
               prefixIcon: Icon(Icons.code),
             ),
@@ -192,23 +193,23 @@ class _ToolsTabState extends State<ToolsTab> with SingleTickerProviderStateMixin
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _infoRow('Modbus CRC-16 (多项式 0xA001):', _calculatedCrc),
+                  _infoRow('Modbus CRC-16 (0xA001):', _calculatedCrc),
                   const Divider(height: 20),
-                  _infoRow('Modbus ASCII LRC (纵向冗余校验):', _calculatedLrc),
+                  _infoRow('Modbus ASCII LRC:', _calculatedLrc),
                   const Divider(height: 20),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('完整 Modbus RTU 报文 (含CRC校验):', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text(AppI18n.instance.t('frames'), style: const TextStyle(fontWeight: FontWeight.bold)),
                       const Spacer(),
                       if (_fullAduHex.isNotEmpty)
                         TextButton.icon(
                           icon: const Icon(Icons.copy, size: 16),
-                          label: const Text('复制完整报文'),
+                          label: Text(AppI18n.instance.t('copyLogText')),
                           onPressed: () {
                             Clipboard.setData(ClipboardData(text: _fullAduHex));
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('已复制完整报文到剪贴板')),
+                              SnackBar(content: Text(AppI18n.instance.t('copiedClipboard'))),
                             );
                           },
                         ),
@@ -223,7 +224,7 @@ class _ToolsTabState extends State<ToolsTab> with SingleTickerProviderStateMixin
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: SelectableText(
-                      _fullAduHex.isEmpty ? '<请输入有效Hex>' : _fullAduHex,
+                      _fullAduHex.isEmpty ? '<Hex>' : _fullAduHex,
                       style: const TextStyle(fontFamily: 'monospace', color: Colors.greenAccent, fontSize: 14),
                     ),
                   ),
@@ -248,14 +249,14 @@ class _ToolsTabState extends State<ToolsTab> with SingleTickerProviderStateMixin
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('32位浮点数 (Float32) 四种字节序对照解析', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(AppI18n.instance.t('byteOrder'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
           SizedBox(
             width: 300,
             child: TextField(
               controller: _floatInputCtrl,
               decoration: const InputDecoration(
-                labelText: '输入浮点数 (Float)',
+                labelText: AppI18n.instance.t('inputNum'),
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.numbers),
               ),
@@ -266,27 +267,31 @@ class _ToolsTabState extends State<ToolsTab> with SingleTickerProviderStateMixin
           const SizedBox(height: 16),
           Card(
             elevation: 2,
-            child: DataTable(
-              columns: const [
-                DataColumn(label: Text('字节序模式', style: TextStyle(fontWeight: FontWeight.bold))),
-                DataColumn(label: Text('排列方式', style: TextStyle(fontWeight: FontWeight.bold))),
-                DataColumn(label: Text('十六进制 (Hex Words)', style: TextStyle(fontWeight: FontWeight.bold))),
-                DataColumn(label: Text('解析为浮点值', style: TextStyle(fontWeight: FontWeight.bold))),
-              ],
-              rows: ModbusByteOrder.values.map((order) {
-                final reordered = ModbusDataConverter.reorder32Bytes(bytes, order);
-                final val = ByteData.sublistView(reordered).getFloat32(0, Endian.big);
-                final hexDump = reordered.map((b) => b.toRadixString(16).padLeft(2, '0').toUpperCase()).join(' ');
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                headingRowColor: WidgetStateProperty.all(Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.25)),
+                columns: const [
+                  DataColumn(label: Text(AppI18n.instance.t('byteOrder'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                  DataColumn(label: Text(AppI18n.instance.t('dataFormat'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                  DataColumn(label: const Text('Hex', style: TextStyle(fontWeight: FontWeight.bold))),
+                  DataColumn(label: Text(AppI18n.instance.t('currValue'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                ],
+                rows: ModbusByteOrder.values.map((order) {
+                  final reordered = ModbusDataConverter.reorder32Bytes(bytes, order);
+                  final val = ByteData.sublistView(reordered).getFloat32(0, Endian.big);
+                  final hexDump = reordered.map((b) => b.toRadixString(16).padLeft(2, '0').toUpperCase()).join(' ');
 
-                return DataRow(
-                  cells: [
-                    DataCell(Text(order.name.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text(order.label)),
-                    DataCell(Text(hexDump, style: const TextStyle(fontFamily: 'monospace', color: Colors.indigo))),
-                    DataCell(Text(val.toStringAsFixed(4), style: const TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.w600))),
-                  ],
-                );
-              }).toList(),
+                  return DataRow(
+                    cells: [
+                      DataCell(Text(order.name.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold))),
+                      DataCell(Text(order.label)),
+                      DataCell(Text(hexDump, style: TextStyle(fontFamily: 'monospace', color: Theme.of(context).colorScheme.primary))),
+                      DataCell(Text(val.toStringAsFixed(4), style: const TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.w600))),
+                    ],
+                  );
+                }).toList(),
+              ),
             ),
           ),
         ],
@@ -306,7 +311,7 @@ class _ToolsTabState extends State<ToolsTab> with SingleTickerProviderStateMixin
                 width: 140,
                 child: TextField(
                   controller: _scanFromIdCtrl,
-                  decoration: const InputDecoration(labelText: '起始从站ID', border: OutlineInputBorder()),
+                  decoration: InputDecoration(labelText: AppI18n.instance.t('slaveId'), border: const OutlineInputBorder()),
                   keyboardType: TextInputType.number,
                 ),
               ),
@@ -315,14 +320,14 @@ class _ToolsTabState extends State<ToolsTab> with SingleTickerProviderStateMixin
                 width: 140,
                 child: TextField(
                   controller: _scanToIdCtrl,
-                  decoration: const InputDecoration(labelText: '结束从站ID', border: OutlineInputBorder()),
+                  decoration: InputDecoration(labelText: AppI18n.instance.t('slaveId'), border: const OutlineInputBorder()),
                   keyboardType: TextInputType.number,
                 ),
               ),
               const SizedBox(width: 16),
               FilledButton.icon(
                 icon: Icon(_isScanning ? Icons.stop : Icons.search),
-                label: Text(_isScanning ? '停止扫描' : '开始扫描从站'),
+                label: Text(_isScanning ? AppI18n.instance.t('pauseLog') : AppI18n.instance.t('rescan')),
                 onPressed: _isScanning ? () => _scannerService.stopScan() : _startSlaveScan,
               ),
             ],
@@ -330,7 +335,7 @@ class _ToolsTabState extends State<ToolsTab> with SingleTickerProviderStateMixin
         ),
         Expanded(
           child: _scanResults.isEmpty
-              ? const Center(child: Text('输入从站ID范围并点击“开始扫描”即可自动发现网络中的 Modbus 设备'))
+              ? Center(child: Text(AppI18n.instance.t('noSlaveHint')))
               : ListView.builder(
                   itemCount: _scanResults.length,
                   itemBuilder: (ctx, idx) {
@@ -340,7 +345,7 @@ class _ToolsTabState extends State<ToolsTab> with SingleTickerProviderStateMixin
                         res.isSuccess ? Icons.check_circle : Icons.cancel_outlined,
                         color: res.isSuccess ? Colors.green : Colors.grey,
                       ),
-                      title: Text('从站 Unit ID: ${res.idOrAddress}  -  ${res.isSuccess ? "在线" : "离线"}'),
+                      title: Text('Unit ID: ${res.idOrAddress}  -  ${res.isSuccess ? "Online" : "Offline"}'),
                       subtitle: Text(res.detail),
                       trailing: Text('${res.latencyMs} ms', style: const TextStyle(fontFamily: 'monospace')),
                     );
@@ -369,7 +374,7 @@ class _ToolsTabState extends State<ToolsTab> with SingleTickerProviderStateMixin
                 width: 160,
                 child: TextField(
                   controller: _stressCountCtrl,
-                  decoration: const InputDecoration(labelText: '测试请求总次数', border: OutlineInputBorder()),
+                  decoration: InputDecoration(labelText: AppI18n.instance.t('regQty'), border: const OutlineInputBorder()),
                   keyboardType: TextInputType.number,
                 ),
               ),
@@ -377,7 +382,7 @@ class _ToolsTabState extends State<ToolsTab> with SingleTickerProviderStateMixin
               FilledButton.icon(
                 style: FilledButton.styleFrom(backgroundColor: Colors.deepOrange),
                 icon: Icon(_isStressRunning ? Icons.stop : Icons.play_arrow),
-                label: Text(_isStressRunning ? '终止压测' : '启动稳定性与延迟基准压测'),
+                label: Text(_isStressRunning ? AppI18n.instance.t('stopAll') : AppI18n.instance.t('startAll')),
                 onPressed: _isStressRunning ? () => _stressService.stop() : _startStressTest,
               ),
             ],
@@ -386,7 +391,7 @@ class _ToolsTabState extends State<ToolsTab> with SingleTickerProviderStateMixin
           if (rep != null) ...[
             LinearProgressIndicator(value: progress, minHeight: 8),
             const SizedBox(height: 12),
-            Text('测试进度: ${rep.completedRequests} / ${rep.totalRequests} (${(progress * 100).toStringAsFixed(1)}%)'),
+            Text('${rep.completedRequests} / ${rep.totalRequests} (${(progress * 100).toStringAsFixed(1)}%)'),
             const SizedBox(height: 16),
             Card(
               elevation: 2,
@@ -394,15 +399,15 @@ class _ToolsTabState extends State<ToolsTab> with SingleTickerProviderStateMixin
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    _infoRow('成功请求数:', '${rep.successCount} (成功率: ${rep.successRate.toStringAsFixed(2)}%)'),
+                    _infoRow('Success:', '${rep.successCount} (${rep.successRate.toStringAsFixed(2)}%)'),
                     const Divider(height: 16),
-                    _infoRow('失败/超时数:', '${rep.errorCount} (丢包率: ${rep.errorRate.toStringAsFixed(2)}%)'),
+                    _infoRow('Error / Timeout:', '${rep.errorCount} (${rep.errorRate.toStringAsFixed(2)}%)'),
                     const Divider(height: 16),
-                    _infoRow('平均往返时延 (Avg Latency):', '${rep.avgLatencyMs.toStringAsFixed(2)} ms'),
+                    _infoRow('Avg Latency:', '${rep.avgLatencyMs.toStringAsFixed(2)} ms'),
                     const Divider(height: 16),
-                    _infoRow('最低时延 (Min Latency):', '${rep.minLatencyMs == 999999 ? 0 : rep.minLatencyMs} ms'),
+                    _infoRow('Min Latency:', '${rep.minLatencyMs == 999999 ? 0 : rep.minLatencyMs} ms'),
                     const Divider(height: 16),
-                    _infoRow('最高时延 (Max Latency):', '${rep.maxLatencyMs} ms'),
+                    _infoRow('Max Latency:', '${rep.maxLatencyMs} ms'),
                   ],
                 ),
               ),
@@ -421,7 +426,7 @@ class _ToolsTabState extends State<ToolsTab> with SingleTickerProviderStateMixin
         Expanded(
           child: SelectableText(
             value,
-            style: const TextStyle(fontFamily: 'monospace', color: Colors.indigo, fontSize: 13),
+            style: TextStyle(fontFamily: 'monospace', color: Theme.of(context).colorScheme.primary, fontSize: 13),
           ),
         ),
       ],

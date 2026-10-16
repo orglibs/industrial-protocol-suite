@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../i18n/app_i18n.dart';
 import '../../models/server_variable_model.dart';
 import '../../models/simulation_config.dart';
 
@@ -60,12 +61,14 @@ class _SimulationDialogState extends State<SimulationDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = AppI18n.instance;
+
     return AlertDialog(
       title: Row(
         children: [
           Icon(Icons.waves, color: Theme.of(context).colorScheme.primary),
           const SizedBox(width: 8),
-          const Text('模拟量波形与动态仿真配置'),
+          Text(i18n.t('simConfigTitle')),
         ],
       ),
       content: SizedBox(
@@ -75,14 +78,14 @@ class _SimulationDialogState extends State<SimulationDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '变量：${widget.variable.shortRef}',
+                '${i18n.t("simTargetVar")}${widget.variable.shortRef}',
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
               ),
               const SizedBox(height: 12),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('启用仿真模拟 (Enable Simulation)'),
-                subtitle: const Text('周期性计算变化并触发上送报告与数据更新'),
+                title: Text(i18n.t('enableSimulation')),
+                subtitle: Text(i18n.t('enableSimSubtitle')),
                 value: _enabled,
                 onChanged: (val) {
                   setState(() {
@@ -94,10 +97,10 @@ class _SimulationDialogState extends State<SimulationDialog> {
               const SizedBox(height: 8),
               DropdownButtonFormField<EaseWaveType>(
                 value: _waveType,
-                decoration: const InputDecoration(
-                  labelText: '波形函数 (Waveform / EaseFunction)',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.graphic_eq),
+                decoration: InputDecoration(
+                  labelText: i18n.t('waveFunction'),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.graphic_eq),
                 ),
                 items: EaseWaveType.values.map((w) {
                   return DropdownMenuItem(
@@ -120,9 +123,9 @@ class _SimulationDialogState extends State<SimulationDialog> {
                     child: TextField(
                       controller: _minCtrl,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: '最小值 (Min)',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: i18n.t('minVal'),
+                        border: const OutlineInputBorder(),
                       ),
                     ),
                   ),
@@ -131,9 +134,9 @@ class _SimulationDialogState extends State<SimulationDialog> {
                     child: TextField(
                       controller: _maxCtrl,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: '最大值 (Max)',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: i18n.t('maxVal'),
+                        border: const OutlineInputBorder(),
                       ),
                     ),
                   ),
@@ -146,9 +149,9 @@ class _SimulationDialogState extends State<SimulationDialog> {
                     child: TextField(
                       controller: _stepCtrl,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: '步长 (Step)',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: i18n.t('stepVal'),
+                        border: const OutlineInputBorder(),
                       ),
                     ),
                   ),
@@ -157,9 +160,9 @@ class _SimulationDialogState extends State<SimulationDialog> {
                     child: TextField(
                       controller: _durationCtrl,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: '周期 (Period ms)',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: i18n.t('periodMs'),
+                        border: const OutlineInputBorder(),
                       ),
                     ),
                   ),
@@ -172,11 +175,11 @@ class _SimulationDialogState extends State<SimulationDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(i18n.t('cancel')),
         ),
         FilledButton.icon(
           icon: const Icon(Icons.check),
-          label: const Text('应用配置'),
+          label: Text(i18n.t('applyConfig')),
           onPressed: _save,
         ),
       ],

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:window_manager/window_manager.dart';
+import '../i18n/app_i18n.dart';
 import '../models/connection_config.dart';
 import '../models/workspace_storage.dart';
 import '../protocol/modbus_server.dart';
@@ -8,18 +10,22 @@ import 'tabs/register_view_tab.dart';
 import 'tabs/tools_tab.dart';
 import 'tabs/topology_tab.dart';
 import 'tabs/traffic_tab.dart';
+import 'widgets/language_picker.dart';
 import 'widgets/modbus_slave_icon.dart';
+import 'widgets/window_title_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   final List<ConnectionConfig> initialConnections;
   final VoidCallback onToggleTheme;
   final bool isDarkMode;
+  final VoidCallback? onLanguageChanged;
 
   const HomeScreen({
     super.key,
     required this.initialConnections,
     required this.onToggleTheme,
     required this.isDarkMode,
+    this.onLanguageChanged,
   });
 
   @override
@@ -51,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await WorkspaceStorage.saveConnections(_connections);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('工作区配置已保存')),
+        SnackBar(content: Text(AppI18n.instance.t('saveWorkspace'))),
       );
     }
   }
@@ -60,6 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isSimRunning = SimulationService.instance.isRunning;
+    final i18n = AppI18n.instance;
 
     int activeServers = 0;
     int totalClients = 0;
@@ -74,82 +81,168 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withAlpha(80),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: const Color(0xFF10B981), width: 1.2),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(46),
+        child: AppBar(
+          toolbarHeight: 46,
+          titleSpacing: 0,
+          leading: WindowManagerHelper.isSupportedPlatform
+              ? DragToMoveArea(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8, right: 4),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primaryContainer.withAlpha(80),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: const Color(0xFF10B981), width: 1.2),
+                      ),
+                      child: const Center(
+                        child: ModbusSlaveIcon(size: 18, color: Color(0xFF10B981)),
+                      ),
+                    ),
+                  ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8, right: 4),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primaryContainer.withAlpha(80),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: const Color(0xFF10B981), width: 1.2),
+                    ),
+                    child: const Center(
+                      child: ModbusSlaveIcon(size: 18, color: Color(0xFF10B981)),
+                    ),
+                  ),
+                ),
+          flexibleSpace: WindowManagerHelper.isSupportedPlatform
+              ? const DragToMoveArea(child: SizedBox.expand())
+              : null,
+          title: WindowManagerHelper.isSupportedPlatform
+              ? DragToMoveArea(
+                  child: SizedBox(
+                    height: 46,
+                    child: Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            i18n.t('appTitle'),
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceVariant,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text('v1.0.0', style: TextStyle(fontSize: 10)),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : SizedBox(
+                  height: 46,
+                  child: Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          i18n.t('appTitle'),
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceVariant,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text('v1.0.0', style: TextStyle(fontSize: 10)),
+                      ),
+                    ],
+                  ),
+                ),
+          actions: [
+            // Wave Simulation Quick Toggle
+            FilledButton.tonalIcon(
+              style: FilledButton.styleFrom(
+                visualDensity: VisualDensity.compact,
+                padding: const EdgeInsets.symmetric(horizontal: 10),
               ),
-              child: const ModbusSlaveIcon(size: 20, color: Color(0xFF10B981)),
-            ),
-            const SizedBox(width: 10),
-            const Text(
-              'Modbus Slave Emulator (从站服务端模拟器)',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceVariant,
-                borderRadius: BorderRadius.circular(4),
+              icon: Icon(
+                isSimRunning ? Icons.waves : Icons.blur_linear,
+                size: 15,
+                color: isSimRunning ? Colors.green : Colors.grey,
               ),
-              child: const Text('v1.0.0', style: TextStyle(fontSize: 11)),
+              label: Text(
+                isSimRunning ? i18n.t('simRunning') : i18n.t('simStart'),
+                style: const TextStyle(fontSize: 12),
+              ),
+              onPressed: () {
+                SimulationService.instance.setConnections(_connections);
+                SimulationService.instance.toggle();
+                setState(() {});
+              },
             ),
+            const SizedBox(width: 6),
+            // Start All
+            IconButton(
+              iconSize: 20,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              icon: const Icon(Icons.play_circle_fill, color: Colors.green),
+              tooltip: i18n.t('startAll'),
+              onPressed: () async {
+                await ModbusServerManager.instance.startAll(_connections);
+                setState(() {});
+              },
+            ),
+            // Stop All
+            IconButton(
+              iconSize: 20,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              icon: const Icon(Icons.stop_circle, color: Colors.red),
+              tooltip: i18n.t('stopAll'),
+              onPressed: () async {
+                await ModbusServerManager.instance.stopAll(_connections);
+                setState(() {});
+              },
+            ),
+            // Save Workspace
+            IconButton(
+              iconSize: 18,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              icon: const Icon(Icons.save_outlined),
+              tooltip: i18n.t('saveWorkspace'),
+              onPressed: _saveWorkspace,
+            ),
+            // Theme Toggle
+            IconButton(
+              iconSize: 18,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              icon: Icon(widget.isDarkMode ? Icons.light_mode : Icons.dark_mode),
+              tooltip: widget.isDarkMode ? i18n.t('themeLight') : i18n.t('themeDark'),
+              onPressed: widget.onToggleTheme,
+            ),
+            // Language Picker
+            LanguagePickerButton(
+              onLanguageChanged: () {
+                setState(() {});
+                widget.onLanguageChanged?.call();
+              },
+            ),
+            // Window Controls (Minimize, Maximize, Close)
+            WindowControls(brightness: theme.brightness),
           ],
         ),
-        actions: [
-          // Wave Simulation Quick Toggle
-          FilledButton.tonalIcon(
-            icon: Icon(
-              isSimRunning ? Icons.waves : Icons.blur_linear,
-              size: 16,
-              color: isSimRunning ? Colors.green : Colors.grey,
-            ),
-            label: Text(isSimRunning ? '波形模拟中' : '启动波形模拟'),
-            onPressed: () {
-              SimulationService.instance.setConnections(_connections);
-              SimulationService.instance.toggle();
-              setState(() {});
-            },
-          ),
-          const SizedBox(width: 8),
-          // Start All
-          IconButton(
-            icon: const Icon(Icons.play_circle_fill, color: Colors.green),
-            tooltip: '一键启动所有连接服务',
-            onPressed: () async {
-              await ModbusServerManager.instance.startAll(_connections);
-              setState(() {});
-            },
-          ),
-          // Stop All
-          IconButton(
-            icon: const Icon(Icons.stop_circle, color: Colors.red),
-            tooltip: '一键停止所有连接服务',
-            onPressed: () async {
-              await ModbusServerManager.instance.stopAll(_connections);
-              setState(() {});
-            },
-          ),
-          // Save Workspace
-          IconButton(
-            icon: const Icon(Icons.save_outlined),
-            tooltip: '保存工作区配置',
-            onPressed: _saveWorkspace,
-          ),
-          // Theme Toggle
-          IconButton(
-            icon: Icon(widget.isDarkMode ? Icons.light_mode : Icons.dark_mode),
-            tooltip: widget.isDarkMode ? '切换为亮色模式' : '切换为暗色模式',
-            onPressed: widget.onToggleTheme,
-          ),
-          const SizedBox(width: 8),
-        ],
       ),
       body: Row(
         children: [
@@ -162,31 +255,31 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: EdgeInsets.symmetric(vertical: 8),
               child: Icon(Icons.device_hub, size: 28),
             ),
-            destinations: const [
+            destinations: [
               NavigationRailDestination(
-                icon: Icon(Icons.grid_view_outlined),
-                selectedIcon: Icon(Icons.grid_view),
-                label: Text('寄存器监视'),
+                icon: const Icon(Icons.grid_view_outlined),
+                selectedIcon: const Icon(Icons.grid_view),
+                label: Text(i18n.t('tabRegisters')),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.account_tree_outlined),
-                selectedIcon: Icon(Icons.account_tree),
-                label: Text('连接与从站'),
+                icon: const Icon(Icons.account_tree_outlined),
+                selectedIcon: const Icon(Icons.account_tree),
+                label: Text(i18n.t('tabConnections')),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.sync_alt_outlined),
-                selectedIcon: Icon(Icons.sync_alt),
-                label: Text('通信报文'),
+                icon: const Icon(Icons.sync_alt_outlined),
+                selectedIcon: const Icon(Icons.sync_alt),
+                label: Text(i18n.t('tabTraffic')),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.show_chart_outlined),
-                selectedIcon: Icon(Icons.show_chart),
-                label: Text('实时曲线'),
+                icon: const Icon(Icons.show_chart_outlined),
+                selectedIcon: const Icon(Icons.show_chart),
+                label: Text(i18n.t('tabCharts')),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.construction_outlined),
-                selectedIcon: Icon(Icons.construction),
-                label: Text('辅助工具'),
+                icon: const Icon(Icons.construction_outlined),
+                selectedIcon: const Icon(Icons.construction),
+                label: Text(i18n.t('tabTools')),
               ),
             ],
           ),
@@ -228,26 +321,28 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(width: 6),
             Text(
-              activeServers > 0 ? '服务运行中 ($activeServers 个连接监听)' : '所有服务端已停止',
+              activeServers > 0
+                  ? '${i18n.t('serversRunning')} ($activeServers)'
+                  : i18n.t('allServersStopped'),
               style: const TextStyle(fontSize: 12),
             ),
             const SizedBox(width: 20),
-            Text('连接主站数: $totalClients', style: const TextStyle(fontSize: 12)),
+            Text('${i18n.t('connectedMasters')}: $totalClients', style: const TextStyle(fontSize: 12)),
             const SizedBox(width: 20),
-            Text('RX 接收: $totalRx 帧', style: const TextStyle(fontSize: 12)),
+            Text('${i18n.t('rxReceived')}: $totalRx ${i18n.t('frames')}', style: const TextStyle(fontSize: 12)),
             const SizedBox(width: 16),
-            Text('TX 发送: $totalTx 帧', style: const TextStyle(fontSize: 12)),
+            Text('${i18n.t('txSent')}: $totalTx ${i18n.t('frames')}', style: const TextStyle(fontSize: 12)),
             const Spacer(),
             if (isSimRunning)
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.waves, size: 14, color: Colors.green),
-                  SizedBox(width: 4),
-                  Text('数据模拟运行中', style: TextStyle(fontSize: 12, color: Colors.green)),
-                  SizedBox(width: 16),
+                  const Icon(Icons.waves, size: 14, color: Colors.green),
+                  const SizedBox(width: 4),
+                  Text(i18n.t('simRunningStatus'), style: const TextStyle(fontSize: 12, color: Colors.green)),
+                  const SizedBox(width: 16),
                 ],
               ),
-            Text('Modbus RTU / TCP / UDP 从站仿真', style: TextStyle(fontSize: 11, color: theme.colorScheme.outline)),
+            Text(i18n.t('footerNote'), style: TextStyle(fontSize: 11, color: theme.colorScheme.outline)),
           ],
         ),
       ),

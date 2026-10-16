@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'package:flutter/material.dart';
 import '../../models/slave_model.dart';
 import '../../protocol/modbus_data_types.dart';
@@ -53,7 +54,7 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
 
     if (id < 1 || id > 247) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('从站ID必须在 1 ~ 247 之间')),
+        const SnackBar(content: Text('Slave ID: 1-247')),
       );
       return;
     }
@@ -83,7 +84,7 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
   Widget build(BuildContext context) {
     final isEdit = widget.slave != null;
     return AlertDialog(
-      title: Text(isEdit ? '编辑从站设备' : '添加从站设备 (Add Slave)'),
+      title: Text(isEdit ? AppI18n.instance.t('editSlaveTitle') : AppI18n.instance.t('newSlaveTitle')),
       content: SizedBox(
         width: 420,
         child: SingleChildScrollView(
@@ -93,7 +94,7 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
               TextField(
                 controller: _nameCtrl,
                 decoration: const InputDecoration(
-                  labelText: '从站名称 (Slave Name)',
+                  labelText: AppI18n.instance.t('slaveAlias'),
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.devices_other),
                 ),
@@ -102,7 +103,7 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
               TextField(
                 controller: _idCtrl,
                 decoration: const InputDecoration(
-                  labelText: '从站地址 Unit ID (1 ~ 247)',
+                  labelText: AppI18n.instance.t('slaveId'),
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.pin),
                 ),
@@ -112,7 +113,7 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
               TextField(
                 controller: _scanRateCtrl,
                 decoration: const InputDecoration(
-                  labelText: '巡检扫描周期 Scan Rate (ms)',
+                  labelText: AppI18n.instance.t('respDelay'),
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.timer),
                 ),
@@ -122,14 +123,14 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
               DropdownButtonFormField<int>(
                 initialValue: _addressType,
                 decoration: const InputDecoration(
-                  labelText: '寄存器地址基数类型 (Address Base)',
+                  labelText: AppI18n.instance.t('addrBase'),
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.format_list_numbered),
                 ),
                 items: const [
-                  DropdownMenuItem(value: 0, child: Text('0-based (协议原生 00000 起始)')),
-                  DropdownMenuItem(value: 1, child: Text('1-based (自然计数 00001 起始)')),
-                  DropdownMenuItem(value: 2, child: Text('PLC标准 (40001/30001/10001)')),
+                  DropdownMenuItem(value: 0, child: Text('0-based (00000 - 09999)')),
+                  DropdownMenuItem(value: 1, child: Text('1-based (00001 - 10000)')),
+                  DropdownMenuItem(value: 2, child: Text('PLC Modicon (0x/1x/3x/40001+)')),
                 ],
                 onChanged: (v) => setState(() => _addressType = v ?? 0),
               ),
@@ -137,7 +138,7 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
               DropdownButtonFormField<ModbusByteOrder>(
                 initialValue: _byteOrder,
                 decoration: const InputDecoration(
-                  labelText: '默认字节序 (Byte Order)',
+                  labelText: AppI18n.instance.t('byteOrder'),
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.swap_horiz),
                 ),
@@ -148,8 +149,8 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
               ),
               const SizedBox(height: 8),
               SwitchListTile(
-                title: const Text('手动刷新模式 (禁止自动轮询)'),
-                subtitle: const Text('开启后只有点击刷新按钮才会下发采集请求'),
+                title: Text(AppI18n.instance.t('pollPaused')),
+                subtitle: Text(AppI18n.instance.t('pollTooltipPaused')),
                 value: _isManual,
                 onChanged: (v) => setState(() => _isManual = v),
               ),
@@ -160,11 +161,11 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(AppI18n.instance.t('cancel')),
         ),
         ElevatedButton(
           onPressed: _save,
-          child: Text(isEdit ? '保存更改' : '添加从站'),
+          child: Text(isEdit ? AppI18n.instance.t('save') : AppI18n.instance.t('confirm')),
         ),
       ],
     );

@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'package:flutter/material.dart';
 import '../../protocol/goose_publisher.dart';
 import '../../protocol/iec61850_server_manager.dart';
@@ -21,6 +22,7 @@ class _GooseTabState extends State<GooseTab> {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = AppI18n.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final items = widget.manager.gooseService.items;
     final svControls = widget.manager.engine.scl?.svControls ?? [];
@@ -32,12 +34,12 @@ class _GooseTabState extends State<GooseTab> {
           children: [
             const Icon(Icons.send_outlined, size: 48, color: Colors.grey),
             const SizedBox(height: 12),
-            const Text('当前 SCL 模型未配置 GOOSE 控制块 (GSEControl) 或采样值 (SampledValueControl)',
-                style: TextStyle(color: Colors.grey)),
+            Text(i18n.t('noGooseConfigured'),
+                style: const TextStyle(color: Colors.grey)),
             const SizedBox(height: 16),
             FilledButton.tonalIcon(
               icon: const Icon(Icons.auto_stories),
-              label: const Text('加载内置 GOOSE 保护示例 (server_example_goose.icd)'),
+              label: Text(i18n.t('loadGooseExample')),
               onPressed: () {
                 // SCL tools tab can load this template
                 DefaultTabController.of(context).animateTo(6);
@@ -124,7 +126,7 @@ class _GooseTabState extends State<GooseTab> {
                               const SizedBox(width: 12),
                               Text('sqNum: ${item.sqNum}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
                               const Spacer(),
-                              Text('总发送: ${item.totalPacketsSent}',
+                              Text('${i18n.t("totalSent")}: ${item.totalPacketsSent}',
                                   style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                             ],
                           ),
@@ -142,7 +144,7 @@ class _GooseTabState extends State<GooseTab> {
         Expanded(
           flex: 6,
           child: _selectedItem == null
-              ? const Center(child: Text('在左侧选择一个 GOOSE 控制块查看报文及状态', style: TextStyle(color: Colors.grey)))
+              ? Center(child: Text(i18n.t('selectGooseHint'), style: const TextStyle(color: Colors.grey)))
               : _buildItemDetails(_selectedItem!),
         ),
       ],
@@ -150,6 +152,7 @@ class _GooseTabState extends State<GooseTab> {
   }
 
   Widget _buildItemDetails(GoosePublisherItem item) {
+    final i18n = AppI18n.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return SingleChildScrollView(
@@ -166,7 +169,7 @@ class _GooseTabState extends State<GooseTab> {
                   color: Colors.teal[700],
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: const Text('GOOSE 控制块', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                child: Text(i18n.t('gcbTitle'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -177,14 +180,14 @@ class _GooseTabState extends State<GooseTab> {
               ),
               FilledButton.icon(
                 icon: const Icon(Icons.bolt, size: 16),
-                label: const Text('模拟状态变位 (stNum++)'),
+                label: Text(i18n.t('simStateChange')),
                 onPressed: () {
                   widget.manager.gooseService.triggerItemEvent(item);
                   setState(() {});
                   widget.onDataChanged();
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('已触发 GOOSE ${item.control.name} 变位事件！stNum=${item.stNum}'),
+                      content: Text('${i18n.t("stateChangeTriggered")} ${item.control.name} stNum=${item.stNum}'),
                       duration: const Duration(seconds: 2),
                     ),
                   );
@@ -201,20 +204,20 @@ class _GooseTabState extends State<GooseTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('GOOSE 发送参数 (IEC 61850-8-1)', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(i18n.t('gooseParamsTitle'), style: const TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
                   _infoRow('GoID / AppID', '0x${item.control.appId.toRadixString(16).padLeft(4, '0')} (${item.control.goId})'),
-                  _infoRow('组播目标 MAC (dstAddress)', item.control.dstAddress),
-                  _infoRow('数据集名称 (datSet)', item.control.datSet),
-                  _infoRow('配置版本 (ConfRev)', item.control.confRev.toString()),
-                  _infoRow('最小重传间隔 (minTime)', '${item.control.minTime} ms'),
-                  _infoRow('心跳保活间隔 (maxTime)', '${item.control.maxTime} ms'),
-                  _infoRow('当前发送周期', '${item.currentIntervalMs} ms'),
-                  _infoRow('状态编号 (stNum)', item.stNum.toString()),
-                  _infoRow('序号 (sqNum)', item.sqNum.toString()),
-                  _infoRow('累计发布包数', item.totalPacketsSent.toString()),
+                  _infoRow(i18n.t('dstMac'), item.control.dstAddress),
+                  _infoRow(i18n.t('dataSetName'), item.control.datSet),
+                  _infoRow(i18n.t('confRevLabel'), item.control.confRev.toString()),
+                  _infoRow(i18n.t('minInterval'), '${item.control.minTime} ms'),
+                  _infoRow(i18n.t('maxInterval'), '${item.control.maxTime} ms'),
+                  _infoRow(i18n.t('currentInterval'), '${item.currentIntervalMs} ms'),
+                  _infoRow(i18n.t('stNumLabel'), item.stNum.toString()),
+                  _infoRow(i18n.t('sqNumLabel'), item.sqNum.toString()),
+                  _infoRow(i18n.t('totalPacketsSent'), item.totalPacketsSent.toString()),
                   if (item.lastPublishTime != null)
-                    _infoRow('最近发布时间', item.lastPublishTime!.toIso8601String().substring(11, 23)),
+                    _infoRow(i18n.t('lastPublishTime'), item.lastPublishTime!.toIso8601String().substring(11, 23)),
                 ],
               ),
             ),
@@ -233,14 +236,14 @@ class _GooseTabState extends State<GooseTab> {
                       const Icon(Icons.code, size: 18),
                       const SizedBox(width: 8),
                       Text(
-                        '最新发送 GOOSE 原始报文帧 (${item.lastPacket?.length ?? 0} 字节)',
+                        '${i18n.t("latestGooseFrame")} (${item.lastPacket?.length ?? 0} ${i18n.t("bytesUnit")})',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
                   if (item.lastPacket == null)
-                    const Text('尚未发送报文，请先开启发布', style: TextStyle(color: Colors.grey))
+                    Text(i18n.t('noGooseSentYet'), style: const TextStyle(color: Colors.grey))
                   else
                     Container(
                       width: double.infinity,

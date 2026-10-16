@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import '../../i18n/app_i18n.dart';
 import '../../services/traffic_logger.dart';
 
 class TrafficTab extends StatefulWidget {
@@ -58,7 +59,7 @@ class _TrafficTabState extends State<TrafficTab> {
     final f = File(path);
     f.writeAsStringSync(text);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('报文日志已成功导出至：$path')),
+      SnackBar(content: Text('${AppI18n.instance.t("trafficExported")}$path')),
     );
   }
 
@@ -66,6 +67,7 @@ class _TrafficTabState extends State<TrafficTab> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final allEntries = _logger.entries;
+    final i18n = AppI18n.instance;
 
     final filtered = allEntries.where((e) {
       if (_directionFilter == 'RX' && e.direction != TrafficDirection.rx) return false;
@@ -95,7 +97,7 @@ class _TrafficTabState extends State<TrafficTab> {
                 child: TextField(
                   controller: _searchCtrl,
                   decoration: InputDecoration(
-                    hintText: '搜索报文内容...',
+                    hintText: i18n.t('searchTrafficHint'),
                     prefixIcon: const Icon(Icons.search, size: 18),
                     isDense: true,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
@@ -107,12 +109,12 @@ class _TrafficTabState extends State<TrafficTab> {
               DropdownButton<String>(
                 value: _protocolFilter,
                 underline: const SizedBox(),
-                items: const [
-                  DropdownMenuItem(value: 'ALL', child: Text('协议: 全部')),
-                  DropdownMenuItem(value: 'MMS', child: Text('协议: MMS')),
-                  DropdownMenuItem(value: 'GOOSE', child: Text('协议: GOOSE')),
-                  DropdownMenuItem(value: 'COTP', child: Text('协议: COTP')),
-                  DropdownMenuItem(value: 'ACSE', child: Text('协议: ACSE')),
+                items: [
+                  DropdownMenuItem(value: 'ALL', child: Text(i18n.t('protoAll'))),
+                  DropdownMenuItem(value: 'MMS', child: Text(i18n.t('protoMms'))),
+                  DropdownMenuItem(value: 'GOOSE', child: Text(i18n.t('protoGoose'))),
+                  DropdownMenuItem(value: 'COTP', child: Text(i18n.t('protoCotp'))),
+                  DropdownMenuItem(value: 'ACSE', child: Text(i18n.t('protoAcse'))),
                 ],
                 onChanged: (val) {
                   if (val != null) setState(() => _protocolFilter = val);
@@ -123,10 +125,10 @@ class _TrafficTabState extends State<TrafficTab> {
               DropdownButton<String>(
                 value: _directionFilter,
                 underline: const SizedBox(),
-                items: const [
-                  DropdownMenuItem(value: 'ALL', child: Text('方向: 全部 (RX/TX)')),
-                  DropdownMenuItem(value: 'RX', child: Text('方向: 仅接收 (RX)')),
-                  DropdownMenuItem(value: 'TX', child: Text('方向: 仅发送 (TX)')),
+                items: [
+                  DropdownMenuItem(value: 'ALL', child: Text(i18n.t('dirAll'))),
+                  DropdownMenuItem(value: 'RX', child: Text(i18n.t('dirRxOnly'))),
+                  DropdownMenuItem(value: 'TX', child: Text(i18n.t('dirTxOnly'))),
                 ],
                 onChanged: (val) {
                   if (val != null) setState(() => _directionFilter = val);
@@ -135,7 +137,7 @@ class _TrafficTabState extends State<TrafficTab> {
               const Spacer(),
               // Auto-Scroll Toggle
               FilterChip(
-                label: const Text('自动滚屏'),
+                label: Text(i18n.t('autoScroll')),
                 selected: _autoScroll,
                 onSelected: (val) => setState(() => _autoScroll = val),
               ),
@@ -144,7 +146,7 @@ class _TrafficTabState extends State<TrafficTab> {
               IconButton(
                 icon: Icon(_logger.isLoggingEnabled ? Icons.pause_circle : Icons.play_circle),
                 color: _logger.isLoggingEnabled ? Colors.orange : Colors.green,
-                tooltip: _logger.isLoggingEnabled ? '暂停抓包' : '恢复抓包',
+                tooltip: _logger.isLoggingEnabled ? i18n.t('pauseCapture') : i18n.t('resumeCapture'),
                 onPressed: () {
                   setState(() {
                     _logger.isLoggingEnabled = !_logger.isLoggingEnabled;
@@ -154,7 +156,7 @@ class _TrafficTabState extends State<TrafficTab> {
               // Clear Log
               IconButton(
                 icon: const Icon(Icons.delete_outline),
-                tooltip: '清空报文',
+                tooltip: i18n.t('clearTraffic'),
                 onPressed: () {
                   _logger.clear();
                   setState(() => _selectedEntry = null);
@@ -163,7 +165,7 @@ class _TrafficTabState extends State<TrafficTab> {
               // Export Log
               IconButton(
                 icon: const Icon(Icons.file_download_outlined),
-                tooltip: '导出报文日志',
+                tooltip: i18n.t('exportTraffic'),
                 onPressed: _exportLog,
               ),
             ],
@@ -182,7 +184,7 @@ class _TrafficTabState extends State<TrafficTab> {
                     border: Border(right: BorderSide(color: isDark ? Colors.grey[800]! : Colors.grey[300]!)),
                   ),
                   child: filtered.isEmpty
-                      ? const Center(child: Text('暂无报文数据', style: TextStyle(color: Colors.grey)))
+                      ? Center(child: Text(i18n.t('noTraffic'), style: const TextStyle(color: Colors.grey)))
                       : ListView.builder(
                           controller: _scrollController,
                           itemCount: filtered.length,
@@ -236,8 +238,8 @@ class _TrafficTabState extends State<TrafficTab> {
               Expanded(
                 flex: 6,
                 child: _selectedEntry == null
-                    ? const Center(child: Text('在左侧列表中点击报文查看十六进制与结构解析', style: TextStyle(color: Colors.grey)))
-                    : _buildPacketDetails(_selectedEntry!),
+                    ? Center(child: Text(i18n.t('clickTrafficHint'), style: const TextStyle(color: Colors.grey)))
+                    : _buildPacketDetails(_selectedEntry!, i18n),
               ),
             ],
           ),
@@ -246,7 +248,7 @@ class _TrafficTabState extends State<TrafficTab> {
     );
   }
 
-  Widget _buildPacketDetails(TrafficEntry entry) {
+  Widget _buildPacketDetails(TrafficEntry entry, AppI18n i18n) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return SingleChildScrollView(
@@ -267,14 +269,14 @@ class _TrafficTabState extends State<TrafficTab> {
                 ),
               ),
               Text(
-                '${entry.rawBytes.length} 字节',
+                '${entry.rawBytes.length} ${i18n.t("bytesUnit")}',
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.grey),
               ),
             ],
           ),
           const SizedBox(height: 8),
           Text(
-            '时间: ${entry.timestamp.toIso8601String()}  |  对端地址: ${entry.clientEndpoint}',
+            '${i18n.t("timeLabel")}: ${entry.timestamp.toIso8601String()}  |  ${i18n.t("peerAddr")}: ${entry.clientEndpoint}',
             style: TextStyle(fontSize: 12, color: isDark ? Colors.grey[400] : Colors.grey[600]),
           ),
           const SizedBox(height: 16),
@@ -286,7 +288,7 @@ class _TrafficTabState extends State<TrafficTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('报文摘要与字段解析', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                  Text(i18n.t('packetSummaryTitle'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                   const SizedBox(height: 6),
                   SelectableText(entry.summary, style: const TextStyle(fontSize: 13)),
                   if (entry.details.isNotEmpty) ...[
@@ -306,11 +308,11 @@ class _TrafficTabState extends State<TrafficTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.terminal, size: 16),
-                      SizedBox(width: 6),
-                      Text('原始十六进制转储 (Hex & ASCII Dump)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                      const Icon(Icons.terminal, size: 16),
+                      const SizedBox(width: 6),
+                      Text(i18n.t('hexDumpTitle'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -322,7 +324,7 @@ class _TrafficTabState extends State<TrafficTab> {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: SelectableText(
-                      entry.rawBytes.isEmpty ? '(空载荷)' : entry.hexDump,
+                      entry.rawBytes.isEmpty ? i18n.t('emptyPayload') : entry.hexDump,
                       style: const TextStyle(fontFamily: 'monospace', fontSize: 11),
                     ),
                   ),

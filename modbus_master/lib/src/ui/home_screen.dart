@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:window_manager/window_manager.dart';
+import '../i18n/app_i18n.dart';
 import '../models/connection_config.dart';
 import '../models/workspace_storage.dart';
 import '../protocol/modbus_client.dart';
@@ -11,16 +13,20 @@ import 'tabs/commands_tab.dart';
 import 'tabs/traffic_tab.dart';
 import 'tabs/tools_tab.dart';
 import 'tabs/chart_tab.dart';
+import 'widgets/language_picker.dart';
 import 'widgets/modbus_master_icon.dart';
+import 'widgets/window_title_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   final VoidCallback? onToggleTheme;
   final bool isDarkMode;
+  final VoidCallback? onLanguageChanged;
 
   const HomeScreen({
     super.key,
     this.onToggleTheme,
     this.isDarkMode = true,
+    this.onLanguageChanged,
   });
 
   @override
@@ -95,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
       await _switchActiveConnection(newConn);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('已添加并切换至新连接: ${newConn.name}')),
+          SnackBar(content: Text('${AppI18n.instance.t('newConn')}: ${newConn.name}')),
         );
       }
     }
@@ -104,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _onDeleteConnection(ConnectionConfig conn) async {
     if (_connections.length <= 1) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('至少需保留一个通信连接配置，无法删除当前唯一连接。')),
+        SnackBar(content: Text(AppI18n.instance.t('deleteConn'))),
       );
       return;
     }
@@ -130,7 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await _saveWorkspace();
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('已删除连接: ${conn.name}')),
+        SnackBar(content: Text('${AppI18n.instance.t('deleteConn')}: ${conn.name}')),
       );
     }
   }
@@ -150,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('工程配置已保存至: ${WorkspaceStorage.defaultFilePath}'),
+          content: Text('${AppI18n.instance.t('saveWorkspace')} -> ${WorkspaceStorage.defaultFilePath}'),
           duration: const Duration(seconds: 2),
         ),
       );
@@ -182,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               CircularProgressIndicator(),
               SizedBox(height: 16),
-              Text('正在载入 Modbus Master 工作区配置...'),
+              Text(AppI18n.instance.t('waitingInput')),
             ],
           ),
         ),
@@ -190,94 +196,48 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     final isConnected = _client.state == ModbusConnectionState.connected;
+    final i18n = AppI18n.instance;
 
     // Build connection label for app bar badge
     String peerBadge;
     if (_activeConfig.mode == ModbusTransportMode.virtual) {
-      peerBadge = '虚拟仿真运行中';
+      peerBadge = i18n.t('virtualSim');
     } else if (isConnected) {
       if (_activeConfig.mode == ModbusTransportMode.serialRtu) {
-        peerBadge = '已连接: ${_activeConfig.serialPortName ?? "串口"}';
+        peerBadge = '${i18n.t('connected')}: ${_activeConfig.serialPortName ?? "COM"}';
       } else {
-        peerBadge = '已连接: ${_activeConfig.ip}:${_activeConfig.port}';
+        peerBadge = '${i18n.t('connected')}: ${_activeConfig.ip}:${_activeConfig.port}';
       }
     } else {
-      peerBadge = '未连接';
+      peerBadge = i18n.t('disconnected');
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withAlpha(80),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: const Color(0xFF10B981), width: 1.2),
-              ),
-              child: const ModbusMasterIcon(size: 20, color: Color(0xFF10B981)),
-            ),
-            const SizedBox(width: 10),
-            const Flexible(
-              child: Text(
-                'Modbus Master Emulator (主站客户端仿真器)',
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceVariant,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: const Text('v1.0.0', style: TextStyle(fontSize: 11)),
-            ),
-            const SizedBox(width: 12),
-
-            // Connection selector dropdown in AppBar
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: theme.dividerColor),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<ConnectionConfig>(
-                  value: _activeConfig,
-                  style: TextStyle(
-                    color: theme.colorScheme.onSurface,
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  items: _connections.map((c) {
-                    final desc = c.mode == ModbusTransportMode.serialRtu
-                        ? (c.serialPortName ?? '串口')
-                        : (c.mode == ModbusTransportMode.virtual ? '虚拟' : '${c.ip}:${c.port}');
-                    return DropdownMenuItem(
-                      value: c,
-                      child: Text('🔌 ${c.name} ($desc)'),
-                    );
-                  }).toList(),
-                  onChanged: (newConn) {
-                    if (newConn != null && newConn != _activeConfig) {
-                      _switchActiveConnection(newConn);
-                    }
-                  },
+        automaticallyImplyLeading: false,
+        titleSpacing: 0,
+        leading: WindowManagerHelper.isSupportedPlatform
+            ? DragToMoveArea(
+                child: const Padding(
+                  padding: EdgeInsets.only(left: 12),
+                  child: ModbusMasterIcon(size: 26, color: Color(0xFF10B981)),
                 ),
+              )
+            : const Padding(
+                padding: EdgeInsets.only(left: 12),
+                child: ModbusMasterIcon(size: 26, color: Color(0xFF10B981)),
               ),
-            ),
-
-            IconButton(
-              icon: const Icon(Icons.add_circle_outline, size: 20),
-              tooltip: '新建通信连接 (Add Connection)',
-              onPressed: _onAddConnection,
-            ),
-          ],
-        ),
+        flexibleSpace: WindowManagerHelper.isSupportedPlatform
+            ? const DragToMoveArea(child: SizedBox.expand())
+            : null,
+        title: WindowManagerHelper.isSupportedPlatform
+            ? DragToMoveArea(
+                child: SizedBox(
+                  height: 48,
+                  child: _buildTitleRow(theme, i18n),
+                ),
+              )
+            : _buildTitleRow(theme, i18n),
         actions: [
           // Connection Status indicator
           Container(
@@ -308,7 +268,7 @@ class _HomeScreenState extends State<HomeScreen> {
               size: 16,
               color: isConnected ? Colors.red : Colors.green,
             ),
-            label: Text(isConnected ? '断开' : '连接'),
+            label: Text(isConnected ? i18n.t('disconnect') : i18n.t('connect')),
             onPressed: () async {
               final messenger = ScaffoldMessenger.of(context);
               if (isConnected) {
@@ -323,7 +283,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 } catch (e) {
                   if (mounted) {
                     messenger.showSnackBar(
-                      SnackBar(content: Text('连接失败: $e'), backgroundColor: Colors.red),
+                      SnackBar(content: Text('${AppI18n.instance.t('connect')} failed: $e'), backgroundColor: Colors.red),
                     );
                   }
                 }
@@ -339,7 +299,7 @@ class _HomeScreenState extends State<HomeScreen> {
               _pollingService.isRunning ? Icons.autorenew : Icons.pause_circle_outline,
               color: _pollingService.isRunning ? Colors.green : Colors.grey,
             ),
-            tooltip: _pollingService.isRunning ? '轮询中 (点击暂停自动轮询)' : '已暂停 (点击恢复自动轮询)',
+            tooltip: _pollingService.isRunning ? i18n.t('pollTooltipRunning') : i18n.t('pollTooltipPaused'),
             onPressed: () {
               setState(() {
                 if (_pollingService.isRunning) {
@@ -354,7 +314,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // Save Workspace button
           IconButton(
             icon: const Icon(Icons.save_outlined),
-            tooltip: '保存工程配置到本地',
+            tooltip: i18n.t('saveWorkspace'),
             onPressed: _saveWorkspace,
           ),
 
@@ -362,10 +322,19 @@ class _HomeScreenState extends State<HomeScreen> {
           if (widget.onToggleTheme != null)
             IconButton(
               icon: Icon(widget.isDarkMode ? Icons.light_mode : Icons.dark_mode),
-              tooltip: widget.isDarkMode ? '切换为亮色模式' : '切换为暗色模式',
+              tooltip: widget.isDarkMode ? i18n.t('themeLight') : i18n.t('themeDark'),
               onPressed: widget.onToggleTheme,
             ),
-          const SizedBox(width: 8),
+
+          LanguagePickerButton(
+            onLanguageChanged: () {
+              setState(() {});
+              widget.onLanguageChanged?.call();
+            },
+          ),
+          const SizedBox(width: 4),
+
+          WindowControls(brightness: theme.brightness),
         ],
       ),
       body: Row(
@@ -379,36 +348,36 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: EdgeInsets.symmetric(vertical: 8),
               child: Icon(Icons.precision_manufacturing_outlined, size: 28),
             ),
-            destinations: const [
+            destinations: [
               NavigationRailDestination(
-                icon: Icon(Icons.grid_view_outlined),
-                selectedIcon: Icon(Icons.grid_view),
-                label: Text('寄存器视图'),
+                icon: const Icon(Icons.grid_view_outlined),
+                selectedIcon: const Icon(Icons.grid_view),
+                label: Text(i18n.t('tabRegisters')),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.account_tree_outlined),
-                selectedIcon: Icon(Icons.account_tree),
-                label: Text('连接与从站'),
+                icon: const Icon(Icons.account_tree_outlined),
+                selectedIcon: const Icon(Icons.account_tree),
+                label: Text(i18n.t('tabConnections')),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.send_outlined),
-                selectedIcon: Icon(Icons.send),
-                label: Text('指令中心'),
+                icon: const Icon(Icons.send_outlined),
+                selectedIcon: const Icon(Icons.send),
+                label: Text(i18n.t('tabCommands')),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.sync_alt_outlined),
-                selectedIcon: Icon(Icons.sync_alt),
-                label: Text('报文监控'),
+                icon: const Icon(Icons.sync_alt_outlined),
+                selectedIcon: const Icon(Icons.sync_alt),
+                label: Text(i18n.t('tabTraffic')),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.construction_outlined),
-                selectedIcon: Icon(Icons.construction),
-                label: Text('实用工具'),
+                icon: const Icon(Icons.construction_outlined),
+                selectedIcon: const Icon(Icons.construction),
+                label: Text(i18n.t('tabTools')),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.show_chart_outlined),
-                selectedIcon: Icon(Icons.show_chart),
-                label: Text('趋势曲线'),
+                icon: const Icon(Icons.show_chart_outlined),
+                selectedIcon: const Icon(Icons.show_chart),
+                label: Text(i18n.t('tabCharts')),
               ),
             ],
           ),
@@ -473,22 +442,86 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(width: 6),
               Text(peerBadge, style: const TextStyle(fontSize: 12)),
               const SizedBox(width: 20),
-              Text('当前连接: ${_activeConfig.name}', style: const TextStyle(fontSize: 12)),
+              Text('${AppI18n.instance.t('connAlias')}: ${_activeConfig.name}', style: const TextStyle(fontSize: 12)),
               const SizedBox(width: 20),
-              Text('从站数量: ${_activeConfig.slaves.length} 个', style: const TextStyle(fontSize: 12)),
+              Text('${AppI18n.instance.t('slavesList')}: ${_activeConfig.slaves.length}', style: const TextStyle(fontSize: 12)),
               const SizedBox(width: 20),
               Text(
                 _pollingService.isRunning
-                    ? '自动轮询中 (${_activeConfig.pollingIntervalMs}ms)'
-                    : '自动轮询已暂停',
+                    ? '${AppI18n.instance.t('pollRunning')} (${_activeConfig.pollingIntervalMs}ms)'
+                    : AppI18n.instance.t('pollPaused'),
                 style: const TextStyle(fontSize: 12),
               ),
               const SizedBox(width: 20),
-              Text('Modbus RTU / TCP / UDP 主站客户端仿真', style: TextStyle(fontSize: 11, color: theme.colorScheme.outline)),
+              Text(AppI18n.instance.t('footerNote'), style: TextStyle(fontSize: 11, color: theme.colorScheme.outline)),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTitleRow(ThemeData theme, AppI18n i18n) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Flexible(
+          child: Text(
+            i18n.t('appTitle'),
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceVariant,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: const Text('v1.0.0', style: TextStyle(fontSize: 11)),
+        ),
+        const SizedBox(width: 12),
+
+        // Connection selector dropdown in AppBar
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: theme.dividerColor),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<ConnectionConfig>(
+              value: _activeConfig,
+              style: TextStyle(
+                color: theme.colorScheme.onSurface,
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
+              items: _connections.map((c) {
+                final desc = c.mode == ModbusTransportMode.serialRtu
+                    ? (c.serialPortName ?? 'COM')
+                    : (c.mode == ModbusTransportMode.virtual ? 'Sim' : '${c.ip}:${c.port}');
+                return DropdownMenuItem(
+                  value: c,
+                  child: Text('🔌 ${c.name} ($desc)'),
+                );
+              }).toList(),
+              onChanged: (newConn) {
+                if (newConn != null && newConn != _activeConfig) {
+                  _switchActiveConnection(newConn);
+                }
+              },
+            ),
+          ),
+        ),
+
+        IconButton(
+          icon: const Icon(Icons.add_circle_outline, size: 20),
+          tooltip: i18n.t('addConnection'),
+          onPressed: _onAddConnection,
+        ),
+      ],
     );
   }
 }

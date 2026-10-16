@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'package:flutter/material.dart';
 import '../../models/scl_models.dart';
 import '../../models/server_variable_model.dart';
@@ -45,6 +46,7 @@ class _DataMonitorTabState extends State<DataMonitorTab> {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = AppI18n.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final allVars = widget.manager.engine.allVariables;
 
@@ -77,7 +79,7 @@ class _DataMonitorTabState extends State<DataMonitorTab> {
                 child: TextField(
                   controller: _searchCtrl,
                   decoration: InputDecoration(
-                    hintText: '搜索变量 (如 mag, stVal)...',
+                    hintText: i18n.t('searchVars'),
                     prefixIcon: const Icon(Icons.search, size: 18),
                     suffixIcon: _searchText.isNotEmpty
                         ? IconButton(icon: const Icon(Icons.clear, size: 16), onPressed: () => _searchCtrl.clear())
@@ -90,14 +92,14 @@ class _DataMonitorTabState extends State<DataMonitorTab> {
               const SizedBox(width: 12),
               // Pinned Filter
               FilterChip(
-                label: const Text('仅显示关注变量'),
+                label: Text(i18n.t('onlyMonitored')),
                 selected: _onlyMonitored,
                 onSelected: (val) => setState(() => _onlyMonitored = val),
               ),
               const SizedBox(width: 8),
               // Simulation Filter
               FilterChip(
-                label: const Text('仅显示波形仿真中'),
+                label: Text(i18n.t('onlySimulated')),
                 selected: _onlySimulated,
                 onSelected: (val) => setState(() => _onlySimulated = val),
               ),
@@ -107,12 +109,12 @@ class _DataMonitorTabState extends State<DataMonitorTab> {
                 value: _fcFilter,
                 underline: const SizedBox(),
                 items: const [
-                  DropdownMenuItem(value: 'ALL', child: Text('FC: 全部')),
-                  DropdownMenuItem(value: 'ST', child: Text('FC: ST (状态)')),
-                  DropdownMenuItem(value: 'MX', child: Text('FC: MX (遥测)')),
-                  DropdownMenuItem(value: 'CO', child: Text('FC: CO (控制)')),
-                  DropdownMenuItem(value: 'SP', child: Text('FC: SP (定值)')),
-                  DropdownMenuItem(value: 'CF', child: Text('FC: CF (配置)')),
+                  DropdownMenuItem(value: 'ALL', child: Text(i18n.t('fcAll'))),
+                  DropdownMenuItem(value: 'ST', child: Text(i18n.t('fcSt'))),
+                  DropdownMenuItem(value: 'MX', child: Text(i18n.t('fcMx'))),
+                  DropdownMenuItem(value: 'CO', child: Text(i18n.t('fcCo'))),
+                  DropdownMenuItem(value: 'SP', child: Text(i18n.t('fcSp'))),
+                  DropdownMenuItem(value: 'CF', child: Text(i18n.t('fcCf'))),
                 ],
                 onChanged: (val) {
                   if (val != null) setState(() => _fcFilter = val);
@@ -122,7 +124,7 @@ class _DataMonitorTabState extends State<DataMonitorTab> {
               // Global Simulation Actions
               OutlinedButton.icon(
                 icon: const Icon(Icons.play_arrow, size: 16, color: Colors.green),
-                label: const Text('启动全部仿真'),
+                label: Text(i18n.t('startAllSim')),
                 onPressed: () {
                   for (final v in allVars) {
                     if (v.fc == FunctionalConstraint.mx) {
@@ -140,7 +142,7 @@ class _DataMonitorTabState extends State<DataMonitorTab> {
               const SizedBox(width: 8),
               OutlinedButton.icon(
                 icon: const Icon(Icons.stop, size: 16, color: Colors.red),
-                label: const Text('停止全部仿真'),
+                label: Text(i18n.t('stopAllSim')),
                 onPressed: () {
                   for (final v in allVars) {
                     v.simulation.enabled = false;
@@ -157,7 +159,7 @@ class _DataMonitorTabState extends State<DataMonitorTab> {
         // Variables Table
         Expanded(
           child: filtered.isEmpty
-              ? const Center(child: Text('无匹配变量数据', style: TextStyle(color: Colors.grey)))
+              ? Center(child: Text(i18n.t('noMatchingVarData'), style: const TextStyle(color: Colors.grey)))
               : SingleChildScrollView(
                   scrollDirection: Axis.vertical,
                   child: SingleChildScrollView(
@@ -168,16 +170,16 @@ class _DataMonitorTabState extends State<DataMonitorTab> {
                       headingRowHeight: 40,
                       dataRowMinHeight: 42,
                       dataRowMaxHeight: 46,
-                      columns: const [
-                        DataColumn(label: Text('关注', style: TextStyle(fontWeight: FontWeight.bold))),
-                        DataColumn(label: Text('变量标识 (Reference)', style: TextStyle(fontWeight: FontWeight.bold))),
-                        DataColumn(label: Text('FC', style: TextStyle(fontWeight: FontWeight.bold))),
-                        DataColumn(label: Text('类型', style: TextStyle(fontWeight: FontWeight.bold))),
-                        DataColumn(label: Text('当前值 (Live Value)', style: TextStyle(fontWeight: FontWeight.bold))),
-                        DataColumn(label: Text('品质状态', style: TextStyle(fontWeight: FontWeight.bold))),
-                        DataColumn(label: Text('更新时间', style: TextStyle(fontWeight: FontWeight.bold))),
-                        DataColumn(label: Text('波形仿真', style: TextStyle(fontWeight: FontWeight.bold))),
-                        DataColumn(label: Text('操作', style: TextStyle(fontWeight: FontWeight.bold))),
+                      columns: [
+                        DataColumn(label: Text(i18n.t('colPin'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                        DataColumn(label: Text(i18n.t('colRef'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                        const DataColumn(label: Text('FC', style: TextStyle(fontWeight: FontWeight.bold))),
+                        DataColumn(label: Text(i18n.t('colType'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                        DataColumn(label: Text(i18n.t('colVal'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                        DataColumn(label: Text(i18n.t('colQuality'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                        DataColumn(label: Text(i18n.t('colTime'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                        DataColumn(label: Text(i18n.t('colSim'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                        DataColumn(label: Text(i18n.t('colAction'), style: const TextStyle(fontWeight: FontWeight.bold))),
                       ],
                       rows: filtered.map((v) {
                         return DataRow(
@@ -286,12 +288,12 @@ class _DataMonitorTabState extends State<DataMonitorTab> {
                                 children: [
                                   IconButton(
                                     icon: const Icon(Icons.edit, size: 16),
-                                    tooltip: '写入数据',
+                                    tooltip: i18n.t('writeValueTooltip'),
                                     onPressed: () => _openWriteDialog(v),
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.waves, size: 16),
-                                    tooltip: '波形仿真',
+                                    tooltip: i18n.t('colSim'),
                                     onPressed: () => _openSimDialog(v),
                                   ),
                                 ],

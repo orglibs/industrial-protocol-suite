@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../models/scl_models.dart';
@@ -41,12 +42,13 @@ class _ReportsTabState extends State<ReportsTab> {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = AppI18n.instance;
     final engine = widget.manager.activeEngine;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (engine == null) {
       return const Center(
-        child: Text('请先选择或创建一个连接', style: TextStyle(color: Colors.grey, fontSize: 16)),
+        child: Text(i18n.t('selectConnFirstReports'), style: const TextStyle(color: Colors.grey, fontSize: 16)),
       );
     }
 
@@ -75,7 +77,7 @@ class _ReportsTabState extends State<ReportsTab> {
                       const Icon(Icons.mark_email_unread_outlined, size: 20, color: Colors.blueAccent),
                       const SizedBox(width: 8),
                       Text(
-                        '报告控制块 (BRCB / URCB)  [${rcbs.length}]',
+                        'BRCB / URCB [${rcbs.length}]',
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                       ),
                       const Spacer(),
@@ -92,7 +94,7 @@ class _ReportsTabState extends State<ReportsTab> {
                   child: rcbs.isEmpty
                       ? const Center(
                           child: Text(
-                            '当前连接模型未检测到报告控制块\n可在"模型浏览"中绑定 SCL 或在线发现模型',
+                            i18n.t('noRcbConnHint'),
                             textAlign: TextAlign.center,
                             style: TextStyle(color: Colors.grey, height: 1.5),
                           ),
@@ -147,7 +149,7 @@ class _ReportsTabState extends State<ReportsTab> {
                                             ),
                                           ),
                                           Tooltip(
-                                            message: rcb.rptEna ? '使能已激活 (RptEna=true)' : '报告未激活 (RptEna=false)',
+                                            message: rcb.rptEna ? i18n.t('rptEnaActive') : i18n.t('rptEnaInactive'),
                                             child: Switch(
                                               value: rcb.rptEna,
                                               activeColor: Colors.greenAccent,
@@ -202,7 +204,7 @@ class _ReportsTabState extends State<ReportsTab> {
                                               visualDensity: VisualDensity.compact,
                                             ),
                                             icon: const Icon(Icons.sync, size: 14),
-                                            label: const Text('总召唤 (GI)', style: TextStyle(fontSize: 11)),
+                                            label: Text(i18n.t('triggerGiClient'), style: const TextStyle(fontSize: 11)),
                                             onPressed: engine.isConnected && !_isOperating
                                                 ? () async {
                                                     setState(() => _isOperating = true);
@@ -255,13 +257,13 @@ class _ReportsTabState extends State<ReportsTab> {
                     const Icon(Icons.receipt_long, size: 20, color: Colors.orangeAccent),
                     const SizedBox(width: 8),
                     Text(
-                      '已接收报告事件 (InformationReport) [${engine.reportEvents.length}]',
+                      'InformationReport [${engine.reportEvents.length}]',
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                     const Spacer(),
                     IconButton(
                       icon: const Icon(Icons.delete_outline, size: 20),
-                      tooltip: '清空事件记录',
+                      tooltip: i18n.t('clearEventsTooltip'),
                       onPressed: () {
                         setState(() {
                           engine.reportEvents.clear();
@@ -280,12 +282,12 @@ class _ReportsTabState extends State<ReportsTab> {
                             Icon(Icons.inbox_outlined, size: 48, color: isDark ? Colors.grey[700] : Colors.grey[400]),
                             const SizedBox(height: 12),
                             Text(
-                              '暂未收到任何服务端突发上送或总召唤报告',
+                              i18n.t('noReportEvents'),
                               style: TextStyle(color: isDark ? Colors.grey[500] : Colors.grey[600]),
                             ),
                             const SizedBox(height: 6),
                             const Text(
-                              '提示: 请确保服务端已连接，并在左侧将对应 BRCB/URCB 的使能开关打开',
+                              i18n.t('noReportEventsHint'),
                               style: TextStyle(fontSize: 12, color: Colors.grey),
                             ),
                           ],
@@ -327,14 +329,14 @@ class _ReportsTabState extends State<ReportsTab> {
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
-                                      '${event.count} 项数据',
+                                      '${event.count} items',
                                       style: const TextStyle(fontSize: 11, color: Colors.blueAccent),
                                     ),
                                   ),
                                 ],
                               ),
                               subtitle: Text(
-                                '时间: $timeStr  |  数据集: ${event.dataSetName.isEmpty ? "(Default)" : event.dataSetName}',
+                                '$timeStr | DataSet: ${event.dataSetName.isEmpty ? "(Default)" : event.dataSetName}',
                                 style: TextStyle(fontSize: 11, color: isDark ? Colors.grey[400] : Colors.grey[600]),
                               ),
                               children: [
@@ -349,12 +351,12 @@ class _ReportsTabState extends State<ReportsTab> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       const Text(
-                                        '变位数据明细:',
+                                        i18n.t('changeDetails'),
                                         style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                                       ),
                                       const SizedBox(height: 6),
                                       if (event.details.isEmpty)
-                                        const Text('无明细字段', style: TextStyle(fontSize: 11, color: Colors.grey))
+                                        Text(i18n.t('noDetails'), style: const TextStyle(fontSize: 11, color: Colors.grey))
                                       else
                                         ...event.details.map((d) => Padding(
                                               padding: const EdgeInsets.symmetric(vertical: 2),
@@ -405,7 +407,7 @@ class _ReportsTabState extends State<ReportsTab> {
               const Icon(Icons.info_outline, size: 16, color: Colors.blueAccent),
               const SizedBox(width: 6),
               Text(
-                '控制块参数: ${rcb.name}',
+                '${rcb.name}',
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
               ),
             ],
@@ -415,7 +417,7 @@ class _ReportsTabState extends State<ReportsTab> {
             spacing: 12,
             runSpacing: 6,
             children: [
-              _buildBadge('模式', rcb.buffered ? 'BRCB 缓存型' : 'URCB 非缓存', Colors.indigo),
+              _buildBadge(i18n.t('modeLabel'), rcb.buffered ? i18n.t('brcbMode') : i18n.t('urcbMode'), Colors.indigo),
               _buildBadge('ConfRev', '${rcb.confRev}', Colors.blueGrey),
               _buildBadge('BufTime', '${rcb.bufTime} ms', Colors.teal),
               _buildBadge('TrgOps.dchg', '${rcb.trgOps.dataChange}', rcb.trgOps.dataChange ? Colors.green : Colors.grey),

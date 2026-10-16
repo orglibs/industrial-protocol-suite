@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../i18n/app_i18n.dart';
 import '../../models/connection_config.dart';
 import '../../models/register_group.dart';
 import '../../models/register_model.dart';
@@ -92,6 +93,7 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final i18n = AppI18n.instance;
     _syncSelection();
 
     final isSimRunning = SimulationService.instance.isRunning;
@@ -108,152 +110,173 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
               color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
               border: Border(bottom: BorderSide(color: theme.dividerColor)),
             ),
-            child: Row(
-              children: [
-                // Connection Dropdown
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: theme.dividerColor),
-                  ),
-                  child: DropdownButton<ConnectionConfig>(
-                    value: widget.connections.contains(_selectedConnection) ? _selectedConnection : null,
-                    hint: const Text('选择连接'),
-                    underline: const SizedBox(),
-                    items: widget.connections.map((c) {
-                      return DropdownMenuItem(
-                        value: c,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.circle,
-                              size: 10,
-                              color: c.isRunning ? Colors.green : Colors.grey,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(c.name),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (c) {
-                      setState(() {
-                        _selectedConnection = c;
-                        _selectedSlave = c?.slaves.isNotEmpty == true ? c!.slaves.first : null;
-                        _selectedGroup = _selectedSlave?.groups.isNotEmpty == true ? _selectedSlave!.groups.first : null;
-                      });
-                    },
-                  ),
-                ),
-                const SizedBox(width: 8),
-                // Slave Dropdown
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: theme.dividerColor),
-                  ),
-                  child: DropdownButton<SlaveModel>(
-                    value: _selectedConnection?.slaves.contains(_selectedSlave) == true ? _selectedSlave : null,
-                    hint: const Text('选择从站'),
-                    underline: const SizedBox(),
-                    items: (_selectedConnection?.slaves ?? []).map((s) {
-                      return DropdownMenuItem(
-                        value: s,
-                        child: Text('${s.name} [ID: ${s.slaveId}]'),
-                      );
-                    }).toList(),
-                    onChanged: (s) {
-                      setState(() {
-                        _selectedSlave = s;
-                        _selectedGroup = s?.groups.isNotEmpty == true ? s!.groups.first : null;
-                      });
-                    },
-                  ),
-                ),
-                const SizedBox(width: 8),
-                // Group Dropdown
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: theme.dividerColor),
-                  ),
-                  child: DropdownButton<RegisterGroupModel>(
-                    value: _selectedSlave?.groups.contains(_selectedGroup) == true ? _selectedGroup : null,
-                    hint: const Text('选择寄存器组'),
-                    underline: const SizedBox(),
-                    items: (_selectedSlave?.groups ?? []).map((g) {
-                      return DropdownMenuItem(
-                        value: g,
-                        child: Text('${g.groupName} (${g.quantity}点)'),
-                      );
-                    }).toList(),
-                    onChanged: (g) => setState(() => _selectedGroup = g),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                // Server Quick Action
-                FilledButton.tonalIcon(
-                  icon: Icon(
-                    isServerRunning ? Icons.stop : Icons.play_arrow,
-                    size: 16,
-                    color: isServerRunning ? Colors.red : Colors.green,
-                  ),
-                  label: Text(isServerRunning ? '停止服务' : '启动监听'),
-                  onPressed: _selectedConnection == null
-                      ? null
-                      : () async {
-                          if (isServerRunning) {
-                            await ModbusServerManager.instance.stopServer(_selectedConnection!);
-                          } else {
-                            try {
-                              await ModbusServerManager.instance.startServer(_selectedConnection!);
-                            } catch (e) {
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('启动服务异常: $e')),
-                                );
-                              }
-                            }
-                          }
-                          setState(() {});
-                          widget.onDataChanged();
-                        },
-                ),
-                const SizedBox(width: 8),
-                // Simulation toggle
-                FilledButton.tonalIcon(
-                  icon: Icon(
-                    isSimRunning ? Icons.waves : Icons.blur_linear,
-                    size: 16,
-                    color: isSimRunning ? Colors.green : Colors.grey,
-                  ),
-                  label: Text(isSimRunning ? '波形模拟中' : '启动波形模拟'),
-                  onPressed: () {
-                    SimulationService.instance.setConnections(widget.connections);
-                    SimulationService.instance.toggle();
-                    setState(() {});
-                  },
-                ),
-                const Spacer(),
-                // Search box
-                SizedBox(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final searchBox = SizedBox(
                   width: 180,
                   child: TextField(
-                    decoration: const InputDecoration(
-                      hintText: '搜索点号/别名...',
-                      prefixIcon: Icon(Icons.search, size: 18),
+                    decoration: InputDecoration(
+                      hintText: i18n.t('searchHint'),
+                      prefixIcon: const Icon(Icons.search, size: 18),
                       isDense: true,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                      border: OutlineInputBorder(),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      border: const OutlineInputBorder(),
                     ),
                     onChanged: (v) => setState(() => _searchKeyword = v.trim()),
                   ),
-                ),
-              ],
+                );
+
+                final selectorsAndButtons = <Widget>[
+                  // Connection Dropdown
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: theme.dividerColor),
+                    ),
+                    child: DropdownButton<ConnectionConfig>(
+                      value: widget.connections.contains(_selectedConnection) ? _selectedConnection : null,
+                      hint: Text(i18n.t('selectConn')),
+                      underline: const SizedBox(),
+                      items: widget.connections.map((c) {
+                        return DropdownMenuItem(
+                          value: c,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.circle,
+                                size: 10,
+                                color: c.isRunning ? Colors.green : Colors.grey,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(c.name),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (c) {
+                        setState(() {
+                          _selectedConnection = c;
+                          _selectedSlave = c?.slaves.isNotEmpty == true ? c!.slaves.first : null;
+                          _selectedGroup = _selectedSlave?.groups.isNotEmpty == true ? _selectedSlave!.groups.first : null;
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  // Slave Dropdown
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: theme.dividerColor),
+                    ),
+                    child: DropdownButton<SlaveModel>(
+                      value: _selectedConnection?.slaves.contains(_selectedSlave) == true ? _selectedSlave : null,
+                      hint: Text(i18n.t('selectSlave')),
+                      underline: const SizedBox(),
+                      items: (_selectedConnection?.slaves ?? []).map((s) {
+                        return DropdownMenuItem(
+                          value: s,
+                          child: Text('${s.name} [ID: ${s.slaveId}]'),
+                        );
+                      }).toList(),
+                      onChanged: (s) {
+                        setState(() {
+                          _selectedSlave = s;
+                          _selectedGroup = s?.groups.isNotEmpty == true ? s!.groups.first : null;
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  // Group Dropdown
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: theme.dividerColor),
+                    ),
+                    child: DropdownButton<RegisterGroupModel>(
+                      value: _selectedSlave?.groups.contains(_selectedGroup) == true ? _selectedGroup : null,
+                      hint: Text(i18n.t('selectGroup')),
+                      underline: const SizedBox(),
+                      items: (_selectedSlave?.groups ?? []).map((g) {
+                        return DropdownMenuItem(
+                          value: g,
+                          child: Text('${g.groupName} (${g.quantity} ${AppI18n.instance.t('pointsCount')})'),
+                        );
+                      }).toList(),
+                      onChanged: (g) => setState(() => _selectedGroup = g),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  // Server Quick Action
+                  FilledButton.tonalIcon(
+                    icon: Icon(
+                      isServerRunning ? Icons.stop : Icons.play_arrow,
+                      size: 16,
+                      color: isServerRunning ? Colors.red : Colors.green,
+                    ),
+                    label: Text(isServerRunning ? i18n.t('stopService') : i18n.t('startListen')),
+                    onPressed: _selectedConnection == null
+                        ? null
+                        : () async {
+                            if (isServerRunning) {
+                              await ModbusServerManager.instance.stopServer(_selectedConnection!);
+                            } else {
+                              try {
+                                await ModbusServerManager.instance.startServer(_selectedConnection!);
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('${AppI18n.instance.t('startListen')} error: $e')),
+                                  );
+                                }
+                              }
+                            }
+                            setState(() {});
+                            widget.onDataChanged();
+                          },
+                  ),
+                  const SizedBox(width: 8),
+                  // Simulation toggle
+                  FilledButton.tonalIcon(
+                    icon: Icon(
+                      isSimRunning ? Icons.waves : Icons.blur_linear,
+                      size: 16,
+                      color: isSimRunning ? Colors.green : Colors.grey,
+                    ),
+                    label: Text(isSimRunning ? i18n.t('simRunning') : i18n.t('simStart')),
+                    onPressed: () {
+                      SimulationService.instance.setConnections(widget.connections);
+                      SimulationService.instance.toggle();
+                      setState(() {});
+                    },
+                  ),
+                ];
+
+                if (constraints.maxWidth >= 990) {
+                  return Row(
+                    children: [
+                      ...selectorsAndButtons,
+                      const Spacer(),
+                      searchBox,
+                    ],
+                  );
+                } else {
+                  return Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      ...selectorsAndButtons,
+                      searchBox,
+                    ],
+                  );
+                }
+              },
             ),
           ),
           // Group Operations Sub-bar
@@ -261,88 +284,126 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               color: theme.colorScheme.surfaceVariant.withOpacity(0.15),
-              child: Row(
-                children: [
-                  Chip(
-                    avatar: const Icon(Icons.category, size: 14),
-                    label: Text(_selectedGroup!.registerType.label, style: const TextStyle(fontSize: 12)),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '起始地址: ${_selectedSlave?.formatAddress(_selectedGroup!.startAddress, _selectedGroup!.registerType)} | 点数: ${_selectedGroup!.quantity}',
-                    style: TextStyle(fontSize: 12, color: theme.colorScheme.outline),
-                  ),
-                  const Spacer(),
-                  TextButton.icon(
-                    icon: const Icon(Icons.auto_fix_high, size: 16),
-                    label: const Text('批量填充'),
-                    onPressed: () async {
-                      final ok = await showDialog<bool>(
-                        context: context,
-                        builder: (_) => BatchFillDialog(group: _selectedGroup!),
-                      );
-                      if (ok == true) {
-                        setState(() {});
-                        widget.onDataChanged();
-                      }
-                    },
-                  ),
-                  TextButton.icon(
-                    icon: const Icon(Icons.waves, size: 16),
-                    label: const Text('配置全组波形'),
-                    onPressed: () async {
-                      final res = await showDialog<dynamic>(
-                        context: context,
-                        builder: (_) => SimulationConfigDialog(
-                          initialConfig: _selectedGroup!.registers.first.simulation,
-                          title: '全组寄存器波形配置 (${_selectedGroup!.groupName})',
-                        ),
-                      );
-                      if (res != null) {
-                        _selectedGroup!.batchConfigureSimulation(res);
-                        setState(() {});
-                        widget.onDataChanged();
-                      }
-                    },
-                  ),
-                  TextButton.icon(
-                    icon: const Icon(Icons.restart_alt, size: 16),
-                    label: const Text('整组清零'),
-                    onPressed: () {
-                      _selectedGroup!.resetAll();
-                      setState(() {});
-                      widget.onDataChanged();
-                    },
-                  ),
-                ],
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final leftInfo = Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Chip(
+                        avatar: const Icon(Icons.category, size: 14),
+                        label: Text(_selectedGroup!.registerType.label, style: const TextStyle(fontSize: 12)),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${i18n.t('startAddr')}: ${_selectedSlave?.formatAddress(_selectedGroup!.startAddress, _selectedGroup!.registerType)} | ${i18n.t('pointsCount')}: ${_selectedGroup!.quantity}',
+                        style: TextStyle(fontSize: 12, color: theme.colorScheme.outline),
+                      ),
+                    ],
+                  );
+
+                  final rightActions = Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextButton.icon(
+                        icon: const Icon(Icons.auto_fix_high, size: 16),
+                        label: Text(i18n.t('batchFill')),
+                        onPressed: () async {
+                          final ok = await showDialog<bool>(
+                            context: context,
+                            builder: (_) => BatchFillDialog(group: _selectedGroup!),
+                          );
+                          if (ok == true) {
+                            setState(() {});
+                            widget.onDataChanged();
+                          }
+                        },
+                      ),
+                      TextButton.icon(
+                        icon: const Icon(Icons.waves, size: 16),
+                        label: Text(i18n.t('batchWave')),
+                        onPressed: () async {
+                          final res = await showDialog<dynamic>(
+                            context: context,
+                            builder: (_) => SimulationConfigDialog(
+                              initialConfig: _selectedGroup!.registers.first.simulation,
+                              title: '${i18n.t('batchWave')} (${_selectedGroup!.groupName})',
+                            ),
+                          );
+                          if (res != null) {
+                            _selectedGroup!.batchConfigureSimulation(res);
+                            setState(() {});
+                            widget.onDataChanged();
+                          }
+                        },
+                      ),
+                      TextButton.icon(
+                        icon: const Icon(Icons.restart_alt, size: 16),
+                        label: Text(i18n.t('resetAll')),
+                        onPressed: () {
+                          _selectedGroup!.resetAll();
+                          setState(() {});
+                          widget.onDataChanged();
+                        },
+                      ),
+                    ],
+                  );
+
+                  if (constraints.maxWidth >= 720) {
+                    return Row(
+                      children: [
+                        leftInfo,
+                        const Spacer(),
+                        rightActions,
+                      ],
+                    );
+                  } else {
+                    return Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        leftInfo,
+                        rightActions,
+                      ],
+                    );
+                  }
+                },
               ),
             ),
           const Divider(height: 1),
           // Registers Table View
           Expanded(
             child: _selectedGroup == null
-                ? const Center(child: Text('请选择或添加寄存器组'))
+                ? Center(child: Text(i18n.t('selectGroup')))
                 : filtered.isEmpty
-                    ? const Center(child: Text('无匹配寄存器数据'))
+                    ? Center(child: Text(i18n.t('searchHint')))
                     : SingleChildScrollView(
                         padding: const EdgeInsets.all(12),
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: DataTable(
-                            headingRowHeight: 40,
-                            dataRowMinHeight: 44,
+                        scrollDirection: Axis.vertical,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minWidth: MediaQuery.of(context).size.width - 120,
+                            ),
+                            child: DataTable(
+                              headingRowColor: WidgetStateProperty.all(
+                                theme.colorScheme.surfaceVariant.withOpacity(0.25),
+                              ),
+                              headingRowHeight: 40,
+                              dataRowMinHeight: 44,
                             dataRowMaxHeight: 44,
                             horizontalMargin: 12,
                             columnSpacing: 16,
-                            columns: const [
-                              DataColumn(label: Text('地址编号', style: TextStyle(fontWeight: FontWeight.bold))),
-                              DataColumn(label: Text('别名 / 描述', style: TextStyle(fontWeight: FontWeight.bold))),
-                              DataColumn(label: Text('当前数值 (双击修改)', style: TextStyle(fontWeight: FontWeight.bold))),
-                              DataColumn(label: Text('数据格式', style: TextStyle(fontWeight: FontWeight.bold))),
-                              DataColumn(label: Text('组合模式', style: TextStyle(fontWeight: FontWeight.bold))),
-                              DataColumn(label: Text('波形模拟', style: TextStyle(fontWeight: FontWeight.bold))),
-                              DataColumn(label: Text('备注说明', style: TextStyle(fontWeight: FontWeight.bold))),
-                              DataColumn(label: Text('操作', style: TextStyle(fontWeight: FontWeight.bold))),
+                            columns: [
+                              DataColumn(label: Text(i18n.t('colAddr'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                              DataColumn(label: Text(i18n.t('colAlias'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                              DataColumn(label: Text(i18n.t('colValue'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                              DataColumn(label: Text(i18n.t('colFormat'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                              DataColumn(label: Text(i18n.t('colComposite'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                              DataColumn(label: Text(i18n.t('colSim'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                              DataColumn(label: Text(i18n.t('colComment'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                              DataColumn(label: Text(i18n.t('colAction'), style: const TextStyle(fontWeight: FontWeight.bold))),
                             ],
                             rows: filtered.map((r) {
                               final formattedAddr = _selectedSlave!.formatAddress(
@@ -420,8 +481,8 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
                                         ],
                                         Text(
                                           r.compositeType == 0
-                                              ? '单字 (16位)'
-                                              : (r.compositeType == 1 ? '双字 (32位)' : '四字 (64位)'),
+                                              ? AppI18n.instance.t('singleWord')
+                                              : (r.compositeType == 1 ? AppI18n.instance.t('doubleWord') : AppI18n.instance.t('quadWord')),
                                           style: const TextStyle(fontSize: 12),
                                         ),
                                       ],
@@ -449,7 +510,7 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
                                       children: [
                                         IconButton(
                                           icon: const Icon(Icons.edit, size: 16),
-                                          tooltip: '配置寄存器',
+                                          tooltip: AppI18n.instance.t('configRegTitle'),
                                           onPressed: () async {
                                             final ok = await showDialog<bool>(
                                               context: context,
@@ -472,13 +533,13 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
                                             size: 16,
                                             color: r.simulation.enabled ? Colors.green : null,
                                           ),
-                                          tooltip: '配置波形模拟',
+                                          tooltip: AppI18n.instance.t('simConfigTitle'),
                                           onPressed: () async {
                                             final sim = await showDialog<dynamic>(
                                               context: context,
                                               builder: (_) => SimulationConfigDialog(
                                                 initialConfig: r.simulation,
-                                                title: '配置 [$formattedAddr] 波形模拟',
+                                                title: '${AppI18n.instance.t('simConfigTitle')} [$formattedAddr]',
                                               ),
                                             );
                                             if (sim != null) {
@@ -497,6 +558,7 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
                           ),
                         ),
                       ),
+                    ),
           ),
         ],
       ),
@@ -516,12 +578,12 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('修改寄存器 [$formattedAddr] 数值'),
+        title: Text('${AppI18n.instance.t('edit')} [$formattedAddr] ${AppI18n.instance.t('currValue')}'),
         content: TextField(
           controller: controller,
           autofocus: true,
           decoration: InputDecoration(
-            labelText: '数值 (${r.valueFormat.label})',
+            labelText: '${AppI18n.instance.t('currValue')} (${r.valueFormat.label})',
             border: const OutlineInputBorder(),
           ),
           onSubmitted: (_) {
@@ -531,13 +593,13 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('取消'),
+            child: Text(AppI18n.instance.t('cancel')),
           ),
           FilledButton(
             onPressed: () {
               _applyQuickEdit(r, controller.text.trim(), byteOrder, ctx);
             },
-            child: const Text('保存'),
+            child: Text(AppI18n.instance.t('save')),
           ),
         ],
       ),
@@ -559,7 +621,7 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
       widget.onDataChanged();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('输入的数值格式无效')),
+        SnackBar(content: Text(AppI18n.instance.t('convertFailed'))),
       );
     }
   }

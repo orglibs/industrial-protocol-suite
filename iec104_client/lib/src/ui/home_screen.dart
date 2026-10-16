@@ -1,25 +1,31 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:window_manager/window_manager.dart';
 import '../client/iec104_client.dart';
 import '../client/traffic_logger.dart';
 import '../client/workspace_storage.dart';
+import '../i18n/app_i18n.dart';
 import 'tabs/connection_tab.dart';
 import 'tabs/points_tab.dart';
 import 'tabs/commands_tab.dart';
 import 'tabs/traffic_tab.dart';
 import 'tabs/parser_tab.dart';
 import 'widgets/iec104_master_icon.dart';
+import 'widgets/language_picker.dart';
+import 'widgets/window_title_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   final Iec104Client client;
   final VoidCallback? onToggleTheme;
   final bool isDarkMode;
+  final VoidCallback? onLanguageChanged;
 
   const HomeScreen({
     super.key,
     required this.client,
     this.onToggleTheme,
     this.isDarkMode = true,
+    this.onLanguageChanged,
   });
 
   @override
@@ -78,39 +84,34 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final isConnected = c.state == ClientConnectionState.connected || c.state == ClientConnectionState.active;
 
+    final i18n = AppI18n.instance;
+
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withAlpha(80),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: const Color(0xFF10B981), width: 1.2),
+        automaticallyImplyLeading: false,
+        titleSpacing: 0,
+        leading: WindowManagerHelper.isSupportedPlatform
+            ? DragToMoveArea(
+                child: const Padding(
+                  padding: EdgeInsets.only(left: 12),
+                  child: Iec104MasterIcon(size: 26, color: Color(0xFF10B981)),
+                ),
+              )
+            : const Padding(
+                padding: EdgeInsets.only(left: 12),
+                child: Iec104MasterIcon(size: 26, color: Color(0xFF10B981)),
               ),
-              child: const Iec104MasterIcon(size: 20, color: Color(0xFF10B981)),
-            ),
-            const SizedBox(width: 10),
-            const Flexible(
-              child: Text(
-                'IEC 60870-5-104 客户端仿真器 (Client Simulator)',
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceVariant,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: const Text('v1.0.0', style: TextStyle(fontSize: 11)),
-            ),
-          ],
-        ),
+        flexibleSpace: WindowManagerHelper.isSupportedPlatform
+            ? const DragToMoveArea(child: SizedBox.expand())
+            : null,
+        title: WindowManagerHelper.isSupportedPlatform
+            ? DragToMoveArea(
+                child: SizedBox(
+                  height: 48,
+                  child: _buildTitleRow(theme, i18n),
+                ),
+              )
+            : _buildTitleRow(theme, i18n),
         actions: [
           // Connection Status indicator pill
           Container(
@@ -133,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  c.state.label,
+                  _getStateLabel(c.state, i18n),
                   style: TextStyle(color: badgeColor, fontWeight: FontWeight.bold, fontSize: 12),
                 ),
               ],
@@ -147,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
               size: 16,
               color: isConnected ? Colors.red : Colors.green,
             ),
-            label: Text(isConnected ? '断开' : '连接'),
+            label: Text(isConnected ? i18n.t('disconnect') : i18n.t('connect')),
             onPressed: () async {
               if (isConnected) {
                 await c.disconnect();
@@ -157,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 } catch (e) {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('连接失败: $e')),
+                      SnackBar(content: Text('${i18n.t('connectFailed')}: $e')),
                     );
                   }
                 }
@@ -169,15 +170,15 @@ class _HomeScreenState extends State<HomeScreen> {
           // Save Workspace Button
           IconButton(
             icon: const Icon(Icons.save_outlined),
-            tooltip: '保存工作区 (${WorkspaceStorage.getWorkspaceFilePath()})',
+            tooltip: i18n.t('saveWorkspace'),
             onPressed: () async {
               final ok = await c.saveWorkspace();
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(ok
-                        ? '工作区配置已保存至: ${WorkspaceStorage.getWorkspaceFilePath()}'
-                        : '保存失败'),
+                        ? '${i18n.t('workspaceSaved')}: ${WorkspaceStorage.getWorkspaceFilePath()}'
+                        : i18n.t('saveFailed')),
                     backgroundColor: ok ? Colors.green : Colors.red,
                   ),
                 );
@@ -188,10 +189,19 @@ class _HomeScreenState extends State<HomeScreen> {
           if (widget.onToggleTheme != null)
             IconButton(
               icon: Icon(widget.isDarkMode ? Icons.light_mode : Icons.dark_mode),
-              tooltip: widget.isDarkMode ? '切换为亮色模式' : '切换为暗色模式',
+              tooltip: widget.isDarkMode ? i18n.t('themeLight') : i18n.t('themeDark'),
               onPressed: widget.onToggleTheme,
             ),
-          const SizedBox(width: 8),
+
+          LanguagePickerButton(
+            onLanguageChanged: () {
+              setState(() {});
+              widget.onLanguageChanged?.call();
+            },
+          ),
+          const SizedBox(width: 4),
+
+          WindowControls(brightness: theme.brightness),
         ],
       ),
       body: Row(
@@ -205,31 +215,31 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: EdgeInsets.symmetric(vertical: 8.0),
               child: Icon(Icons.device_hub, size: 28),
             ),
-            destinations: const [
+            destinations: [
               NavigationRailDestination(
-                icon: Icon(Icons.settings_ethernet_outlined),
-                selectedIcon: Icon(Icons.settings_ethernet),
-                label: Text('连接主控'),
+                icon: const Icon(Icons.settings_ethernet_outlined),
+                selectedIcon: const Icon(Icons.settings_ethernet),
+                label: Text(i18n.t('tabConnection')),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.table_chart_outlined),
-                selectedIcon: Icon(Icons.table_chart),
-                label: Text('点位监视'),
+                icon: const Icon(Icons.table_chart_outlined),
+                selectedIcon: const Icon(Icons.table_chart),
+                label: Text(i18n.t('tabPoints')),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.send_outlined),
-                selectedIcon: Icon(Icons.send),
-                label: Text('命令下发'),
+                icon: const Icon(Icons.send_outlined),
+                selectedIcon: const Icon(Icons.send),
+                label: Text(i18n.t('tabCommands')),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.receipt_long_outlined),
-                selectedIcon: Icon(Icons.receipt_long),
-                label: Text('报文抓包'),
+                icon: const Icon(Icons.receipt_long_outlined),
+                selectedIcon: const Icon(Icons.receipt_long),
+                label: Text(i18n.t('tabTraffic')),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.code_outlined),
-                selectedIcon: Icon(Icons.code),
-                label: Text('离线解析'),
+                icon: const Icon(Icons.code_outlined),
+                selectedIcon: const Icon(Icons.code),
+                label: Text(i18n.t('tabParser')),
               ),
             ],
           ),
@@ -261,24 +271,61 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(width: 6),
               Text(
                 c.state == ClientConnectionState.active
-                    ? '通信链路已激活 (目标: ${c.host}:${c.port})'
-                    : (c.state == ClientConnectionState.connected ? 'TCP已连通 (等待激活)' : '客户端已断开'),
+                    ? '${i18n.t('linkActive')} (${c.host}:${c.port})'
+                    : (c.state == ClientConnectionState.connected ? i18n.t('tcpConnected') : i18n.t('clientDisconnected')),
                 style: const TextStyle(fontSize: 12),
               ),
               const SizedBox(width: 20),
-              Text('从站(COA): ${c.stations.length} 个', style: const TextStyle(fontSize: 12)),
+              Text('${i18n.t('coaStation')}: ${c.stations.length}', style: const TextStyle(fontSize: 12)),
               const SizedBox(width: 20),
-              Text('点表总数: $totalPoints 点', style: const TextStyle(fontSize: 12)),
+              Text('${i18n.t('totalPoints')}: $totalPoints', style: const TextStyle(fontSize: 12)),
               const SizedBox(width: 20),
-              Text('RX 接收: $rxCount 帧', style: const TextStyle(fontSize: 12)),
+              Text('RX: $rxCount ${i18n.t('frames')}', style: const TextStyle(fontSize: 12)),
               const SizedBox(width: 16),
-              Text('TX 发送: $txCount 帧', style: const TextStyle(fontSize: 12)),
+              Text('TX: $txCount ${i18n.t('frames')}', style: const TextStyle(fontSize: 12)),
               const SizedBox(width: 20),
-              Text('IEC 60870-5-104 客户端主站仿真', style: TextStyle(fontSize: 11, color: theme.colorScheme.outline)),
+              Text(i18n.t('iec104MasterSim'), style: TextStyle(fontSize: 11, color: theme.colorScheme.outline)),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildTitleRow(ThemeData theme, AppI18n i18n) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Flexible(
+          child: Text(
+            i18n.t('appTitle'),
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceVariant,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: const Text('v1.0.0', style: TextStyle(fontSize: 11)),
+        ),
+      ],
+    );
+  }
+
+  String _getStateLabel(ClientConnectionState state, AppI18n i18n) {
+    switch (state) {
+      case ClientConnectionState.disconnected:
+        return i18n.t('disconnected');
+      case ClientConnectionState.connecting:
+        return i18n.t('connecting');
+      case ClientConnectionState.connected:
+        return i18n.t('connected');
+      case ClientConnectionState.active:
+        return i18n.t('stateActive');
+    }
   }
 }

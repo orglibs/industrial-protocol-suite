@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../client/iec104_client.dart';
 import '../../client/station_data.dart';
+import '../../i18n/app_i18n.dart';
 
 class EditStationDialog extends StatefulWidget {
   final Iec104Client client;
@@ -40,10 +41,11 @@ class _EditStationDialogState extends State<EditStationDialog> {
   }
 
   void _confirmDelete() {
+    final i18n = AppI18n.instance;
     if (widget.client.stations.length <= 1) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('至少需要保留一个从站，无法删除最后一个从站'),
+        SnackBar(
+          content: Text(i18n.t('cannotDeleteLastStation')),
           backgroundColor: Colors.orange,
         ),
       );
@@ -53,20 +55,20 @@ class _EditStationDialogState extends State<EditStationDialog> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.red),
-            SizedBox(width: 8),
-            Text('确认删除从站？'),
+            const Icon(Icons.warning_amber_rounded, color: Colors.red),
+            const SizedBox(width: 8),
+            Text(i18n.t('deleteStationConfirm')),
           ],
         ),
         content: Text(
-          '确定要删除从站【${widget.station.name}】(COA: ${widget.station.commonAddress}) 吗？\n该站内包含的 ${widget.station.points.length} 个点号数据将被全部清除。',
+          '${i18n.t('deleteStationConfirm')}\n[${widget.station.name}] (COA: ${widget.station.commonAddress})',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('取消'),
+            child: Text(i18n.t('cancel')),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
@@ -78,11 +80,11 @@ class _EditStationDialogState extends State<EditStationDialog> {
               widget.onStationDeleted?.call();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('已成功删除从站 (COA: $deletedCa)'),
+                  content: Text('${i18n.t('deleteStation')}: COA = $deletedCa'),
                 ),
               );
             },
-            child: const Text('确认删除'),
+            child: Text(i18n.t('confirm')),
           ),
         ],
       ),
@@ -91,14 +93,16 @@ class _EditStationDialogState extends State<EditStationDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final i18n = AppI18n.instance;
     final pointCount = widget.station.points.length;
 
     return AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.settings_outlined, color: Colors.blue),
-          SizedBox(width: 8),
-          Text('管理从站配置 (Edit Station)'),
+          Icon(Icons.settings_outlined, color: theme.colorScheme.primary),
+          const SizedBox(width: 8),
+          Text(i18n.t('editStation')),
         ],
       ),
       content: SingleChildScrollView(
@@ -113,18 +117,18 @@ class _EditStationDialogState extends State<EditStationDialog> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
+                    color: theme.colorScheme.primaryContainer.withAlpha(50),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.blue.shade200),
+                    border: Border.all(color: theme.colorScheme.primary.withAlpha(80)),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.info_outline, color: Colors.blue),
+                      Icon(Icons.info_outline, color: theme.colorScheme.primary),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          '当前站内拥有 $pointCount 个监视点位。若修改 COA 地址，站内点位的从站地址将一并自动迁移。',
-                          style: TextStyle(fontSize: 12, color: Colors.blue.shade900),
+                          '${i18n.t('totalPoints')}: $pointCount. (COA: ${widget.station.commonAddress})',
+                          style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface),
                         ),
                       ),
                     ],
@@ -133,20 +137,20 @@ class _EditStationDialogState extends State<EditStationDialog> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _caCtrl,
-                  decoration: const InputDecoration(
-                    labelText: '从站公共地址 (COA / CA)',
-                    helperText: '范围: 1 ~ 65535',
-                    prefixIcon: Icon(Icons.tag),
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: i18n.t('coa'),
+                    helperText: i18n.t('coaRange'),
+                    prefixIcon: const Icon(Icons.tag),
+                    border: const OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.number,
                   validator: (v) {
                     final n = int.tryParse(v ?? '');
                     if (n == null || n <= 0 || n > 65535) {
-                      return '请输入 1 ~ 65535 之间的有效整数';
+                      return i18n.t('coaRange');
                     }
                     if (n != widget.station.commonAddress && widget.client.stations.containsKey(n)) {
-                      return '该 COA 地址 ($n) 已被其他从站使用';
+                      return i18n.t('coaExists');
                     }
                     return null;
                   },
@@ -154,14 +158,14 @@ class _EditStationDialogState extends State<EditStationDialog> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _nameCtrl,
-                  decoration: const InputDecoration(
-                    labelText: '从站名称 (Station Name)',
-                    prefixIcon: Icon(Icons.edit_note),
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: i18n.t('stationNamePrompt'),
+                    prefixIcon: const Icon(Icons.edit_note),
+                    border: const OutlineInputBorder(),
                   ),
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) {
-                      return '从站名称不能为空';
+                      return i18n.t('stationNameEmpty');
                     }
                     return null;
                   },
@@ -176,13 +180,13 @@ class _EditStationDialogState extends State<EditStationDialog> {
           children: [
             TextButton.icon(
               icon: const Icon(Icons.delete_outline, color: Colors.red, size: 18),
-              label: const Text('删除从站', style: TextStyle(color: Colors.red)),
+              label: Text(i18n.t('deleteStation'), style: const TextStyle(color: Colors.red)),
               onPressed: _confirmDelete,
             ),
             const Spacer(),
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('取消'),
+              child: Text(i18n.t('cancel')),
             ),
             const SizedBox(width: 8),
             FilledButton(
@@ -197,13 +201,13 @@ class _EditStationDialogState extends State<EditStationDialog> {
                   widget.onStationChanged?.call(newCa);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('已保存从站修改: $newName (COA: $newCa)'),
+                      content: Text('${i18n.t('stationName')}: $newName (COA: $newCa)'),
                       backgroundColor: Colors.green,
                     ),
                   );
                 }
               },
-              child: const Text('保存修改'),
+              child: Text(i18n.t('save')),
             ),
           ],
         ),

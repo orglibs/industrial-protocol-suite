@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../i18n/app_i18n.dart';
 import '../../models/scl_models.dart';
 import '../../models/server_variable_model.dart';
 
@@ -59,13 +60,14 @@ class _WriteValueDialogState extends State<WriteValueDialog> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final i18n = AppI18n.instance;
 
     return AlertDialog(
       title: Row(
         children: [
           Icon(Icons.edit_note, color: Theme.of(context).colorScheme.primary),
           const SizedBox(width: 8),
-          const Text('写入变量值 / 控制操作'),
+          Text(i18n.t('writeValServerTitle')),
         ],
       ),
       content: SizedBox(
@@ -112,11 +114,11 @@ class _WriteValueDialogState extends State<WriteValueDialog> {
                 ),
               ),
               const SizedBox(height: 16),
-              const Text('目标数据值 (Value):', style: TextStyle(fontWeight: FontWeight.w600)),
+              Text(i18n.t('targetDataVal'), style: const TextStyle(fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
               if (widget.variable.type == IecBasicType.boolean)
                 SwitchListTile(
-                  title: Text(_boolVal ? 'TRUE (合闸 / 动作 / 1)' : 'FALSE (分闸 / 复位 / 0)'),
+                  title: Text(_boolVal ? i18n.t('boolTrueDesc') : i18n.t('boolFalseDesc')),
                   value: _boolVal,
                   onChanged: (val) {
                     setState(() {
@@ -130,7 +132,7 @@ class _WriteValueDialogState extends State<WriteValueDialog> {
                   controller: _valCtrl,
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),
-                    hintText: '输入数值，如 220.5 或 1',
+                    hintText: i18n.t('enterValHint'),
                     suffixIcon: IconButton(
                       icon: const Icon(Icons.clear),
                       onPressed: () => _valCtrl.clear(),
@@ -138,14 +140,14 @@ class _WriteValueDialogState extends State<WriteValueDialog> {
                   ),
                 ),
               const SizedBox(height: 16),
-              const Text('品质状态 (Quality Flags):', style: TextStyle(fontWeight: FontWeight.w600)),
+              Text(i18n.t('qualityFlagsTitle'), style: const TextStyle(fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
                 runSpacing: 4,
                 children: [
                   FilterChip(
-                    label: const Text('有效 (Good)'),
+                    label: Text(i18n.t('qualityGood')),
                     selected: _quality == 0,
                     onSelected: (sel) {
                       setState(() {
@@ -154,7 +156,7 @@ class _WriteValueDialogState extends State<WriteValueDialog> {
                     },
                   ),
                   FilterChip(
-                    label: const Text('无效 (Invalid)'),
+                    label: Text(i18n.t('qualityInvalid')),
                     selected: (_quality & 0x01) != 0,
                     onSelected: (sel) {
                       setState(() {
@@ -163,7 +165,7 @@ class _WriteValueDialogState extends State<WriteValueDialog> {
                     },
                   ),
                   FilterChip(
-                    label: const Text('超范围 (OutOfRange)'),
+                    label: Text(i18n.t('qualityOutOfRange')),
                     selected: (_quality & 0x04) != 0,
                     onSelected: (sel) {
                       setState(() {
@@ -172,7 +174,7 @@ class _WriteValueDialogState extends State<WriteValueDialog> {
                     },
                   ),
                   FilterChip(
-                    label: const Text('测试模式 (Test)'),
+                    label: Text(i18n.t('qualityTest')),
                     selected: (_quality & 0x2000) != 0,
                     onSelected: (sel) {
                       setState(() {
@@ -181,7 +183,7 @@ class _WriteValueDialogState extends State<WriteValueDialog> {
                     },
                   ),
                   FilterChip(
-                    label: const Text('闭锁 (Blocked)'),
+                    label: Text(i18n.t('qualityBlocked')),
                     selected: (_quality & 0x4000) != 0,
                     onSelected: (sel) {
                       setState(() {
@@ -198,11 +200,11 @@ class _WriteValueDialogState extends State<WriteValueDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(i18n.t('cancel')),
         ),
         FilledButton.icon(
           icon: const Icon(Icons.check),
-          label: const Text('写入并生效'),
+          label: Text(i18n.t('writeAndApply')),
           onPressed: _save,
         ),
       ],

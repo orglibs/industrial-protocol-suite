@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'src/i18n/app_i18n.dart';
 import 'src/models/connection_config.dart';
 import 'src/models/workspace_storage.dart';
 import 'src/ui/home_screen.dart';
+import 'src/ui/widgets/window_title_bar.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await WindowManagerHelper.initialize();
   final connections = await WorkspaceStorage.loadConnections();
   runApp(ModbusSlaveApp(initialConnections: connections));
 }
@@ -27,12 +30,24 @@ class _ModbusSlaveAppState extends State<ModbusSlaveApp> {
     });
   }
 
+  void _onLanguageChanged() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Modbus Slave Emulator',
+      title: AppI18n.instance.t('appTitle'),
       debugShowCheckedModeBanner: false,
       themeMode: _themeMode,
+      builder: (context, child) {
+        return Directionality(
+          textDirection: AppI18n.instance.currentLanguage.isRtl
+              ? TextDirection.rtl
+              : TextDirection.ltr,
+          child: child ?? const SizedBox(),
+        );
+      },
       theme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.light,
@@ -63,6 +78,7 @@ class _ModbusSlaveAppState extends State<ModbusSlaveApp> {
         initialConnections: widget.initialConnections,
         onToggleTheme: _toggleTheme,
         isDarkMode: _themeMode == ThemeMode.dark,
+        onLanguageChanged: _onLanguageChanged,
       ),
     );
   }

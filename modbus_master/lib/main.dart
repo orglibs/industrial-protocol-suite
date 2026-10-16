@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'src/i18n/app_i18n.dart';
 import 'src/ui/home_screen.dart';
+import 'src/ui/widgets/window_title_bar.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await WindowManagerHelper.initialize();
   runApp(const ModbusMasterApp());
 }
 
@@ -22,10 +25,16 @@ class _ModbusMasterAppState extends State<ModbusMasterApp> {
     });
   }
 
+  void _onLanguageChanged() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
+    final i18n = AppI18n.instance;
+
     return MaterialApp(
-      title: 'Modbus Master Emulator',
+      title: i18n.t('appTitle'),
       debugShowCheckedModeBanner: false,
       themeMode: _themeMode,
       theme: ThemeData(
@@ -54,9 +63,13 @@ class _ModbusMasterAppState extends State<ModbusMasterApp> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
-      home: HomeScreen(
-        onToggleTheme: _toggleTheme,
-        isDarkMode: _themeMode == ThemeMode.dark,
+      home: Directionality(
+        textDirection: i18n.currentLanguage.isRtl ? TextDirection.rtl : TextDirection.ltr,
+        child: HomeScreen(
+          onToggleTheme: _toggleTheme,
+          isDarkMode: _themeMode == ThemeMode.dark,
+          onLanguageChanged: _onLanguageChanged,
+        ),
       ),
     );
   }

@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'package:flutter/material.dart';
 import '../../models/client_variable_model.dart';
 import '../../models/scl_models.dart';
@@ -57,6 +58,7 @@ class _DataMonitorTabState extends State<DataMonitorTab> {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = AppI18n.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final engine = widget.manager.activeEngine;
     final allVars = engine?.allVariables ?? [];
@@ -89,7 +91,7 @@ class _DataMonitorTabState extends State<DataMonitorTab> {
                 child: TextField(
                   controller: _searchCtrl,
                   decoration: InputDecoration(
-                    hintText: '搜索测点 (如 mag, stVal)...',
+                    hintText: i18n.t('searchVars'),
                     prefixIcon: const Icon(Icons.search, size: 18),
                     suffixIcon: _searchText.isNotEmpty
                         ? IconButton(icon: const Icon(Icons.clear, size: 16), onPressed: () => _searchCtrl.clear())
@@ -101,13 +103,13 @@ class _DataMonitorTabState extends State<DataMonitorTab> {
               ),
               const SizedBox(width: 12),
               FilterChip(
-                label: const Text('仅显示关注'),
+                label: Text(i18n.t('onlyMonitored')),
                 selected: _onlyMonitored,
                 onSelected: (val) => setState(() => _onlyMonitored = val),
               ),
               const SizedBox(width: 8),
               FilterChip(
-                label: const Text('仅显示周期轮询中'),
+                label: Text(i18n.t('onlyPolling')),
                 selected: _onlyPolling,
                 onSelected: (val) => setState(() => _onlyPolling = val),
               ),
@@ -116,12 +118,12 @@ class _DataMonitorTabState extends State<DataMonitorTab> {
                 value: _fcFilter,
                 underline: const SizedBox(),
                 items: const [
-                  DropdownMenuItem(value: 'ALL', child: Text('FC: 全部')),
-                  DropdownMenuItem(value: 'ST', child: Text('FC: ST (状态)')),
-                  DropdownMenuItem(value: 'MX', child: Text('FC: MX (遥测)')),
-                  DropdownMenuItem(value: 'CO', child: Text('FC: CO (控制)')),
-                  DropdownMenuItem(value: 'SP', child: Text('FC: SP (定值)')),
-                  DropdownMenuItem(value: 'CF', child: Text('FC: CF (配置)')),
+                  DropdownMenuItem(value: 'ALL', child: Text(i18n.t('fcAll'))),
+                  DropdownMenuItem(value: 'ST', child: Text(i18n.t('fcSt'))),
+                  DropdownMenuItem(value: 'MX', child: Text(i18n.t('fcMx'))),
+                  DropdownMenuItem(value: 'CO', child: Text(i18n.t('fcCo'))),
+                  DropdownMenuItem(value: 'SP', child: Text(i18n.t('fcSp'))),
+                  DropdownMenuItem(value: 'CF', child: Text(i18n.t('fcCf'))),
                 ],
                 onChanged: (val) {
                   if (val != null) setState(() => _fcFilter = val);
@@ -133,13 +135,13 @@ class _DataMonitorTabState extends State<DataMonitorTab> {
                 icon: _isPollingAll
                     ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                     : const Icon(Icons.refresh, size: 16),
-                label: const Text('一键读取全部 (Poll All)'),
+                label: Text(i18n.t('pollAll')),
                 onPressed: (engine?.isConnected ?? false) && !_isPollingAll ? _pollAllNow : null,
               ),
               const SizedBox(width: 8),
               OutlinedButton.icon(
                 icon: const Icon(Icons.play_circle_outline, size: 16, color: Colors.green),
-                label: const Text('开启周期轮询'),
+                label: Text(i18n.t('startPolling')),
                 onPressed: () {
                   for (final v in filtered) {
                     v.isPolling = true;
@@ -151,7 +153,7 @@ class _DataMonitorTabState extends State<DataMonitorTab> {
               const SizedBox(width: 8),
               OutlinedButton.icon(
                 icon: const Icon(Icons.pause_circle_outline, size: 16, color: Colors.red),
-                label: const Text('停止轮询'),
+                label: Text(i18n.t('stopPolling')),
                 onPressed: () {
                   for (final v in allVars) {
                     v.isPolling = false;
@@ -167,7 +169,7 @@ class _DataMonitorTabState extends State<DataMonitorTab> {
         // Data Table
         Expanded(
           child: filtered.isEmpty
-              ? const Center(child: Text('无匹配测点数据', style: TextStyle(color: Colors.grey)))
+              ? Center(child: Text(i18n.t('noMatchingPoints'), style: const TextStyle(color: Colors.grey)))
               : SingleChildScrollView(
                   scrollDirection: Axis.vertical,
                   child: SingleChildScrollView(
@@ -178,16 +180,16 @@ class _DataMonitorTabState extends State<DataMonitorTab> {
                       headingRowHeight: 40,
                       dataRowMinHeight: 42,
                       dataRowMaxHeight: 46,
-                      columns: const [
-                        DataColumn(label: Text('关注', style: TextStyle(fontWeight: FontWeight.bold))),
-                        DataColumn(label: Text('变量标识 (Reference)', style: TextStyle(fontWeight: FontWeight.bold))),
-                        DataColumn(label: Text('FC', style: TextStyle(fontWeight: FontWeight.bold))),
-                        DataColumn(label: Text('类型', style: TextStyle(fontWeight: FontWeight.bold))),
-                        DataColumn(label: Text('实时采集值 (Live Value)', style: TextStyle(fontWeight: FontWeight.bold))),
-                        DataColumn(label: Text('品质状态', style: TextStyle(fontWeight: FontWeight.bold))),
-                        DataColumn(label: Text('时间戳', style: TextStyle(fontWeight: FontWeight.bold))),
-                        DataColumn(label: Text('周期轮询', style: TextStyle(fontWeight: FontWeight.bold))),
-                        DataColumn(label: Text('操作', style: TextStyle(fontWeight: FontWeight.bold))),
+                      columns: [
+                        DataColumn(label: Text(i18n.t('colPin'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                        DataColumn(label: Text(i18n.t('colRef'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                        const DataColumn(label: Text('FC', style: TextStyle(fontWeight: FontWeight.bold))),
+                        DataColumn(label: Text(i18n.t('colType'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                        DataColumn(label: Text(i18n.t('colLiveAcqVal'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                        DataColumn(label: Text(i18n.t('colQuality'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                        DataColumn(label: Text(i18n.t('optTimestamp'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                        DataColumn(label: Text(i18n.t('colPoll'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                        DataColumn(label: Text(i18n.t('colAction'), style: const TextStyle(fontWeight: FontWeight.bold))),
                       ],
                       rows: filtered.map((v) {
                         return DataRow(
@@ -277,7 +279,7 @@ class _DataMonitorTabState extends State<DataMonitorTab> {
                                 children: [
                                   IconButton(
                                     icon: const Icon(Icons.refresh, size: 16),
-                                    tooltip: '单点读取',
+                                    tooltip: i18n.t('readSingle'),
                                     onPressed: () async {
                                       await engine?.readVariable(v);
                                       setState(() {});
@@ -286,13 +288,13 @@ class _DataMonitorTabState extends State<DataMonitorTab> {
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.edit, size: 16),
-                                    tooltip: '写入数据',
+                                    tooltip: i18n.t('writeValueTooltip'),
                                     onPressed: () => _openWriteDialog(v),
                                   ),
                                   if (v.isControllable)
                                     IconButton(
                                       icon: const Icon(Icons.power_settings_new, size: 16, color: Colors.deepOrange),
-                                      tooltip: '遥控操作',
+                                      tooltip: i18n.t('remoteControl'),
                                       onPressed: () => _openControlDialog(v),
                                     ),
                                 ],

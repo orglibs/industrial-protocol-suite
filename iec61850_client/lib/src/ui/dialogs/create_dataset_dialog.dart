@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'package:flutter/material.dart';
 import '../../models/client_variable_model.dart';
 
@@ -48,6 +49,7 @@ class _CreateDataSetDialogState extends State<CreateDataSetDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = AppI18n.instance;
     final filtered = _filter.isEmpty
         ? widget.allVariables
         : widget.allVariables.where((v) =>
@@ -55,11 +57,11 @@ class _CreateDataSetDialogState extends State<CreateDataSetDialog> {
             v.shortRef.toLowerCase().contains(_filter)).toList();
 
     return AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.dataset_outlined),
-          SizedBox(width: 8),
-          Text('创建动态数据集 (Create Dynamic DataSet)'),
+          const Icon(Icons.dataset_outlined),
+          const SizedBox(width: 8),
+          Text(i18n.t('createDataSetTitle')),
         ],
       ),
       content: SizedBox(
@@ -69,27 +71,27 @@ class _CreateDataSetDialogState extends State<CreateDataSetDialog> {
           children: [
             TextField(
               controller: _nameCtrl,
-              decoration: const InputDecoration(
-                labelText: '数据集名称 (DataSet Name)',
-                hintText: '如 dsMeasurements, dsEvents',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.tag),
+              decoration: InputDecoration(
+                labelText: i18n.t('dataSetNameLabel'),
+                hintText: i18n.t('dataSetNameHint'),
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.tag),
               ),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _searchCtrl,
-              decoration: const InputDecoration(
-                hintText: '快速搜索变量测点...',
-                prefixIcon: Icon(Icons.search, size: 18),
+              decoration: InputDecoration(
+                hintText: i18n.t('searchPointsHint'),
+                prefixIcon: const Icon(Icons.search, size: 18),
                 isDense: true,
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 8),
             Row(
               children: [
-                Text('已选成员: ${_selectedRefs.length} / ${widget.allVariables.length}',
+                Text('${i18n.t("relDataSetMembers")}: ${_selectedRefs.length} / ${widget.allVariables.length}',
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                 const Spacer(),
                 TextButton(
@@ -102,7 +104,7 @@ class _CreateDataSetDialogState extends State<CreateDataSetDialog> {
                       }
                     });
                   },
-                  child: Text(_selectedRefs.length == filtered.length ? '取消全选' : '全选筛选项'),
+                  child: Text(_selectedRefs.length == filtered.length ? i18n.t('deselectAll') : i18n.t('selectAll')),
                 ),
               ],
             ),
@@ -138,11 +140,11 @@ class _CreateDataSetDialogState extends State<CreateDataSetDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(i18n.t('cancel')),
         ),
         FilledButton.icon(
           icon: const Icon(Icons.check),
-          label: const Text('确认创建'),
+          label: Text(i18n.t('confirmCreate')),
           onPressed: _selectedRefs.isEmpty ? null : _submit,
         ),
       ],

@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'package:flutter/material.dart';
 import '../../models/register_group.dart';
 
@@ -28,7 +29,7 @@ class _EditGroupDialogState extends State<EditGroupDialog> {
   void initState() {
     super.initState();
     final g = widget.group;
-    _nameCtrl = TextEditingController(text: g?.groupName ?? '寄存器组 ${DateTime.now().millisecondsSinceEpoch % 100}');
+    _nameCtrl = TextEditingController(text: g?.groupName ?? 'Group ${DateTime.now().millisecondsSinceEpoch % 100}');
     _startAddrCtrl = TextEditingController(text: (g?.startAddress ?? 0).toString());
     _qtyCtrl = TextEditingController(text: (g?.quantity ?? 10).toString());
     _type = g?.registerType ?? ModbusRegisterType.holdingRegisters;
@@ -50,14 +51,14 @@ class _EditGroupDialogState extends State<EditGroupDialog> {
 
     if (startAddr < 0 || startAddr > 65535) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('起始地址必须在 0 ~ 65535 之间')),
+        const SnackBar(content: Text('Start Address: 0-65535')),
       );
       return;
     }
 
     if (qty < 1 || qty > 125) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('寄存器数量必须在 1 ~ 125 之间 (Modbus协议限制)')),
+        const SnackBar(content: Text('Quantity: 1-125')),
       );
       return;
     }
@@ -86,7 +87,7 @@ class _EditGroupDialogState extends State<EditGroupDialog> {
   Widget build(BuildContext context) {
     final isEdit = widget.group != null;
     return AlertDialog(
-      title: Text(isEdit ? '编辑寄存器组任务' : '添加寄存器组任务 (Add Register Group)'),
+      title: Text(isEdit ? AppI18n.instance.t('editGroupTitle') : AppI18n.instance.t('newGroupTitle')),
       content: SizedBox(
         width: 420,
         child: SingleChildScrollView(
@@ -96,7 +97,7 @@ class _EditGroupDialogState extends State<EditGroupDialog> {
               TextField(
                 controller: _nameCtrl,
                 decoration: const InputDecoration(
-                  labelText: '任务组名称 (Group Name)',
+                  labelText: AppI18n.instance.t('groupName'),
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.folder_special),
                 ),
@@ -105,7 +106,7 @@ class _EditGroupDialogState extends State<EditGroupDialog> {
               DropdownButtonFormField<ModbusRegisterType>(
                 initialValue: _type,
                 decoration: const InputDecoration(
-                  labelText: '寄存器类型 / 功能码 (Register Type)',
+                  labelText: AppI18n.instance.t('regType'),
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.category),
                 ),
@@ -118,7 +119,7 @@ class _EditGroupDialogState extends State<EditGroupDialog> {
               TextField(
                 controller: _startAddrCtrl,
                 decoration: const InputDecoration(
-                  labelText: '起始寄存器地址 Start Address (0..65535)',
+                  labelText: AppI18n.instance.t('startAddr'),
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.pin),
                 ),
@@ -128,7 +129,7 @@ class _EditGroupDialogState extends State<EditGroupDialog> {
               TextField(
                 controller: _qtyCtrl,
                 decoration: const InputDecoration(
-                  labelText: '读取点数 Quantity (1..125)',
+                  labelText: AppI18n.instance.t('regQty'),
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.format_list_numbered),
                 ),
@@ -136,8 +137,8 @@ class _EditGroupDialogState extends State<EditGroupDialog> {
               ),
               const SizedBox(height: 8),
               SwitchListTile(
-                title: const Text('启用此任务采集'),
-                subtitle: const Text('控制轮询服务是否循环下发本组采集请求'),
+                title: Text(AppI18n.instance.t('enableSim')),
+                subtitle: Text(AppI18n.instance.t('enableSimSub')),
                 value: _isEnabled,
                 onChanged: (v) => setState(() => _isEnabled = v),
               ),
@@ -148,11 +149,11 @@ class _EditGroupDialogState extends State<EditGroupDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(AppI18n.instance.t('cancel')),
         ),
         ElevatedButton(
           onPressed: _save,
-          child: Text(isEdit ? '保存更改' : '添加组'),
+          child: Text(isEdit ? AppI18n.instance.t('save') : AppI18n.instance.t('confirm')),
         ),
       ],
     );

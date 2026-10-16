@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:iec104_client/main.dart';
 import 'package:iec104_client/src/client/iec104_client.dart';
+import 'package:iec104_client/src/i18n/app_i18n.dart';
 import 'package:iec104_client/src/ui/dialogs/add_station_dialog.dart';
 import 'package:iec104_client/src/ui/dialogs/edit_station_dialog.dart';
 import 'package:iec104_client/src/ui/dialogs/add_point_dialog.dart';
@@ -14,6 +15,7 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
 
+    AppI18n.instance.setLanguage(AppLanguage.zhCN);
     final client = Iec104Client();
     await tester.pumpWidget(Iec104ClientApp(client: client));
 

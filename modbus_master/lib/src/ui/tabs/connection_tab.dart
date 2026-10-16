@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'package:flutter/material.dart';
 import '../../models/connection_config.dart';
 import '../../models/register_group.dart';
@@ -43,7 +44,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
   List<String> _availablePorts = [];
   static const List<int> _baudRates = [1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200];
   static const List<int> _dataBitsList = [8, 7];
-  static const Map<int, String> _parityLabels = {0: '无校验 (None)', 1: '奇校验 (Odd)', 2: '偶校验 (Even)'};
+  static const Map<int, String> _parityLabels = {0: 'None (0)', 1: 'Odd (1)', 2: 'Even (2)'};
   static const List<int> _stopBitsList = [1, 2];
 
   @override
@@ -92,13 +93,13 @@ class _ConnectionTabState extends State<ConnectionTab> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('手动指定串口设备路径'),
+        title: Text(AppI18n.instance.t('serialPort')), 
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              '请输入物理串口设备节点 (如 Linux 的 /dev/ttyUSB0、/dev/pts/1 或 Windows 的 COM1):',
+              'e.g. /dev/ttyUSB0 | COM1',
               style: TextStyle(fontSize: 13),
             ),
             const SizedBox(height: 12),
@@ -106,7 +107,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
               controller: textCtrl,
               autofocus: true,
               decoration: const InputDecoration(
-                labelText: '串口设备路径',
+                labelText: AppI18n.instance.t('serialPort'),
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.usb),
               ),
@@ -114,7 +115,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('取消')),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text(AppI18n.instance.t('cancel'))),
           ElevatedButton(
             onPressed: () {
               final val = textCtrl.text.trim();
@@ -129,7 +130,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
               }
               Navigator.of(ctx).pop();
             },
-            child: const Text('确定'),
+            child: Text(AppI18n.instance.t('confirm')),
           ),
         ],
       ),
@@ -173,7 +174,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('连接失败: $e'), backgroundColor: Colors.red),
+            SnackBar(content: Text('${AppI18n.instance.t('connect')} failed: $e'), backgroundColor: Colors.red),
           );
         }
       }
@@ -199,7 +200,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
   void _deleteCurrentConnection() {
     if (widget.connections.length <= 1) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('至少需保留一个通信连接配置，无法删除当前唯一连接。')),
+        SnackBar(content: Text(AppI18n.instance.t('deleteConn'))),
       );
       return;
     }
@@ -207,17 +208,17 @@ class _ConnectionTabState extends State<ConnectionTab> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('删除连接'),
-        content: Text('确认删除连接 [${widget.activeConnection.name}] 及其下属的所有从站设备 (${widget.activeConnection.slaves.length} 个)？'),
+        title: Text(AppI18n.instance.t('deleteConn')),
+        content: Text('${AppI18n.instance.t('deleteConn')} [${widget.activeConnection.name}]?'),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('取消')),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text(AppI18n.instance.t('cancel'))),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
             onPressed: () {
               Navigator.of(ctx).pop();
               widget.onDeleteConnection(widget.activeConnection);
             },
-            child: const Text('确认删除'),
+            child: Text(AppI18n.instance.t('delete')),
           ),
         ],
       ),
@@ -260,7 +261,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
     });
     widget.onConfigChanged();
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('已复制从站 [${copied.name} (ID: ${copied.slaveId})] 到当前连接')),
+      SnackBar(content: Text('${AppI18n.instance.t('copySlave')}: ${copied.name}')),
     );
   }
 
@@ -268,10 +269,10 @@ class _ConnectionTabState extends State<ConnectionTab> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('删除从站'),
-        content: Text('确认从连接 [${widget.activeConnection.name}] 中删除从站 [${slave.name} (ID: ${slave.slaveId})] 及其所有寄存器组？'),
+        title: Text(AppI18n.instance.t('deleteSlave')),
+        content: Text('${AppI18n.instance.t('deleteSlave')} [${slave.name}]?'),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('取消')),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text(AppI18n.instance.t('cancel'))),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
             onPressed: () {
@@ -281,7 +282,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
               widget.onConfigChanged();
               Navigator.of(ctx).pop();
             },
-            child: const Text('确认删除'),
+            child: Text(AppI18n.instance.t('delete')),
           ),
         ],
       ),
@@ -345,7 +346,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
                         children: [
                           Icon(Icons.hub, color: theme.colorScheme.primary, size: 28),
                           const SizedBox(width: 8),
-                          const Text('当前连接: ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          Text('${AppI18n.instance.t('connAlias')}: ', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                           const SizedBox(width: 6),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
@@ -359,8 +360,8 @@ class _ConnectionTabState extends State<ConnectionTab> {
                                 value: widget.activeConnection,
                                 items: widget.connections.map((c) {
                                   final desc = c.mode == ModbusTransportMode.serialRtu
-                                      ? (c.serialPortName ?? '串口')
-                                      : (c.mode == ModbusTransportMode.virtual ? '虚拟' : '${c.ip}:${c.port}');
+                                      ? (c.serialPortName ?? AppI18n.instance.t('serialPort'))
+                                      : (c.mode == ModbusTransportMode.virtual ? 'Virtual' : '${c.ip}:${c.port}');
                                   return DropdownMenuItem(
                                     value: c,
                                     child: Row(
@@ -445,26 +446,26 @@ class _ConnectionTabState extends State<ConnectionTab> {
                               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                             ),
                             icon: Icon(isConnected ? Icons.link_off : Icons.link, size: 18),
-                            label: Text(isConnected ? '断开' : '连接'),
+                            label: Text(isConnected ? AppI18n.instance.t('disconnect') : AppI18n.instance.t('connect')),
                             onPressed: isConnecting ? null : _toggleConnection,
                           ),
 
                           OutlinedButton.icon(
                             icon: const Icon(Icons.add, size: 16),
-                            label: const Text('添加连接'),
+                            label: Text(AppI18n.instance.t('newConn')),
                             onPressed: widget.onAddConnection,
                           ),
 
                           OutlinedButton.icon(
                             icon: const Icon(Icons.edit, size: 16),
-                            label: const Text('编辑参数'),
+                            label: Text(AppI18n.instance.t('editParams')),
                             onPressed: isConnected ? null : _editCurrentConnection,
                           ),
 
                           if (widget.connections.length > 1)
                             IconButton(
                               icon: const Icon(Icons.delete_outline, color: Colors.red),
-                              tooltip: '删除此连接',
+                              tooltip: AppI18n.instance.t('deleteConn'),
                               onPressed: isConnected ? null : _deleteCurrentConnection,
                             ),
                         ],
@@ -488,7 +489,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
                           isExpanded: true,
                           initialValue: widget.activeConnection.mode,
                           decoration: const InputDecoration(
-                            labelText: '工作模式 (Transport Mode)',
+                            labelText: AppI18n.instance.t('protoType'),
                             border: OutlineInputBorder(),
                             prefixIcon: Icon(Icons.settings_ethernet),
                           ),
@@ -540,7 +541,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
                                     ? widget.activeConnection.serialPortName
                                     : (_availablePorts.isNotEmpty ? _availablePorts.first : null),
                                 decoration: const InputDecoration(
-                                  labelText: '串口设备 (Port)',
+                                  labelText: AppI18n.instance.t('serialPort'),
                                   border: OutlineInputBorder(),
                                   prefixIcon: Icon(Icons.usb),
                                 ),
@@ -563,12 +564,12 @@ class _ConnectionTabState extends State<ConnectionTab> {
                             const SizedBox(width: 4),
                             IconButton(
                               icon: const Icon(Icons.edit_note),
-                              tooltip: '手动输入串口路径',
+                              tooltip: AppI18n.instance.t('serialPort'),
                               onPressed: isConnected ? null : _showCustomPortDialog,
                             ),
                             IconButton(
                               icon: const Icon(Icons.refresh),
-                              tooltip: '重新扫描可用串口',
+                              tooltip: AppI18n.instance.t('rescan'),
                               onPressed: isConnected ? null : _loadAvailablePorts,
                             ),
                           ],
@@ -584,7 +585,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
                                 ? widget.activeConnection.baudRate
                                 : 9600,
                             decoration: const InputDecoration(
-                              labelText: '波特率',
+                              labelText: AppI18n.instance.t('baudRate'),
                               border: OutlineInputBorder(),
                             ),
                             items: _baudRates.map((b) => DropdownMenuItem(
@@ -614,12 +615,12 @@ class _ConnectionTabState extends State<ConnectionTab> {
                                 ? widget.activeConnection.dataBits
                                 : 8,
                             decoration: const InputDecoration(
-                              labelText: '数据位',
+                              labelText: AppI18n.instance.t('dataBits'),
                               border: OutlineInputBorder(),
                             ),
                             items: _dataBitsList.map((d) => DropdownMenuItem(
                               value: d,
-                              child: Text('$d 位'),
+                              child: Text('$d Bits'),
                             )).toList(),
                             onChanged: isConnected
                                 ? null
@@ -644,7 +645,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
                                 ? widget.activeConnection.parity
                                 : 0,
                             decoration: const InputDecoration(
-                              labelText: '校验位',
+                              labelText: AppI18n.instance.t('parity'),
                               border: OutlineInputBorder(),
                             ),
                             items: _parityLabels.entries.map((e) => DropdownMenuItem(
@@ -674,12 +675,12 @@ class _ConnectionTabState extends State<ConnectionTab> {
                                 ? widget.activeConnection.stopBits
                                 : 1,
                             decoration: const InputDecoration(
-                              labelText: '停止位',
+                              labelText: AppI18n.instance.t('stopBits'),
                               border: OutlineInputBorder(),
                             ),
                             items: _stopBitsList.map((s) => DropdownMenuItem(
                               value: s,
-                              child: Text('$s 位'),
+                              child: Text('$s Bits'),
                             )).toList(),
                             onChanged: isConnected
                                 ? null
@@ -704,7 +705,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
                             controller: _ipCtrl,
                             enabled: !isConnected,
                             decoration: const InputDecoration(
-                              labelText: '目标 IP / 主机名',
+                              labelText: AppI18n.instance.t('listenIp'),
                               border: OutlineInputBorder(),
                               prefixIcon: Icon(Icons.dns),
                             ),
@@ -716,7 +717,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
                             controller: _portCtrl,
                             enabled: !isConnected,
                             decoration: const InputDecoration(
-                              labelText: '端口 (Port)',
+                              labelText: AppI18n.instance.t('listenPort'),
                               border: OutlineInputBorder(),
                               prefixIcon: Icon(Icons.numbers),
                             ),
@@ -739,7 +740,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
                             children: [
                               Icon(Icons.memory, color: theme.colorScheme.primary, size: 20),
                               const SizedBox(width: 8),
-                              Text('本地虚拟仿真：已集成电表测量量与开关量，无需外部设备', style: TextStyle(fontSize: 13, color: theme.colorScheme.primary)),
+                              Text(AppI18n.instance.t('footerNote'), style: TextStyle(fontSize: 13, color: theme.colorScheme.primary)),
                             ],
                           ),
                         ),
@@ -751,7 +752,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
                           controller: _timeoutCtrl,
                           enabled: !isConnected,
                           decoration: const InputDecoration(
-                            labelText: '超时时间 (ms)',
+                            labelText: AppI18n.instance.t('respDelay'),
                             border: OutlineInputBorder(),
                             prefixIcon: Icon(Icons.timer),
                           ),
@@ -780,12 +781,12 @@ class _ConnectionTabState extends State<ConnectionTab> {
                   const Icon(Icons.account_tree, color: Colors.blueGrey, size: 24),
                   const SizedBox(width: 8),
                   Text(
-                    '从站与任务列表 [隶属于连接: ${widget.activeConnection.name}]',
+                    '[${widget.activeConnection.name}] ${AppI18n.instance.t('slavesList')}',
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(width: 8),
                   Chip(
-                    label: Text('${widget.activeConnection.slaves.length} 个从站', style: const TextStyle(fontSize: 12)),
+                    label: Text('${widget.activeConnection.slaves.length}', style: const TextStyle(fontSize: 12)),
                     backgroundColor: Colors.grey.shade100,
                   ),
                 ],
@@ -797,7 +798,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
                   foregroundColor: Colors.white,
                 ),
                 icon: const Icon(Icons.add),
-                label: const Text('添加从站到当前连接 (Add Slave)'),
+                label: Text(AppI18n.instance.t('newSlave')),
                 onPressed: _addSlave,
               ),
             ],
@@ -814,11 +815,11 @@ class _ConnectionTabState extends State<ConnectionTab> {
                     children: [
                       const Icon(Icons.device_unknown, size: 48, color: Colors.blueGrey),
                       const SizedBox(height: 12),
-                      Text('连接【${widget.activeConnection.name}】下暂无从站设备', style: const TextStyle(fontSize: 15)),
+                      Text(AppI18n.instance.t('noSlaveHint'), style: const TextStyle(fontSize: 15)),
                       const SizedBox(height: 8),
                       ElevatedButton.icon(
                         icon: const Icon(Icons.add),
-                        label: const Text('立即添加从站设备'),
+                        label: Text(AppI18n.instance.t('newSlave')),
                         onPressed: _addSlave,
                       ),
                     ],
@@ -860,12 +861,12 @@ class _ConnectionTabState extends State<ConnectionTab> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    '${slave.name} [从机 Unit ID: ${slave.slaveId}]',
+                                    '${slave.name} [ID: ${slave.slaveId}]',
                                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    '扫描: ${slave.scanRate}ms | 基数: ${slave.registerAddressesType == 0 ? "0-based" : (slave.registerAddressesType == 1 ? "1-based" : "PLC")} | 字节序: ${slave.byteOrder.name.toUpperCase()}',
+                                    '${slave.scanRate}ms | ${slave.byteOrder.name.toUpperCase()}',
                                     style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
                                   ),
                                 ],
@@ -877,22 +878,22 @@ class _ConnectionTabState extends State<ConnectionTab> {
                             children: [
                               TextButton.icon(
                                 icon: const Icon(Icons.edit, size: 16),
-                                label: const Text('编辑'),
+                                label: Text(AppI18n.instance.t('edit')),
                                 onPressed: () => _editSlave(slave),
                               ),
                               TextButton.icon(
                                 icon: const Icon(Icons.copy, size: 16),
-                                label: const Text('复制从站'),
+                                label: Text(AppI18n.instance.t('copySlave')),
                                 onPressed: () => _copySlave(slave),
                               ),
                               TextButton.icon(
                                 icon: const Icon(Icons.add_circle_outline, size: 16),
-                                label: const Text('添加任务组'),
+                                label: Text(AppI18n.instance.t('addGroup')),
                                 onPressed: () => _addGroup(slave),
                               ),
                               IconButton(
                                 icon: const Icon(Icons.delete_outline, color: Colors.red),
-                                tooltip: '删除从站',
+                                tooltip: AppI18n.instance.t('deleteSlave'),
                                 onPressed: () => _deleteSlave(slave),
                               ),
                             ],
@@ -907,7 +908,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           child: Text(
-                            '当前从站暂无寄存器采集任务，点击“添加任务组”进行配置',
+                            AppI18n.instance.t('noGroupHint'),
                             style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
                           ),
                         )
@@ -931,7 +932,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
                               ),
                               title: Text(group.groupName, style: const TextStyle(fontWeight: FontWeight.w600)),
                               subtitle: Text(
-                                '${group.registerType.label} | 起始地址: ${group.startAddress} | 点数: ${group.quantity} | 状态: ${group.lastScanStatus ?? "就绪"}',
+                                '${group.registerType.label} | ${AppI18n.instance.t('startAddr')}: ${group.startAddress} | ${AppI18n.instance.t('pointsCount')}: ${group.quantity}',
                                 style: const TextStyle(fontSize: 12),
                               ),
                               trailing: Row(

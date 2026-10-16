@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'package:flutter/material.dart';
 import '../../models/connection_config.dart';
 import '../../models/register_group.dart';
@@ -58,7 +59,7 @@ class _ChartTabState extends State<ChartTab> {
   @override
   Widget build(BuildContext context) {
     if (widget.config.slaves.isEmpty) {
-      return const Center(child: Text('暂无可用从站'));
+      return Center(child: Text(AppI18n.instance.t('noSlaveHint')));
     }
 
     if (_selectedSlave == null || !widget.config.slaves.contains(_selectedSlave)) {
@@ -71,73 +72,77 @@ class _ChartTabState extends State<ChartTab> {
       _selectedRegister = _selectedGroup!.registers.first;
     }
 
+    final theme = Theme.of(context);
+
     return Column(
       children: [
         // Selector bar
-        Card(
-          margin: const EdgeInsets.all(8),
-          elevation: 2,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Wrap(
-              spacing: 12,
-              runSpacing: 8,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                DropdownButton<SlaveModel>(
-                  value: _selectedSlave,
+        Container(
+          margin: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: theme.dividerColor),
+          ),
+          child: Wrap(
+            spacing: 12,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              DropdownButton<SlaveModel>(
+                value: _selectedSlave,
+                underline: const SizedBox(),
+                items: widget.config.slaves.map((s) {
+                  return DropdownMenuItem(value: s, child: Text(s.name));
+                }).toList(),
+                onChanged: (s) {
+                  setState(() {
+                    _selectedSlave = s;
+                    _selectedGroup = s?.groups.isNotEmpty == true ? s!.groups.first : null;
+                    _selectedRegister = _selectedGroup?.registers.isNotEmpty == true ? _selectedGroup!.registers.first : null;
+                    _history.clear();
+                  });
+                },
+              ),
+              if (_selectedSlave != null && _selectedSlave!.groups.isNotEmpty)
+                DropdownButton<RegisterGroupModel>(
+                  value: _selectedGroup,
                   underline: const SizedBox(),
-                  items: widget.config.slaves.map((s) {
-                    return DropdownMenuItem(value: s, child: Text(s.name));
+                  items: _selectedSlave!.groups.map((g) {
+                    return DropdownMenuItem(value: g, child: Text(g.groupName));
                   }).toList(),
-                  onChanged: (s) {
+                  onChanged: (g) {
                     setState(() {
-                      _selectedSlave = s;
-                      _selectedGroup = s?.groups.isNotEmpty == true ? s!.groups.first : null;
-                      _selectedRegister = _selectedGroup?.registers.isNotEmpty == true ? _selectedGroup!.registers.first : null;
+                      _selectedGroup = g;
+                      _selectedRegister = g?.registers.isNotEmpty == true ? g!.registers.first : null;
                       _history.clear();
                     });
                   },
                 ),
-                if (_selectedSlave != null && _selectedSlave!.groups.isNotEmpty)
-                  DropdownButton<RegisterGroupModel>(
-                    value: _selectedGroup,
-                    underline: const SizedBox(),
-                    items: _selectedSlave!.groups.map((g) {
-                      return DropdownMenuItem(value: g, child: Text(g.groupName));
-                    }).toList(),
-                    onChanged: (g) {
-                      setState(() {
-                        _selectedGroup = g;
-                        _selectedRegister = g?.registers.isNotEmpty == true ? g!.registers.first : null;
-                        _history.clear();
-                      });
-                    },
-                  ),
-                if (_selectedGroup != null && _selectedGroup!.registers.isNotEmpty)
-                  DropdownButton<RegisterModel>(
-                    value: _selectedRegister,
-                    underline: const SizedBox(),
-                    items: _selectedGroup!.registers.map((r) {
-                      return DropdownMenuItem(
-                        value: r,
-                        child: Text('${r.alias ?? "点位"}[地址:${r.address}] (当前值: ${r.rawValue})'),
-                      );
-                    }).toList(),
-                    onChanged: (r) {
-                      setState(() {
-                        _selectedRegister = r;
-                        _history.clear();
-                      });
-                    },
-                  ),
-                IconButton.outlined(
-                  icon: const Icon(Icons.clear_all),
-                  tooltip: '清空历史曲线',
-                  onPressed: () => setState(() => _history.clear()),
+              if (_selectedGroup != null && _selectedGroup!.registers.isNotEmpty)
+                DropdownButton<RegisterModel>(
+                  value: _selectedRegister,
+                  underline: const SizedBox(),
+                  items: _selectedGroup!.registers.map((r) {
+                    return DropdownMenuItem(
+                      value: r,
+                      child: Text('${r.alias ?? "Point"}[${AppI18n.instance.t('colAddr')}:${r.address}] (${AppI18n.instance.t('currValue')}: ${r.rawValue})'),
+                    );
+                  }).toList(),
+                  onChanged: (r) {
+                    setState(() {
+                      _selectedRegister = r;
+                      _history.clear();
+                    });
+                  },
                 ),
-              ],
-            ),
+              IconButton.outlined(
+                icon: const Icon(Icons.clear_all),
+                tooltip: AppI18n.instance.t('clearChart'),
+                onPressed: () => setState(() => _history.clear()),
+              ),
+            ],
           ),
         ),
 
@@ -148,16 +153,16 @@ class _ChartTabState extends State<ChartTab> {
             child: Row(
               children: [
                 Text(
-                  '当前监视: ${_selectedRegister!.alias ?? "点位"} [地址: ${_selectedRegister!.address}]',
+                  '${_selectedRegister!.alias ?? "Point"} [${AppI18n.instance.t('colAddr')}: ${_selectedRegister!.address}]',
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                 ),
                 const SizedBox(width: 16),
                 Text(
-                  '实时数值: ${_selectedRegister!.rawValue}',
-                  style: const TextStyle(fontSize: 14, color: Colors.indigo, fontWeight: FontWeight.bold),
+                  '${AppI18n.instance.t('currValue')}: ${_selectedRegister!.rawValue}',
+                  style: TextStyle(fontSize: 14, color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
-                Text('历史数据点: ${_history.length} / $_maxPoints', style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                Text('${AppI18n.instance.t('pointsCount')}: ${_history.length} / $_maxPoints', style: TextStyle(color: theme.colorScheme.outline, fontSize: 12)),
               ],
             ),
           ),
@@ -174,7 +179,7 @@ class _ChartTabState extends State<ChartTab> {
                 padding: const EdgeInsets.all(16),
                 child: _history.isEmpty
                     ? const Center(
-                        child: Text('启动轮询采集后，此处将实时绘制遥测数值动态波动曲线', style: TextStyle(color: Colors.white60)),
+                        child: Text(AppI18n.instance.t('noChartData'), style: const TextStyle(color: Colors.white60)),
                       )
                     : CustomPaint(
                         painter: _TrendChartPainter(_history),

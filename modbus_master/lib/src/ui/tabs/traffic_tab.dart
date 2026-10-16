@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../services/traffic_logger.dart';
@@ -60,14 +61,14 @@ class _TrafficTabState extends State<TrafficTab> {
               // Pause / Resume
               IconButton.filledTonal(
                 icon: Icon(_isPaused ? Icons.play_arrow : Icons.pause),
-                tooltip: _isPaused ? '恢复捕获' : '暂停捕获',
+                tooltip: _isPaused ? AppI18n.instance.t('resumeLog') : AppI18n.instance.t('pauseLog'),
                 onPressed: () => setState(() => _isPaused = !_isPaused),
               ),
               const SizedBox(width: 8),
               // Clear
               IconButton.outlined(
                 icon: const Icon(Icons.delete_sweep),
-                tooltip: '清空报文记录',
+                tooltip: AppI18n.instance.t('clearLog'),
                 onPressed: () {
                   setState(() {
                     _logger.clear();
@@ -81,7 +82,7 @@ class _TrafficTabState extends State<TrafficTab> {
                 child: TextField(
                   controller: _searchCtrl,
                   decoration: InputDecoration(
-                    hintText: '搜索功能码、十六进制、地址或内容...',
+                    hintText: AppI18n.instance.t('searchHexHint'),
                     prefixIcon: const Icon(Icons.search, size: 20),
                     suffixIcon: _filter.isNotEmpty
                         ? IconButton(
@@ -101,7 +102,7 @@ class _TrafficTabState extends State<TrafficTab> {
               ),
               const SizedBox(width: 16),
               Text(
-                '共 ${filtered.length} 条报文',
+                '${filtered.length} ${AppI18n.instance.t('frames')}',
                 style: TextStyle(color: theme.colorScheme.outline, fontSize: 13),
               ),
             ],
@@ -118,7 +119,7 @@ class _TrafficTabState extends State<TrafficTab> {
                     children: [
                       Icon(Icons.sync_alt, size: 48, color: theme.colorScheme.outline),
                       const SizedBox(height: 12),
-                      const Text('暂无通信报文记录，连接设备或虚拟从站开始轮询'),
+                      Text(AppI18n.instance.t('emptyTrafficHint')),
                     ],
                   ),
                 )
@@ -233,7 +234,7 @@ class _TrafficTabState extends State<TrafficTab> {
               ? Container(
                   color: theme.colorScheme.surfaceVariant.withOpacity(0.1),
                   alignment: Alignment.center,
-                  child: Text('点击上方任意报文以查看详细解析与十六进制数据', style: TextStyle(color: theme.colorScheme.outline)),
+                  child: Text(AppI18n.instance.t('emptyTrafficHint'), style: TextStyle(color: theme.colorScheme.outline)),
                 )
               : _buildInspector(theme, _selectedEntry!),
         ),
@@ -253,17 +254,17 @@ class _TrafficTabState extends State<TrafficTab> {
               Icon(Icons.data_object, size: 20, color: theme.colorScheme.primary),
               const SizedBox(width: 8),
               Text(
-                '报文解析详情 [${entry.directionLabel}] - ${entry.summary}',
+                '[${entry.directionLabel}] - ${entry.summary}',
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
               ),
               const Spacer(),
               TextButton.icon(
                 icon: const Icon(Icons.copy, size: 16),
-                label: const Text('复制十六进制'),
+                label: Text(AppI18n.instance.t('copyHex')),
                 onPressed: () {
                   Clipboard.setData(ClipboardData(text: entry.rawHex));
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('已复制报文十六进制到剪贴板'), duration: Duration(seconds: 1)),
+                    SnackBar(content: Text(AppI18n.instance.t('copiedClipboard')), duration: const Duration(seconds: 1)),
                   );
                 },
               ),
@@ -276,11 +277,11 @@ class _TrafficTabState extends State<TrafficTab> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '协议说明: ${entry.protocolDetail}',
+                    '${entry.protocolDetail}',
                     style: TextStyle(fontSize: 13, color: theme.textTheme.bodyMedium?.color),
                   ),
                   const SizedBox(height: 8),
-                  const Text('十六进制原始字节流 (Hex Dump):', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                  Text(AppI18n.instance.t('inputHex'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                   const SizedBox(height: 4),
                   Container(
                     width: double.infinity,
@@ -290,7 +291,7 @@ class _TrafficTabState extends State<TrafficTab> {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: SelectableText(
-                      entry.rawHex.isEmpty ? '<空报文>' : entry.rawHex,
+                      entry.rawHex.isEmpty ? '<Empty>' : entry.rawHex,
                       style: const TextStyle(fontFamily: 'monospace', color: Colors.greenAccent, fontSize: 13),
                     ),
                   ),

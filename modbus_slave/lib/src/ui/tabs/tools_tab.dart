@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -65,7 +66,7 @@ class _ToolsTabState extends State<ToolsTab> {
         return;
       }
     } catch (_) {}
-    setState(() => _bytesOutputHex = '转换失败: 输入无效');
+    setState(() => _bytesOutputHex = AppI18n.instance.t('convertFailed'));
   }
 
   void _calcBytesToNumber() {
@@ -79,7 +80,7 @@ class _ToolsTabState extends State<ToolsTab> {
       final val = ModbusDataConverter.parseValue(uint8, _numFormat, _numByteOrder);
       setState(() => _numberOutput = val.toString());
     } catch (e) {
-      setState(() => _numberOutput = '解析错误: $e');
+      setState(() => _numberOutput = '${AppI18n.instance.t('parseError')}: $e');
     }
   }
 
@@ -109,7 +110,7 @@ class _ToolsTabState extends State<ToolsTab> {
       setState(() {
         final crcLo = (crc & 0xFF).toRadixString(16).padLeft(2, '0').toUpperCase();
         final crcHi = ((crc >> 8) & 0xFF).toRadixString(16).padLeft(2, '0').toUpperCase();
-        _crc16Result = '$crcLo $crcHi (低位在前: 0x${crc.toRadixString(16).padLeft(4, "0").toUpperCase()})';
+        _crc16Result = '$crcLo $crcHi (0x${crc.toRadixString(16).padLeft(4, "0").toUpperCase()})';
         _lrcResult = '0x${lrc.toRadixString(16).padLeft(2, "0").toUpperCase()}';
         _sum8Result = '0x${sum8.toRadixString(16).padLeft(2, "0").toUpperCase()}';
       });
@@ -145,22 +146,22 @@ class _ToolsTabState extends State<ToolsTab> {
               NavigationRailDestination(
                 icon: Icon(Icons.calculate_outlined),
                 selectedIcon: Icon(Icons.calculate),
-                label: Text('数值/字节转换'),
+                label: Text(AppI18n.instance.t('numByteConvert')),
               ),
               NavigationRailDestination(
                 icon: Icon(Icons.verified_outlined),
                 selectedIcon: Icon(Icons.verified),
-                label: Text('校验算法 (CRC)'),
+                label: Text(AppI18n.instance.t('checkAlgo')),
               ),
               NavigationRailDestination(
                 icon: Icon(Icons.text_fields_outlined),
                 selectedIcon: Icon(Icons.text_fields),
-                label: Text('字符编解码'),
+                label: Text(AppI18n.instance.t('charCodec')),
               ),
               NavigationRailDestination(
                 icon: Icon(Icons.usb_outlined),
                 selectedIcon: Icon(Icons.usb),
-                label: Text('串口探测'),
+                label: Text(AppI18n.instance.t('serialDetect')),
               ),
             ],
           ),
@@ -191,23 +192,23 @@ class _ToolsTabState extends State<ToolsTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('数值 ⇋ 字节转换器 (Number <-> Bytes)', style: theme.textTheme.titleLarge),
+          Text(AppI18n.instance.t('numByteConvert'), style: theme.textTheme.titleLarge),
           const SizedBox(height: 8),
-          const Text('复刻 MSE 的 FloatToBytes, DoubleToBytes, LongToBytes 转换模块，支持多种端序'),
+          Text(AppI18n.instance.t('dataFormat')),
           const SizedBox(height: 24),
           Row(
             children: [
               Expanded(
                 child: DropdownButtonFormField<RegisterDataFormat>(
                   value: _numFormat,
-                  decoration: const InputDecoration(labelText: '目标数据类型', border: OutlineInputBorder()),
+                  decoration: InputDecoration(labelText: AppI18n.instance.t('dataFormat'), border: const OutlineInputBorder()),
                   items: const [
-                    DropdownMenuItem(value: RegisterDataFormat.float32, child: Text('32位 浮点数 (Float32)')),
-                    DropdownMenuItem(value: RegisterDataFormat.double64, child: Text('64位 双精度浮点 (Double64)')),
-                    DropdownMenuItem(value: RegisterDataFormat.signed32, child: Text('32位 有符号整数 (Int32)')),
-                    DropdownMenuItem(value: RegisterDataFormat.unsigned32, child: Text('32位 无符号整数 (UInt32)')),
-                    DropdownMenuItem(value: RegisterDataFormat.signed16, child: Text('16位 有符号整数 (Int16)')),
-                    DropdownMenuItem(value: RegisterDataFormat.unsigned16, child: Text('16位 无符号整数 (UInt16)')),
+                    DropdownMenuItem(value: RegisterDataFormat.float32, child: Text('Float32 (32-bit)')),
+                    DropdownMenuItem(value: RegisterDataFormat.double64, child: Text('Double64 (64-bit)')),
+                    DropdownMenuItem(value: RegisterDataFormat.signed32, child: Text('Int32 (32-bit)')),
+                    DropdownMenuItem(value: RegisterDataFormat.unsigned32, child: Text('UInt32 (32-bit)')),
+                    DropdownMenuItem(value: RegisterDataFormat.signed16, child: Text('Int16 (16-bit)')),
+                    DropdownMenuItem(value: RegisterDataFormat.unsigned16, child: Text('UInt16 (16-bit)')),
                   ],
                   onChanged: (v) {
                     if (v != null) {
@@ -222,7 +223,7 @@ class _ToolsTabState extends State<ToolsTab> {
               Expanded(
                 child: DropdownButtonFormField<ModbusByteOrder>(
                   value: _numByteOrder,
-                  decoration: const InputDecoration(labelText: '字节序 / 大小端 (Byte Order)', border: OutlineInputBorder()),
+                  decoration: InputDecoration(labelText: AppI18n.instance.t('byteOrder'), border: const OutlineInputBorder()),
                   items: ModbusByteOrder.values.map((o) {
                     return DropdownMenuItem(value: o, child: Text(o.label));
                   }).toList(),
@@ -244,7 +245,7 @@ class _ToolsTabState extends State<ToolsTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('数值转十六进制字节 (Number -> Hex Bytes)', style: theme.textTheme.titleMedium),
+                  Text(AppI18n.instance.t('numToHex'), style: theme.textTheme.titleMedium),
                   const SizedBox(height: 12),
                   Row(
                     children: [
@@ -252,7 +253,7 @@ class _ToolsTabState extends State<ToolsTab> {
                         child: TextFormField(
                           initialValue: _numInput,
                           decoration: const InputDecoration(
-                            labelText: '输入数值 (Number)',
+                            labelText: AppI18n.instance.t('inputNum'),
                             border: OutlineInputBorder(),
                           ),
                           onChanged: (v) {
@@ -289,7 +290,7 @@ class _ToolsTabState extends State<ToolsTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('十六进制字节转数值 (Hex Bytes -> Number)', style: theme.textTheme.titleMedium),
+                  Text(AppI18n.instance.t('hexToNum'), style: theme.textTheme.titleMedium),
                   const SizedBox(height: 12),
                   Row(
                     children: [
@@ -297,7 +298,7 @@ class _ToolsTabState extends State<ToolsTab> {
                         child: TextFormField(
                           initialValue: _bytesInputHex,
                           decoration: const InputDecoration(
-                            labelText: '输入十六进制字节 (如: 42 F6 E9 79)',
+                            labelText: AppI18n.instance.t('inputHex'),
                             border: OutlineInputBorder(),
                           ),
                           onChanged: (v) {
@@ -316,7 +317,7 @@ class _ToolsTabState extends State<ToolsTab> {
                             border: Border.all(color: theme.dividerColor),
                           ),
                           child: Text(
-                            '数值: $_numberOutput',
+                            '${AppI18n.instance.t('currValue')}: $_numberOutput',
                             style: const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'monospace'),
                           ),
                         ),
@@ -338,16 +339,16 @@ class _ToolsTabState extends State<ToolsTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('校验码计算器 (Redundancy Check Calculator)', style: theme.textTheme.titleLarge),
+          Text(AppI18n.instance.t('checkAlgo'), style: theme.textTheme.titleLarge),
           const SizedBox(height: 8),
-          const Text('复刻 MSE 的 RedundancyCheckWindow，计算 Modbus CRC-16、ASCII LRC 及校验和'),
+          Text(AppI18n.instance.t('checkAlgo')),
           const SizedBox(height: 24),
           TextField(
             controller: _crcInputController,
             maxLines: 3,
             decoration: const InputDecoration(
-              labelText: '输入十六进制数据流 (空格分隔)',
-              hintText: '如: 01 03 00 00 00 0A',
+              labelText: AppI18n.instance.t('inputHex'),
+              hintText: '01 03 00 00 00 0A',
               border: OutlineInputBorder(),
             ),
             onChanged: (_) => _calcCrc(),
@@ -359,27 +360,27 @@ class _ToolsTabState extends State<ToolsTab> {
               child: Column(
                 children: [
                   ListTile(
-                    title: const Text('Modbus CRC-16 (多项式 0xA001)'),
+                    title: const Text('Modbus CRC-16 (0xA001)'),
                     subtitle: Text(
-                      _crc16Result.isEmpty ? '等待输入' : _crc16Result,
+                      _crc16Result.isEmpty ? AppI18n.instance.t('waitingInput') : _crc16Result,
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, fontFamily: 'monospace'),
                     ),
                     trailing: const Icon(Icons.check_circle_outline, color: Colors.green),
                   ),
                   const Divider(),
                   ListTile(
-                    title: const Text('Modbus ASCII LRC 纵向冗余校验'),
+                    title: const Text('Modbus ASCII LRC'),
                     subtitle: Text(
-                      _lrcResult.isEmpty ? '等待输入' : _lrcResult,
+                      _lrcResult.isEmpty ? AppI18n.instance.t('waitingInput') : _lrcResult,
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, fontFamily: 'monospace'),
                     ),
                     trailing: const Icon(Icons.verified_outlined, color: Colors.blue),
                   ),
                   const Divider(),
                   ListTile(
-                    title: const Text('累加校验和 (Sum 8)'),
+                    title: const Text('Sum 8 (Checksum)'),
                     subtitle: Text(
-                      _sum8Result.isEmpty ? '等待输入' : _sum8Result,
+                      _sum8Result.isEmpty ? AppI18n.instance.t('waitingInput') : _sum8Result,
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, fontFamily: 'monospace'),
                     ),
                     trailing: const Icon(Icons.tag, color: Colors.orange),
@@ -399,14 +400,14 @@ class _ToolsTabState extends State<ToolsTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('字符编解码器 (Character Encoding / Decoding)', style: theme.textTheme.titleLarge),
+          Text(AppI18n.instance.t('charCodec'), style: theme.textTheme.titleLarge),
           const SizedBox(height: 8),
-          const Text('复刻 MSE 的 CharacterEncodingDecodingWindow，在 ASCII/UTF-8 与十六进制之间互转'),
+          Text(AppI18n.instance.t('charCodec')),
           const SizedBox(height: 24),
           TextField(
             controller: _textInputController,
             decoration: const InputDecoration(
-              labelText: '字符串文本 (Text)',
+              labelText: 'Text (ASCII / UTF-8)',
               border: OutlineInputBorder(),
             ),
             onChanged: (text) {
@@ -418,7 +419,7 @@ class _ToolsTabState extends State<ToolsTab> {
           TextField(
             controller: _hexInputController,
             decoration: const InputDecoration(
-              labelText: '十六进制编码 (Hex String)',
+              labelText: 'Hex Bytes',
               border: OutlineInputBorder(),
             ),
             onChanged: (hex) {
@@ -448,14 +449,14 @@ class _ToolsTabState extends State<ToolsTab> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('串口探测与状态检测 (Serial Port Detection)', style: theme.textTheme.titleLarge),
+                Text(AppI18n.instance.t('serialDetect'), style: theme.textTheme.titleLarge),
                 const SizedBox(height: 4),
-                const Text('复刻 MSE 的 SerialPortOccupancyDetectionWindow，检测主机可用物理串口与虚拟串口设备'),
+                Text(AppI18n.instance.t('serialDetect')),
               ],
             ),
             FilledButton.icon(
               icon: _isDetecting ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.refresh),
-              label: const Text('重新扫描'),
+              label: Text(AppI18n.instance.t('rescan')),
               onPressed: _isDetecting ? null : _detectSerialPorts,
             ),
           ],
@@ -464,7 +465,7 @@ class _ToolsTabState extends State<ToolsTab> {
         Expanded(
           child: _detectedPorts.isEmpty
               ? const Center(
-                  child: Text('未扫描到可用串口设备 (若使用 USB 转串口，请插入并检查驱动或 sudo chmod 666 /dev/ttyUSB0)'),
+                  child: Text(AppI18n.instance.t('noSerialFound')),
                 )
               : ListView.builder(
                   itemCount: _detectedPorts.length,
@@ -474,9 +475,9 @@ class _ToolsTabState extends State<ToolsTab> {
                       child: ListTile(
                         leading: const Icon(Icons.usb, color: Colors.blue),
                         title: Text(port, style: const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'monospace')),
-                        subtitle: Text(port.contains('USB') ? 'USB 转串口设备' : '系统标准 TTY / 虚拟终端'),
+                        subtitle: Text(port.contains('USB') ? 'USB Serial Port' : 'System TTY / Virtual Terminal'),
                         trailing: const Chip(
-                          label: Text('就绪可用', style: TextStyle(color: Colors.green)),
+                          label: Text(AppI18n.instance.t('serialReady'), style: const TextStyle(color: Colors.green)),
                           backgroundColor: Color(0x224CAF50),
                         ),
                       ),

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../client/iec104_client.dart';
 import '../../client/station_data.dart';
+import '../../i18n/app_i18n.dart';
 import '../../protocol/asdu.dart';
 import '../dialogs/add_station_dialog.dart';
 import '../dialogs/edit_station_dialog.dart';
@@ -21,21 +22,21 @@ class PointsTab extends StatefulWidget {
 
 class _PointsTabState extends State<PointsTab> {
   int _selectedCa = 1;
-  String _selectedCategory = '全部';
+  String _selectedCategory = 'ALL';
   String _searchQuery = '';
   StreamSubscription<ClientPointModel>? _pointSub;
   StreamSubscription<List<ClientStationModel>>? _stationSub;
 
   final List<String> _categories = [
-    '全部',
-    '单点遥信 (YX)',
-    '双点遥信 (YX)',
-    '短浮点遥测 (YC)',
-    '归一化遥测 (YC)',
-    '标度化遥测 (YC)',
-    '电能量脉冲 (YM)',
-    '变压器档位 (ST)',
-    '二进制串 (BO)',
+    'ALL',
+    'M_SP_NA_1 (YX)',
+    'M_DP_NA_1 (YX)',
+    'M_ME_NC_1 (YC)',
+    'M_ME_NA_1 (YC)',
+    'M_ME_NB_1 (YC)',
+    'M_IT_NA_1 (YM)',
+    'M_ST_NA_1 (ST)',
+    'M_BO_NA_1 (BO)',
   ];
 
   @override
@@ -141,15 +142,16 @@ class _PointsTabState extends State<PointsTab> {
   }
 
   void _confirmClearStation(ClientStationModel station) {
+    final i18n = AppI18n.instance;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('清空站内点号'),
-        content: Text('确定要清空从站【${station.name}】下的所有 ${station.points.length} 个点号吗？'),
+        title: Text(i18n.t('clearStationPoints')),
+        content: Text('${i18n.t('clearPointsPrompt')}\n[${station.name}] (COA: ${station.commonAddress})'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('取消'),
+            child: Text(i18n.t('cancel')),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
@@ -157,10 +159,10 @@ class _PointsTabState extends State<PointsTab> {
               Navigator.pop(ctx);
               setState(() => station.clear());
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('已清空从站 [CA=${station.commonAddress}] 的所有点号')),
+                SnackBar(content: Text('${i18n.t('pointsCleared')}: CA=${station.commonAddress}')),
               );
             },
-            child: const Text('确认清空'),
+            child: Text(i18n.t('clearConfirm')),
           ),
         ],
       ),
@@ -168,32 +170,33 @@ class _PointsTabState extends State<PointsTab> {
   }
 
   void _quickRemoteControl(ClientPointModel p) {
+    final i18n = AppI18n.instance;
     if (p.typeId == AsduTypeId.mSpNa1 || p.typeId == AsduTypeId.mSpTb1) {
       final currentVal = p.value == true;
       final targetVal = !currentVal;
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: Text('单命令遥控 (C_SC_NA_1) - IOA: ${p.ioa}'),
+          title: Text('${i18n.t('singleCommand')} - IOA: ${p.ioa}'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('点位名称: ${p.name}'),
-              Text('当前状态: ${p.displayValue}'),
+              Text('${i18n.t('name')}: ${p.name}'),
+              Text('${i18n.t('val')}: ${p.displayValue}'),
               const SizedBox(height: 12),
               Text(
-                '目标状态: ${targetVal ? "1 (合/ON)" : "0 (分/OFF)"}',
+                '${i18n.t('setValue')}: ${targetVal ? "1 (ON)" : "0 (OFF)"}',
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 12),
-              const Text('标准两步遥控：可选择先“预置(Select)”或直接“执行(Execute)”：'),
+              Text(i18n.t('openPresetOrExecutePrompt')),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('取消'),
+              child: Text(i18n.t('cancel')),
             ),
             OutlinedButton(
               onPressed: () {
@@ -205,10 +208,10 @@ class _PointsTabState extends State<PointsTab> {
                 );
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('已下发预置选择: IOA=${p.ioa}')),
+                  SnackBar(content: Text('${i18n.t('presetSelectedSent')}: IOA=${p.ioa}')),
                 );
               },
-              child: const Text('预置选择 (Select)'),
+              child: Text(i18n.t('sendSelect')),
             ),
             ElevatedButton(
               onPressed: () {
@@ -220,10 +223,10 @@ class _PointsTabState extends State<PointsTab> {
                 );
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('已下发直接执行: IOA=${p.ioa}')),
+                  SnackBar(content: Text('${i18n.t('directExecuteSent')}: IOA=${p.ioa}')),
                 );
               },
-              child: const Text('直接执行 (Execute)'),
+              child: Text(i18n.t('sendExecute')),
             ),
           ],
         ),
@@ -234,6 +237,7 @@ class _PointsTabState extends State<PointsTab> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final i18n = AppI18n.instance;
     final c = widget.client;
     final availableCas = c.stations.keys.toList()..sort();
     if (availableCas.isNotEmpty && !availableCas.contains(_selectedCa)) {
@@ -244,8 +248,18 @@ class _PointsTabState extends State<PointsTab> {
     var points = st.pointList;
 
     // Filter by category
-    if (_selectedCategory != '全部') {
-      points = points.where((p) => p.typeCategory == _selectedCategory).toList();
+    if (_selectedCategory != 'ALL') {
+      points = points.where((p) {
+        if (_selectedCategory.contains('M_SP') && (p.typeId == AsduTypeId.mSpNa1 || p.typeId == AsduTypeId.mSpTb1)) return true;
+        if (_selectedCategory.contains('M_DP') && (p.typeId == AsduTypeId.mDpNa1 || p.typeId == AsduTypeId.mDpTb1)) return true;
+        if (_selectedCategory.contains('M_ME_NC') && (p.typeId == AsduTypeId.mMeNc1 || p.typeId == AsduTypeId.mMeTf1)) return true;
+        if (_selectedCategory.contains('M_ME_NA') && (p.typeId == AsduTypeId.mMeNa1 || p.typeId == AsduTypeId.mMeTd1)) return true;
+        if (_selectedCategory.contains('M_ME_NB') && (p.typeId == AsduTypeId.mMeNb1 || p.typeId == AsduTypeId.mMeTe1)) return true;
+        if (_selectedCategory.contains('M_IT') && (p.typeId == AsduTypeId.mItNa1 || p.typeId == AsduTypeId.mItTb1)) return true;
+        if (_selectedCategory.contains('M_ST') && (p.typeId == AsduTypeId.mStNa1 || p.typeId == AsduTypeId.mStTb1)) return true;
+        if (_selectedCategory.contains('M_BO') && (p.typeId == AsduTypeId.mBoNa1 || p.typeId == AsduTypeId.mBoTb1)) return true;
+        return false;
+      }).toList();
     }
 
     // Filter by search
@@ -272,7 +286,7 @@ class _PointsTabState extends State<PointsTab> {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               // Station selector
-              const Text('当前从站 (COA):', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text('${i18n.t('filterStation')}:', style: const TextStyle(fontWeight: FontWeight.bold)),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
@@ -285,7 +299,7 @@ class _PointsTabState extends State<PointsTab> {
                   items: availableCas.map((ca) {
                     return DropdownMenuItem(
                       value: ca,
-                      child: Text('CA=$ca - ${c.stations[ca]?.name ?? "变电站"} (${c.stations[ca]?.points.length ?? 0}点)'),
+                      child: Text('CA=$ca - ${c.stations[ca]?.name ?? "Station"} (${c.stations[ca]?.points.length ?? 0})'),
                     );
                   }).toList(),
                   onChanged: (val) {
@@ -297,12 +311,12 @@ class _PointsTabState extends State<PointsTab> {
               // Station action buttons
               OutlinedButton.icon(
                 icon: const Icon(Icons.add_circle_outline, size: 16),
-                label: const Text('增加从站'),
+                label: Text(i18n.t('addStation')),
                 onPressed: _openAddStationDialog,
               ),
               OutlinedButton.icon(
                 icon: const Icon(Icons.settings_outlined, size: 16),
-                label: const Text('管理从站'),
+                label: Text(i18n.t('editStation')),
                 onPressed: () => _openEditStationDialog(st),
               ),
 
@@ -310,22 +324,22 @@ class _PointsTabState extends State<PointsTab> {
               // Points actions
               FilledButton.icon(
                 icon: const Icon(Icons.add, size: 16),
-                label: const Text('增加点号'),
+                label: Text(i18n.t('addPoint')),
                 onPressed: () => _openAddPointDialog(st),
               ),
               FilledButton.tonalIcon(
                 icon: const Icon(Icons.playlist_add, size: 16),
-                label: const Text('批量生成点号'),
+                label: Text(i18n.t('batchGenerate')),
                 onPressed: () => _openBatchAddPointsDialog(st),
               ),
               OutlinedButton.icon(
                 icon: const Icon(Icons.import_export, size: 16),
-                label: const Text('导入/导出点表'),
+                label: Text(i18n.t('importExport')),
                 onPressed: () => _openImportExportDialog(st),
               ),
               OutlinedButton.icon(
                 icon: const Icon(Icons.clear_all, size: 16, color: Colors.red),
-                label: const Text('清空点位', style: TextStyle(color: Colors.red)),
+                label: Text(i18n.t('clearStationPoints'), style: const TextStyle(color: Colors.red)),
                 onPressed: st.points.isNotEmpty ? () => _confirmClearStation(st) : null,
               ),
             ],
@@ -338,7 +352,7 @@ class _PointsTabState extends State<PointsTab> {
           child: Row(
             children: [
               // Category filter
-              const Text('类型筛选: ', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text('${i18n.t('filterType')}: ', style: const TextStyle(fontWeight: FontWeight.bold)),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
@@ -360,11 +374,11 @@ class _PointsTabState extends State<PointsTab> {
               // Search
               Expanded(
                 child: TextField(
-                  decoration: const InputDecoration(
-                    hintText: '搜索 IOA (十进制/十六进制) 或点位名称...',
-                    prefixIcon: Icon(Icons.search),
+                  decoration: InputDecoration(
+                    hintText: i18n.t('searchPoint'),
+                    prefixIcon: const Icon(Icons.search),
                     isDense: true,
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                   ),
                   onChanged: (val) => setState(() => _searchQuery = val.trim()),
                 ),
@@ -372,13 +386,13 @@ class _PointsTabState extends State<PointsTab> {
               const SizedBox(width: 16),
               OutlinedButton.icon(
                 icon: const Icon(Icons.refresh),
-                label: const Text('单点刷新 (Read)'),
+                label: Text(i18n.t('singlePointRefresh')),
                 onPressed: c.state == ClientConnectionState.active
                     ? () {
                         if (points.isNotEmpty) {
                           c.sendReadCommand(ca: _selectedCa, ioa: points.first.ioa);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('已下发读取命令 (C_RD_NA_1): IOA=${points.first.ioa}')),
+                            SnackBar(content: Text('C_RD_NA_1: IOA=${points.first.ioa}')),
                           );
                         }
                       }
@@ -395,17 +409,11 @@ class _PointsTabState extends State<PointsTab> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.inbox, size: 56, color: Colors.grey.shade400),
+                      Icon(Icons.inbox, size: 56, color: theme.colorScheme.outline.withOpacity(0.6)),
                       const SizedBox(height: 12),
                       Text(
-                        '当前从站 [CA=$_selectedCa] 暂无点位数据',
-                        style: TextStyle(color: Colors.grey.shade700, fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        '您可以点击上方【增加点号】、【批量生成点号】进行配置，\n或在【连接】页面点击【下发总召唤】由服务端自动上送入库',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                        '${i18n.t('noPointsPrompt')} [CA=$_selectedCa]',
+                        style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 16),
                       Wrap(
@@ -413,12 +421,12 @@ class _PointsTabState extends State<PointsTab> {
                         children: [
                           FilledButton.icon(
                             icon: const Icon(Icons.add),
-                            label: const Text('添加点号'),
+                            label: Text(i18n.t('addPoint')),
                             onPressed: () => _openAddPointDialog(st),
                           ),
                           FilledButton.tonalIcon(
                             icon: const Icon(Icons.playlist_add),
-                            label: const Text('批量生成点号'),
+                            label: Text(i18n.t('batchGenerate')),
                             onPressed: () => _openBatchAddPointsDialog(st),
                           ),
                         ],
@@ -438,14 +446,14 @@ class _PointsTabState extends State<PointsTab> {
                       leading: CircleAvatar(
                         radius: 18,
                         backgroundColor: isSwitch
-                            ? (p.value == true ? Colors.green.shade100 : Colors.red.shade100)
-                            : Colors.blue.shade100,
+                            ? (p.value == true ? Colors.green.withOpacity(0.2) : Colors.red.withOpacity(0.2))
+                            : theme.colorScheme.primaryContainer.withAlpha(80),
                         child: Text(
-                          isSwitch ? (p.value == true ? '合' : '分') : '测',
+                          isSwitch ? (p.value == true ? 'ON' : 'OFF') : 'AI',
                           style: TextStyle(
                             color: isSwitch
-                                ? (p.value == true ? Colors.green.shade900 : Colors.red.shade900)
-                                : Colors.blue.shade900,
+                                ? (p.value == true ? Colors.green : Colors.red)
+                                : theme.colorScheme.primary,
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
                           ),
@@ -456,7 +464,7 @@ class _PointsTabState extends State<PointsTab> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: Colors.grey.shade200,
+                              color: theme.colorScheme.surfaceVariant.withOpacity(0.5),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
@@ -468,19 +476,19 @@ class _PointsTabState extends State<PointsTab> {
                           Text(p.name, style: const TextStyle(fontWeight: FontWeight.w600)),
                           const SizedBox(width: 8),
                           Text(
-                            '[${p.typeCategory}]',
-                            style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                            '[${p.typeId.name}]',
+                            style: TextStyle(color: theme.colorScheme.outline, fontSize: 12),
                           ),
                         ],
                       ),
                       subtitle: Row(
                         children: [
-                          Text('更新时间: ${p.lastUpdated.toIso8601String().substring(11, 23)}'),
+                          Text('${i18n.t('lastUpdate')}: ${p.lastUpdated.toIso8601String().substring(11, 23)}'),
                           const SizedBox(width: 12),
-                          Text('刷新次数: ${p.updateCount}'),
+                          Text('${i18n.t('refreshCount')}: ${p.updateCount}'),
                           if (p.quality != null && p.quality!.invalid) ...[
                             const SizedBox(width: 8),
-                            const Text('[无效IV]', style: TextStyle(color: Colors.red)),
+                            Text(i18n.t('invalidQuality'), style: const TextStyle(color: Colors.red)),
                           ],
                         ],
                       ),
@@ -490,14 +498,8 @@ class _PointsTabState extends State<PointsTab> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
-                              color: isSwitch
-                                  ? (p.value == true ? Colors.green.shade50 : Colors.red.shade50)
-                                  : Colors.blue.shade50,
-                              border: Border.all(
-                                color: isSwitch
-                                    ? (p.value == true ? Colors.green.shade400 : Colors.red.shade400)
-                                    : Colors.blue.shade400,
-                              ),
+                              color: theme.colorScheme.surfaceVariant.withOpacity(0.4),
+                              border: Border.all(color: theme.dividerColor),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
@@ -506,34 +508,34 @@ class _PointsTabState extends State<PointsTab> {
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
                                 color: isSwitch
-                                    ? (p.value == true ? Colors.green.shade900 : Colors.red.shade900)
-                                    : Colors.blue.shade900,
+                                    ? (p.value == true ? Colors.green : Colors.red)
+                                    : theme.colorScheme.primary,
                               ),
                             ),
                           ),
                           if (isSwitch) ...[
                             const SizedBox(width: 4),
                             IconButton(
-                              icon: const Icon(Icons.touch_app, color: Colors.blue),
-                              tooltip: '快捷遥控单命令',
+                              icon: Icon(Icons.touch_app, color: theme.colorScheme.primary),
+                              tooltip: i18n.t('singleCommand'),
                               onPressed: () => _quickRemoteControl(p),
                             ),
                           ],
                           IconButton(
                             icon: const Icon(Icons.refresh, size: 18),
-                            tooltip: '读取该点位 (C_RD_NA_1)',
+                            tooltip: i18n.t('singlePointRefresh'),
                             onPressed: c.state == ClientConnectionState.active
                                 ? () {
                                     c.sendReadCommand(ca: _selectedCa, ioa: p.ioa);
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('已下发读命令: IOA=${p.ioa}')),
+                                      SnackBar(content: Text('C_RD_NA_1: IOA=${p.ioa}')),
                                     );
                                   }
                                 : null,
                           ),
                           IconButton(
                             icon: const Icon(Icons.edit_outlined, size: 18),
-                            tooltip: '编辑/删除点号',
+                            tooltip: i18n.t('editPoint'),
                             onPressed: () => _openEditPointDialog(st, p),
                           ),
                         ],

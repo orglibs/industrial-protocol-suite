@@ -1,3 +1,4 @@
+import "../../i18n/app_i18n.dart";
 import 'package:flutter/material.dart';
 import '../../protocol/asdu.dart';
 import '../../server/iec104_server.dart';
@@ -97,7 +98,7 @@ class _StationTabState extends State<StationTab> {
           );
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('点位 ${point.name} [IOA: ${point.ioa}] 已更新为: $newVal，并突发推送(COT=3)'),
+              content: Text('[IOA: ${point.ioa}] $newVal (COT=3)'),
               duration: const Duration(seconds: 2),
             ),
           );
@@ -123,7 +124,7 @@ class _StationTabState extends State<StationTab> {
           ),
           child: Row(
             children: [
-              const Text('当前从站 (COA):', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text("${AppI18n.instance.t('coa')}:", style: const TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(width: 12),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -139,7 +140,7 @@ class _StationTabState extends State<StationTab> {
                   items: widget.server.stations.values.map((s) {
                     return DropdownMenuItem(
                       value: s.commonAddress,
-                      child: Text('CA: ${s.commonAddress} - ${s.name} (${s.points.length}点)'),
+                      child: Text('CA: ${s.commonAddress} - ${s.name} (${s.points.length})'),
                     );
                   }).toList(),
                   onChanged: (v) {
@@ -150,7 +151,7 @@ class _StationTabState extends State<StationTab> {
               const SizedBox(width: 8),
               OutlinedButton.icon(
                 icon: const Icon(Icons.add_circle_outline, size: 16),
-                label: const Text('增加从站'),
+                label: Text(AppI18n.instance.t('addStation')),
                 onPressed: () {
                   showDialog(
                     context: context,
@@ -165,7 +166,7 @@ class _StationTabState extends State<StationTab> {
               if (station != null)
                 OutlinedButton.icon(
                   icon: const Icon(Icons.settings_outlined, size: 16),
-                  label: const Text('管理从站'),
+                  label: Text(AppI18n.instance.t('editStation')),
                   onPressed: () {
                     showDialog(
                       context: context,
@@ -185,7 +186,7 @@ class _StationTabState extends State<StationTab> {
               const Spacer(),
               FilledButton.icon(
                 icon: const Icon(Icons.add, size: 18),
-                label: const Text('添加点位'),
+                label: Text(AppI18n.instance.t('addPoint')),
                 onPressed: station == null
                     ? null
                     : () {
@@ -203,7 +204,7 @@ class _StationTabState extends State<StationTab> {
               const SizedBox(width: 8),
               OutlinedButton.icon(
                 icon: const Icon(Icons.playlist_add, size: 18),
-                label: const Text('批量生成'),
+                label: Text(AppI18n.instance.t('batchInit')),
                 onPressed: station == null
                     ? null
                     : () {
@@ -228,12 +229,12 @@ class _StationTabState extends State<StationTab> {
               const SizedBox(width: 8),
               OutlinedButton.icon(
                 icon: const Icon(Icons.refresh, size: 18),
-                label: const Text('重置示例数据'),
+                label: const Text('Reset Demo'),
                 onPressed: () {
                   setState(() {
                     widget.server.stations[_selectedCoa] = Station.createDefault(
                       commonAddress: _selectedCoa,
-                      name: station?.name ?? '110kV 变电站 #1',
+                      name: station?.name ?? 'Substation #1',
                     );
                   });
                 },
@@ -251,27 +252,27 @@ class _StationTabState extends State<StationTab> {
                 spacing: 8,
                 children: [
                   ChoiceChip(
-                    label: const Text('全部'),
+                    label: Text(AppI18n.instance.t('allConn')),
                     selected: _filterType == 'ALL',
                     onSelected: (_) => setState(() => _filterType = 'ALL'),
                   ),
                   ChoiceChip(
-                    label: const Text('单点遥信 (Type 1/30)'),
+                    label: const Text('SP (Type 1/30)'),
                     selected: _filterType == 'SP',
                     onSelected: (_) => setState(() => _filterType = 'SP'),
                   ),
                   ChoiceChip(
-                    label: const Text('双点遥信 (Type 3/31)'),
+                    label: const Text('DP (Type 3/31)'),
                     selected: _filterType == 'DP',
                     onSelected: (_) => setState(() => _filterType = 'DP'),
                   ),
                   ChoiceChip(
-                    label: const Text('遥测模拟量 (Type 9/11/13)'),
+                    label: const Text('ME (Type 9/11/13)'),
                     selected: _filterType == 'ME',
                     onSelected: (_) => setState(() => _filterType = 'ME'),
                   ),
                   ChoiceChip(
-                    label: const Text('电能量遥脉 (Type 15/37)'),
+                    label: const Text('IT (Type 15/37)'),
                     selected: _filterType == 'IT',
                     onSelected: (_) => setState(() => _filterType = 'IT'),
                   ),
@@ -281,8 +282,8 @@ class _StationTabState extends State<StationTab> {
               SizedBox(
                 width: 260,
                 child: TextField(
-                  decoration: const InputDecoration(
-                    hintText: '搜索 IOA 或点位名称...',
+                  decoration: InputDecoration(
+                    hintText: AppI18n.instance.t('searchHint'),
                     prefixIcon: Icon(Icons.search, size: 20),
                     isDense: true,
                     border: OutlineInputBorder(),
@@ -297,126 +298,147 @@ class _StationTabState extends State<StationTab> {
         // Data Table
         Expanded(
           child: points.isEmpty
-              ? const Center(child: Text('暂无匹配的点位'))
+              ? Center(child: Text(AppI18n.instance.t('noChartData')))
               : SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: DataTable(
-                      headingRowColor: WidgetStateProperty.all(Colors.grey.shade100),
-                      columns: const [
-                        DataColumn(label: Text('IOA (十进制/十六进制)')),
-                        DataColumn(label: Text('ASDU 协议类型')),
-                        DataColumn(label: Text('点位名称')),
-                        DataColumn(label: Text('实时数值 (点击修改)')),
-                        DataColumn(label: Text('品质标志')),
-                        DataColumn(label: Text('自动变化模拟')),
-                        DataColumn(label: Text('操作')),
-                      ],
-                      rows: points.map((p) {
-                        final isSingle = p.typeId == AsduTypeId.mSpNa1 || p.typeId == AsduTypeId.mSpTb1;
-                        final hexIoa = '0x${p.ioa.toRadixString(16).padLeft(6, '0').toUpperCase()}';
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width - 120),
+                      child: DataTable(
+                        headingRowColor: WidgetStateProperty.all(theme.colorScheme.surfaceVariant.withOpacity(0.35)),
+                        headingRowHeight: 42,
+                        dataRowMinHeight: 46,
+                        dataRowMaxHeight: 46,
+                        horizontalMargin: 16,
+                        columnSpacing: 20,
+                        columns: [
+                          DataColumn(label: Text(AppI18n.instance.t('ioa'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                          DataColumn(label: const Text('ASDU Type', style: TextStyle(fontWeight: FontWeight.bold))),
+                          DataColumn(label: Text(AppI18n.instance.t('pointName'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                          DataColumn(label: Text(AppI18n.instance.t('currValue'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                          DataColumn(label: Text(AppI18n.instance.t('qualityFlags'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                          DataColumn(label: Text(AppI18n.instance.t('colSim'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                          DataColumn(label: Text(AppI18n.instance.t('operation'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                        ],
+                        rows: points.map((p) {
+                          final isSingle = p.typeId == AsduTypeId.mSpNa1 || p.typeId == AsduTypeId.mSpTb1;
+                          final hexIoa = '0x${p.ioa.toRadixString(16).padLeft(6, '0').toUpperCase()}';
 
-                        return DataRow(cells: [
-                          DataCell(Text('${p.ioa} ($hexIoa)', style: const TextStyle(fontFamily: 'monospace'))),
-                          DataCell(Text('${p.typeId.nameString} [${p.typeId.id}]')),
-                          DataCell(Text(p.name, style: const TextStyle(fontWeight: FontWeight.w500))),
-                          DataCell(
-                            InkWell(
-                              onTap: () => _showEditDialog(p),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          return DataRow(cells: [
+                            DataCell(Text('${p.ioa} ($hexIoa)', style: const TextStyle(fontFamily: 'monospace'))),
+                            DataCell(Text('${p.typeId.nameString} [${p.typeId.id}]')),
+                            DataCell(Text(p.name, style: const TextStyle(fontWeight: FontWeight.w500))),
+                            DataCell(
+                              InkWell(
+                                onTap: () => _showEditDialog(p),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.surfaceVariant.withOpacity(0.4),
+                                    borderRadius: BorderRadius.circular(4),
+                                    border: Border.all(color: theme.dividerColor),
+                                  ),
+                                  child: Text(
+                                    p.displayValue,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: isSingle
+                                          ? (p.value == true ? Colors.green : Colors.grey)
+                                          : theme.colorScheme.primary,
+                                      fontFamily: 'monospace',
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: Colors.blue.shade50,
+                                  color: (p.quality.invalid ? Colors.red : Colors.green).withOpacity(0.12),
                                   borderRadius: BorderRadius.circular(4),
-                                  border: Border.all(color: Colors.blue.shade200),
+                                  border: Border.all(
+                                    color: (p.quality.invalid ? Colors.red : Colors.green).withOpacity(0.4),
+                                  ),
                                 ),
                                 child: Text(
-                                  p.displayValue,
+                                  p.quality.summary,
                                   style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.blue.shade900,
-                                    fontFamily: 'monospace',
+                                    color: p.quality.invalid ? Colors.redAccent : Colors.green,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12,
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                          DataCell(
-                            Text(
-                              p.quality.summary,
-                              style: TextStyle(
-                                color: p.quality.invalid ? Colors.red : Colors.green.shade700,
-                                fontSize: 12,
+                            DataCell(
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Switch(
+                                    value: p.autoChangeEnabled,
+                                    onChanged: (v) {
+                                      setState(() => p.autoChangeEnabled = v);
+                                    },
+                                  ),
+                                  if (p.autoChangeEnabled)
+                                    Text(
+                                      p.easeType.name,
+                                      style: TextStyle(fontSize: 11, color: theme.colorScheme.primary),
+                                    ),
+                                ],
                               ),
                             ),
-                          ),
-                          DataCell(
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Switch(
-                                  value: p.autoChangeEnabled,
-                                  onChanged: (v) {
-                                    setState(() => p.autoChangeEnabled = v);
-                                  },
-                                ),
-                                if (p.autoChangeEnabled)
-                                  Text(
-                                    p.easeType.name,
-                                    style: TextStyle(fontSize: 11, color: Colors.indigo.shade700),
-                                  ),
-                              ],
-                            ),
-                          ),
-                          DataCell(
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (isSingle)
+                            DataCell(
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (isSingle)
+                                    IconButton(
+                                      icon: Icon(p.value == true ? Icons.toggle_on : Icons.toggle_off,
+                                          color: p.value == true ? Colors.green : Colors.grey),
+                                      tooltip: 'Toggle',
+                                      onPressed: () {
+                                        widget.server.updatePointValue(
+                                          _selectedCoa,
+                                          p.ioa,
+                                          !(p.value == true),
+                                          triggerSpontaneous: true,
+                                        );
+                                      },
+                                    ),
                                   IconButton(
-                                    icon: Icon(p.value == true ? Icons.toggle_on : Icons.toggle_off,
-                                        color: p.value == true ? Colors.green : Colors.grey),
-                                    tooltip: '分/合快速切换',
+                                    icon: Icon(Icons.send, color: theme.colorScheme.primary, size: 20),
+                                    tooltip: 'Spontaneous (COT=3)',
                                     onPressed: () {
-                                      widget.server.updatePointValue(
-                                        _selectedCoa,
-                                        p.ioa,
-                                        !(p.value == true),
-                                        triggerSpontaneous: true,
+                                      widget.server.broadcastSpontaneous(p, _selectedCoa);
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text('[COT=3] ${p.name}'),
+                                          duration: const Duration(seconds: 1),
+                                        ),
                                       );
                                     },
                                   ),
-                                IconButton(
-                                  icon: const Icon(Icons.send, color: Colors.blue, size: 20),
-                                  tooltip: '突发发送 (COT=3 Spontaneous)',
-                                  onPressed: () {
-                                    widget.server.broadcastSpontaneous(p, _selectedCoa);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text('已向所有客户端突发推送点位 ${p.name} [COT=3]'),
-                                        duration: const Duration(seconds: 1),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.edit, color: Colors.grey, size: 20),
-                                  tooltip: '编辑点位数据',
-                                  onPressed: () => _showEditDialog(p),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
-                                  tooltip: '删除点位',
-                                  onPressed: () {
-                                    setState(() => station?.removePoint(p.ioa));
-                                  },
-                                ),
-                              ],
+                                  IconButton(
+                                    icon: const Icon(Icons.edit, color: Colors.grey, size: 20),
+                                    tooltip: AppI18n.instance.t('editPoint'),
+                                    onPressed: () => _showEditDialog(p),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                                    tooltip: AppI18n.instance.t('deletePoint'),
+                                    onPressed: () {
+                                      setState(() => station?.removePoint(p.ioa));
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ]);
-                      }).toList(),
+                          ]);
+                        }).toList(),
+                      ),
                     ),
                   ),
                 ),

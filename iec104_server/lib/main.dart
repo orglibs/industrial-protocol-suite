@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
+import 'src/i18n/app_i18n.dart';
 import 'src/server/iec104_server.dart';
 import 'src/ui/home_screen.dart';
+import 'src/ui/widgets/window_title_bar.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await WindowManagerHelper.initialize();
 
   // Instantiate the core IEC 104 Server
   final server = Iec104Server();
   await server.loadWorkspace();
 
-  // Auto-start server on port 2404
-  try {
-    await server.start();
-  } catch (e) {
-    debugPrint('Auto-start server error: $e');
-  }
-
+  // Core IEC 104 Server does not start automatically by default; started manually via UI.
   runApp(Iec104SimulatorApp(server: server));
 }
 
@@ -37,10 +34,16 @@ class _Iec104SimulatorAppState extends State<Iec104SimulatorApp> {
     });
   }
 
+  void _onLanguageChanged() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
+    final i18n = AppI18n.instance;
+
     return MaterialApp(
-      title: 'IEC 60870-5-104 Server Simulator',
+      title: i18n.t('appTitle'),
       debugShowCheckedModeBanner: false,
       themeMode: _themeMode,
       theme: ThemeData(
@@ -69,10 +72,14 @@ class _Iec104SimulatorAppState extends State<Iec104SimulatorApp> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
-      home: HomeScreen(
-        server: widget.server,
-        onToggleTheme: _toggleTheme,
-        isDarkMode: _themeMode == ThemeMode.dark,
+      home: Directionality(
+        textDirection: i18n.currentLanguage.isRtl ? TextDirection.rtl : TextDirection.ltr,
+        child: HomeScreen(
+          server: widget.server,
+          onToggleTheme: _toggleTheme,
+          isDarkMode: _themeMode == ThemeMode.dark,
+          onLanguageChanged: _onLanguageChanged,
+        ),
       ),
     );
   }

@@ -1,3 +1,4 @@
+import "../../i18n/app_i18n.dart";
 import 'package:flutter/material.dart';
 import '../../server/traffic_logger.dart';
 
@@ -71,24 +72,24 @@ class _TrafficTabState extends State<TrafficTab> {
               ),
               child: Row(
                 children: [
-                  Text('总报文: ${allEntries.length} (收: $rxCount, 发: $txCount)',
+                  Text("${AppI18n.instance.t('frames')}: ${allEntries.length} (RX: $rxCount, TX: $txCount)",
                       style: const TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(width: 16),
                   Wrap(
                     spacing: 6,
                     children: [
                       ChoiceChip(
-                        label: const Text('全部'),
+                        label: Text(AppI18n.instance.t('allConn')),
                         selected: _directionFilter == 'ALL',
                         onSelected: (_) => setState(() => _directionFilter = 'ALL'),
                       ),
                       ChoiceChip(
-                        label: const Text('接收 [RX]'),
+                        label: Text(AppI18n.instance.t('rxOnly')),
                         selected: _directionFilter == 'RX',
                         onSelected: (_) => setState(() => _directionFilter = 'RX'),
                       ),
                       ChoiceChip(
-                        label: const Text('发送 [TX]'),
+                        label: Text(AppI18n.instance.t('txOnly')),
                         selected: _directionFilter == 'TX',
                         onSelected: (_) => setState(() => _directionFilter = 'TX'),
                       ),
@@ -101,15 +102,15 @@ class _TrafficTabState extends State<TrafficTab> {
                         value: _autoScroll,
                         onChanged: (v) => setState(() => _autoScroll = v ?? true),
                       ),
-                      const Text('自动滚动', style: TextStyle(fontSize: 13)),
+                      Text(AppI18n.instance.t('autoScroll'), style: const TextStyle(fontSize: 13)),
                     ],
                   ),
                   const Spacer(),
                   SizedBox(
                     width: 220,
                     child: TextField(
-                      decoration: const InputDecoration(
-                        hintText: '过滤十六进制或摘要...',
+                      decoration: InputDecoration(
+                        hintText: AppI18n.instance.t('searchHexHint'),
                         prefixIcon: Icon(Icons.search, size: 18),
                         isDense: true,
                         contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -121,7 +122,7 @@ class _TrafficTabState extends State<TrafficTab> {
                   const SizedBox(width: 8),
                   OutlinedButton.icon(
                     icon: const Icon(Icons.delete_outline, size: 18),
-                    label: const Text('清空记录'),
+                    label: Text(AppI18n.instance.t('clearLog')),
                     onPressed: () {
                       setState(() {
                         TrafficLogger.instance.clear();
@@ -147,7 +148,7 @@ class _TrafficTabState extends State<TrafficTab> {
                               children: [
                                 Icon(Icons.sync_alt, size: 48, color: theme.colorScheme.outline),
                                 const SizedBox(height: 12),
-                                const Text('暂无通信报文记录'),
+                                Text(AppI18n.instance.t('emptyTrafficHint')),
                               ],
                             ),
                           )
@@ -174,7 +175,7 @@ class _TrafficTabState extends State<TrafficTab> {
                                     border: Border.all(color: badgeColor.withOpacity(0.5)),
                                   ),
                                   child: Text(
-                                    isRx ? 'RX 收' : 'TX 发',
+                                    isRx ? 'RX' : 'TX',
                                     style: TextStyle(
                                       color: badgeColor,
                                       fontWeight: FontWeight.bold,
@@ -228,7 +229,7 @@ class _TrafficTabState extends State<TrafficTab> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text('报文详细剖析 (Frame Detail)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                                Text(AppI18n.instance.t('tabTraffic'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                                 IconButton(
                                   icon: const Icon(Icons.close, size: 20),
                                   onPressed: () => setState(() => _selectedEntry = null),
@@ -237,7 +238,7 @@ class _TrafficTabState extends State<TrafficTab> {
                             ),
                             const Divider(),
                             Text(
-                              '原始报文十六进制:',
+                              'Raw Hex:',
                               style: TextStyle(fontWeight: FontWeight.w600, color: theme.colorScheme.outline, fontSize: 12),
                             ),
                             const SizedBox(height: 4),
@@ -246,7 +247,7 @@ class _TrafficTabState extends State<TrafficTab> {
                               style: const TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.bold, fontSize: 13),
                             ),
                             const SizedBox(height: 12),
-                            const Text('协议字段分解:', style: TextStyle(fontWeight: FontWeight.bold)),
+                            Text('Protocol Breakdown:', style: const TextStyle(fontWeight: FontWeight.bold)),
                             const SizedBox(height: 8),
                             Expanded(
                               child: ListView(

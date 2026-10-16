@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../models/connection_config.dart';
@@ -99,7 +100,7 @@ class _ChartTabState extends State<ChartTab> {
                     // Connection
                     DropdownButton<ConnectionConfig>(
                       value: widget.connections.contains(_selectedConnection) ? _selectedConnection : null,
-                      hint: const Text('选择连接'),
+                      hint: Text(AppI18n.instance.t('selectConn')),
                       underline: const SizedBox(),
                       items: widget.connections.map((c) {
                         return DropdownMenuItem(value: c, child: Text(c.name));
@@ -118,7 +119,7 @@ class _ChartTabState extends State<ChartTab> {
                     // Slave
                     DropdownButton<SlaveModel>(
                       value: _selectedConnection?.slaves.contains(_selectedSlave) == true ? _selectedSlave : null,
-                      hint: const Text('选择从站'),
+                      hint: Text(AppI18n.instance.t('selectSlave')),
                       underline: const SizedBox(),
                       items: (_selectedConnection?.slaves ?? []).map((s) {
                         return DropdownMenuItem(value: s, child: Text('${s.name} (ID: ${s.slaveId})'));
@@ -136,7 +137,7 @@ class _ChartTabState extends State<ChartTab> {
                     // Group
                     DropdownButton<RegisterGroupModel>(
                       value: _selectedSlave?.groups.contains(_selectedGroup) == true ? _selectedGroup : null,
-                      hint: const Text('选择寄存器组'),
+                      hint: Text(AppI18n.instance.t('selectGroup')),
                       underline: const SizedBox(),
                       items: (_selectedSlave?.groups ?? []).map((g) {
                         return DropdownMenuItem(value: g, child: Text(g.groupName));
@@ -153,11 +154,11 @@ class _ChartTabState extends State<ChartTab> {
                     // Register
                     DropdownButton<RegisterModel>(
                       value: _selectedGroup?.registers.contains(_selectedRegister) == true ? _selectedRegister : null,
-                      hint: const Text('选择点号'),
+                      hint: Text(AppI18n.instance.t('selectPoint')),
                       underline: const SizedBox(),
                       items: (_selectedGroup?.registers ?? []).map((r) {
                         final alias = r.alias != null ? ' - ${r.alias}' : '';
-                        return DropdownMenuItem(value: r, child: Text('地址 ${r.address}$alias'));
+                        return DropdownMenuItem(value: r, child: Text('${AppI18n.instance.t('colAddr')} ${r.address}$alias'));
                       }).toList(),
                       onChanged: (r) {
                         setState(() {
@@ -169,12 +170,12 @@ class _ChartTabState extends State<ChartTab> {
                     const Spacer(),
                     IconButton(
                       icon: Icon(_isPaused ? Icons.play_arrow : Icons.pause),
-                      tooltip: _isPaused ? '继续采样' : '暂停采样',
+                      tooltip: _isPaused ? AppI18n.instance.t('resumeLog') : AppI18n.instance.t('pauseLog'),
                       onPressed: () => setState(() => _isPaused = !_isPaused),
                     ),
                     IconButton(
                       icon: const Icon(Icons.clear_all),
-                      tooltip: '清空历史曲线',
+                      tooltip: AppI18n.instance.t('clearChart'),
                       onPressed: () => setState(() => _history.clear()),
                     ),
                   ],
@@ -192,7 +193,7 @@ class _ChartTabState extends State<ChartTab> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('当前采样值 (Current Value)', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                          Text(AppI18n.instance.t('currValue'), style: const TextStyle(fontSize: 12, color: Colors.grey)),
                           const SizedBox(height: 4),
                           Text(
                             curVal.toString(),
@@ -215,7 +216,7 @@ class _ChartTabState extends State<ChartTab> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('波谷极小值 (Min in Window)', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                          Text(AppI18n.instance.t('waveMin'), style: const TextStyle(fontSize: 12, color: Colors.grey)),
                           const SizedBox(height: 4),
                           Text(
                             minVal.toStringAsFixed(1),
@@ -234,7 +235,7 @@ class _ChartTabState extends State<ChartTab> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('波峰极大值 (Max in Window)', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                          Text(AppI18n.instance.t('waveMax'), style: const TextStyle(fontSize: 12, color: Colors.grey)),
                           const SizedBox(height: 4),
                           Text(
                             maxVal.toStringAsFixed(1),
@@ -253,7 +254,7 @@ class _ChartTabState extends State<ChartTab> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('采样率 (Sample Rate)', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                          Text(AppI18n.instance.t('refreshRate'), style: const TextStyle(fontSize: 12, color: Colors.grey)),
                           const SizedBox(height: 4),
                           const Text(
                             '5 Hz (200ms)',
@@ -274,7 +275,7 @@ class _ChartTabState extends State<ChartTab> {
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: _history.isEmpty
-                      ? const Center(child: Text('等待数据采样点接入...'))
+                      ? Center(child: Text(AppI18n.instance.t('noChartData')))
                       : CustomPaint(
                           size: Size.infinite,
                           painter: _LiveTrendPainter(

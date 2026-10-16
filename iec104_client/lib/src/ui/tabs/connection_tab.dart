@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../client/iec104_client.dart';
 import '../../client/traffic_logger.dart';
+import '../../i18n/app_i18n.dart';
 
 class ConnectionTab extends StatefulWidget {
   final Iec104Client client;
@@ -97,6 +98,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
   }
 
   Future<void> _runVerification() async {
+    final i18n = AppI18n.instance;
     setState(() {
       _isVerifying = true;
       _verifyResults = null;
@@ -113,15 +115,30 @@ class _ConnectionTabState extends State<ConnectionTab> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _verifyResults = ['验证异常: $e'];
+          _verifyResults = ['${i18n.t('parseError')}: $e'];
           _isVerifying = false;
         });
       }
     }
   }
 
+  String _getStateLabel(ClientConnectionState state, AppI18n i18n) {
+    switch (state) {
+      case ClientConnectionState.disconnected:
+        return i18n.t('disconnected');
+      case ClientConnectionState.connecting:
+        return i18n.t('connecting');
+      case ClientConnectionState.connected:
+        return i18n.t('connected');
+      case ClientConnectionState.active:
+        return i18n.t('stateActive');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final i18n = AppI18n.instance;
     final c = widget.client;
     final isConnected = c.state != ClientConnectionState.disconnected;
     final isActive = c.state == ClientConnectionState.active;
@@ -156,11 +173,11 @@ class _ConnectionTabState extends State<ConnectionTab> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '连接状态: ${c.state.label}',
+                        '${i18n.t('connectionStatus')}: ${_getStateLabel(c.state, i18n)}',
                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const Spacer(),
-                      Text('N(S): ${c.sendSeq} | N(R): ${c.recvSeq} | 未确认: ${c.unconfirmedRecvCount}'),
+                      Text('N(S): ${c.sendSeq} | N(R): ${c.recvSeq} | ${i18n.t('unconfirmed')}: ${c.unconfirmedRecvCount}'),
                       if (c.isWebVirtualMode) ...[
                         const SizedBox(width: 12),
                         Container(
@@ -170,7 +187,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
                             borderRadius: BorderRadius.circular(4),
                             border: Border.all(color: Colors.amber.shade700),
                           ),
-                          child: const Text('Web 虚拟测试模式', style: TextStyle(color: Colors.brown, fontSize: 12)),
+                          child: Text(i18n.t('webVirtualMode'), style: const TextStyle(color: Colors.brown, fontSize: 12)),
                         ),
                       ],
                     ],
@@ -181,13 +198,9 @@ class _ConnectionTabState extends State<ConnectionTab> {
                     runSpacing: 8,
                     children: [
                       if (!isConnected)
-                        ElevatedButton.icon(
+                        FilledButton.icon(
                           icon: const Icon(Icons.link),
-                          label: const Text('建立连接 (Connect)'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue.shade700,
-                            foregroundColor: Colors.white,
-                          ),
+                          label: Text(i18n.t('connect')),
                           onPressed: () async {
                             _applyParams();
                             try {
@@ -196,7 +209,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
                             } catch (e) {
                               if (mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('连接失败: $e')),
+                                  SnackBar(content: Text('${i18n.t('connectFailed')}: $e')),
                                 );
                               }
                             }
@@ -205,7 +218,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
                       else
                         ElevatedButton.icon(
                           icon: const Icon(Icons.link_off),
-                          label: const Text('断开连接 (Disconnect)'),
+                          label: Text(i18n.t('disconnect')),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red.shade700,
                             foregroundColor: Colors.white,
@@ -217,22 +230,22 @@ class _ConnectionTabState extends State<ConnectionTab> {
                         ),
                       OutlinedButton.icon(
                         icon: const Icon(Icons.play_circle_outline),
-                        label: const Text('STARTDT (激活数据)'),
+                        label: Text(i18n.t('startdtAct')),
                         onPressed: isConnected ? () => c.sendStartDt() : null,
                       ),
                       OutlinedButton.icon(
                         icon: const Icon(Icons.stop_circle_outlined),
-                        label: const Text('STOPDT (停止数据)'),
+                        label: Text(i18n.t('stopdtAct')),
                         onPressed: isConnected ? () => c.sendStopDt() : null,
                       ),
                       OutlinedButton.icon(
                         icon: const Icon(Icons.favorite_border),
-                        label: const Text('TESTFR (链路保活)'),
+                        label: Text(i18n.t('testfrAct')),
                         onPressed: isConnected ? () => c.sendTestFr() : null,
                       ),
                       OutlinedButton.icon(
                         icon: const Icon(Icons.done_all),
-                        label: const Text('发送 S 确认帧'),
+                        label: Text(i18n.t('sendSFrame')),
                         onPressed: isConnected ? () => c.sendSFrame() : null,
                       ),
                     ],
@@ -243,17 +256,17 @@ class _ConnectionTabState extends State<ConnectionTab> {
                     children: [
                       FilledButton.tonalIcon(
                         icon: const Icon(Icons.sync),
-                        label: const Text('下发总召唤 (C_IC_NA_1)'),
+                        label: Text(i18n.t('sendGeneralInterrogation')),
                         onPressed: isActive ? () => c.sendGeneralInterrogation() : null,
                       ),
                       FilledButton.tonalIcon(
                         icon: const Icon(Icons.access_time),
-                        label: const Text('时钟同步 (C_CS_NA_1)'),
+                        label: Text(i18n.t('clockSyncCmd')),
                         onPressed: isActive ? () => c.sendClockSynchronization() : null,
                       ),
                       FilledButton.tonalIcon(
                         icon: const Icon(Icons.flash_on),
-                        label: const Text('电能量总召 (C_CI_NA_1)'),
+                        label: Text(i18n.t('counterInterrogation')),
                         onPressed: isActive ? () => c.sendCounterInterrogation() : null,
                       ),
                     ],
@@ -273,7 +286,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('网络与连接参数 (Connection Configuration)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(i18n.t('connAndParam'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 16),
                   Row(
                     children: [
@@ -281,10 +294,10 @@ class _ConnectionTabState extends State<ConnectionTab> {
                         flex: 2,
                         child: TextField(
                           controller: _hostCtrl,
-                          decoration: const InputDecoration(
-                            labelText: '服务端 IP 地址 (Host)',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.computer),
+                          decoration: InputDecoration(
+                            labelText: i18n.t('targetIp'),
+                            border: const OutlineInputBorder(),
+                            prefixIcon: const Icon(Icons.computer),
                           ),
                           enabled: !isConnected,
                         ),
@@ -294,10 +307,10 @@ class _ConnectionTabState extends State<ConnectionTab> {
                         flex: 1,
                         child: TextField(
                           controller: _portCtrl,
-                          decoration: const InputDecoration(
-                            labelText: '端口 (Port)',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.tag),
+                          decoration: InputDecoration(
+                            labelText: i18n.t('port'),
+                            border: const OutlineInputBorder(),
+                            prefixIcon: const Icon(Icons.tag),
                           ),
                           enabled: !isConnected,
                         ),
@@ -307,59 +320,59 @@ class _ConnectionTabState extends State<ConnectionTab> {
                         flex: 1,
                         child: TextField(
                           controller: _caCtrl,
-                          decoration: const InputDecoration(
-                            labelText: '默认从站公共地址 (COA)',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.location_city),
+                          decoration: InputDecoration(
+                            labelText: i18n.t('coa'),
+                            border: const OutlineInputBorder(),
+                            prefixIcon: const Icon(Icons.location_city),
                           ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  const Text('IEC 60870-5-104 传输层定时器与窗口参数', style: TextStyle(fontWeight: FontWeight.w600)),
+                  const Text('IEC 60870-5-104 Timers & Parameters', style: TextStyle(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 8),
                   Row(
                     children: [
                       Expanded(
                         child: TextField(
                           controller: _kCtrl,
-                          decoration: const InputDecoration(labelText: 'k 发送窗口', border: OutlineInputBorder(), helperText: '最大未确认发送'),
+                          decoration: InputDecoration(labelText: 'k', border: const OutlineInputBorder(), helperText: i18n.t('kValue')),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
                           controller: _wCtrl,
-                          decoration: const InputDecoration(labelText: 'w 接收窗口', border: OutlineInputBorder(), helperText: '最大未确认接收'),
+                          decoration: InputDecoration(labelText: 'w', border: const OutlineInputBorder(), helperText: i18n.t('wValue')),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
                           controller: _t0Ctrl,
-                          decoration: const InputDecoration(labelText: 't0 超时 (s)', border: OutlineInputBorder(), helperText: 'TCP连接超时'),
+                          decoration: const InputDecoration(labelText: 't0 (s)', border: OutlineInputBorder(), helperText: 'Connect Timeout'),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
                           controller: _t1Ctrl,
-                          decoration: const InputDecoration(labelText: 't1 超时 (s)', border: OutlineInputBorder(), helperText: 'APDU确认超时'),
+                          decoration: InputDecoration(labelText: 't1 (s)', border: const OutlineInputBorder(), helperText: i18n.t('t1Timeout')),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
                           controller: _t2Ctrl,
-                          decoration: const InputDecoration(labelText: 't2 超时 (s)', border: OutlineInputBorder(), helperText: 'S帧回复延迟'),
+                          decoration: const InputDecoration(labelText: 't2 (s)', border: OutlineInputBorder(), helperText: 'Ack Timeout'),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
                           controller: _t3Ctrl,
-                          decoration: const InputDecoration(labelText: 't3 保活 (s)', border: OutlineInputBorder(), helperText: '空闲测试心跳'),
+                          decoration: InputDecoration(labelText: 't3 (s)', border: const OutlineInputBorder(), helperText: i18n.t('testfrInterval')),
                         ),
                       ),
                     ],
@@ -379,15 +392,15 @@ class _ConnectionTabState extends State<ConnectionTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('高级自动化任务与周期轮询 (Automatic Tasks)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const Text('Automation & Periodic Tasks', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
                   SwitchListTile(
-                    title: const Text('连接建立后自动发送 STARTDT act (Auto STARTDT)'),
+                    title: Text(i18n.t('autoStartdt')),
                     value: c.autoStartDt,
                     onChanged: (val) => setState(() => c.autoStartDt = val),
                   ),
                   SwitchListTile(
-                    title: const Text('链路激活后自动执行总召唤 (Auto General Interrogation)'),
+                    title: Text(i18n.t('autoGeneralInterrogation')),
                     value: c.autoGeneralInterrogation,
                     onChanged: (val) => setState(() => c.autoGeneralInterrogation = val),
                   ),
@@ -398,8 +411,8 @@ class _ConnectionTabState extends State<ConnectionTab> {
                         child: TextField(
                           controller: _giPeriodCtrl,
                           decoration: const InputDecoration(
-                            labelText: '周期总召唤间隔 (秒)',
-                            helperText: '0 表示禁用',
+                            labelText: 'GI Period (s)',
+                            helperText: '0 = Disabled',
                             border: OutlineInputBorder(),
                           ),
                         ),
@@ -409,8 +422,8 @@ class _ConnectionTabState extends State<ConnectionTab> {
                         child: TextField(
                           controller: _clockPeriodCtrl,
                           decoration: const InputDecoration(
-                            labelText: '周期时钟同步间隔 (秒)',
-                            helperText: '0 表示禁用',
+                            labelText: 'Clock Sync Period (s)',
+                            helperText: '0 = Disabled',
                             border: OutlineInputBorder(),
                           ),
                         ),
@@ -420,8 +433,8 @@ class _ConnectionTabState extends State<ConnectionTab> {
                         child: TextField(
                           controller: _counterPeriodCtrl,
                           decoration: const InputDecoration(
-                            labelText: '周期电能量召唤间隔 (秒)',
-                            helperText: '0 表示禁用',
+                            labelText: 'Counter GI Period (s)',
+                            helperText: '0 = Disabled',
                             border: OutlineInputBorder(),
                           ),
                         ),
@@ -437,8 +450,12 @@ class _ConnectionTabState extends State<ConnectionTab> {
 
           // Automated Verification Card
           Card(
-            elevation: 2,
-            color: Colors.blue.shade50,
+            elevation: 1,
+            color: theme.colorScheme.primaryContainer.withAlpha(40),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: theme.colorScheme.primary.withAlpha(80)),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -446,28 +463,24 @@ class _ConnectionTabState extends State<ConnectionTab> {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.verified_outlined, color: Colors.blue),
+                      Icon(Icons.verified_outlined, color: theme.colorScheme.primary),
                       const SizedBox(width: 8),
-                      const Text(
-                        '客户端全功能自动化一键验证',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
+                      Text(
+                        'IEC 104 Client Self-Test',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: theme.colorScheme.primary),
                       ),
                       const Spacer(),
-                      ElevatedButton.icon(
+                      FilledButton.icon(
                         icon: _isVerifying
                             ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                             : const Icon(Icons.play_arrow),
-                        label: Text(_isVerifying ? '正在验证...' : '运行自动化测试'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue.shade700,
-                          foregroundColor: Colors.white,
-                        ),
+                        label: Text(_isVerifying ? 'Verifying...' : 'Run Self-Test'),
                         onPressed: _isVerifying ? null : _runVerification,
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
-                  const Text('自动按序测试：连接创建 -> STARTDT握手 -> 总召唤解析 -> 时钟对时 -> 遥控预置与执行 -> 电能量总召 -> 单点读取 -> S确认对齐 -> 心跳保活 -> 正常断开。'),
+                  const Text('Automated sequence: Connect -> STARTDT -> GI -> Clock Sync -> Telecontrol -> Counter -> Read -> S-Ack -> TestFR -> Disconnect.'),
                   if (_verifyResults != null) ...[
                     const Divider(height: 24),
                     for (final r in _verifyResults!)
@@ -477,16 +490,16 @@ class _ConnectionTabState extends State<ConnectionTab> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Icon(
-                              r.contains('失败') ? Icons.cancel : Icons.check_circle,
+                              (r.contains('FAIL') || r.contains('Error') || r.contains('\u5931\u8d25')) ? Icons.cancel : Icons.check_circle,
                               size: 18,
-                              color: r.contains('失败') ? Colors.red : Colors.green,
+                              color: (r.contains('FAIL') || r.contains('Error') || r.contains('\u5931\u8d25')) ? Colors.red : Colors.green,
                             ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 r,
                                 style: TextStyle(
-                                  color: r.contains('失败') ? Colors.red.shade900 : Colors.green.shade900,
+                                  color: (r.contains('FAIL') || r.contains('Error') || r.contains('\u5931\u8d25')) ? Colors.red.shade900 : Colors.green.shade900,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),

@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'package:flutter/material.dart';
 import '../../models/dictionary_service.dart';
 import '../../models/server_variable_model.dart';
@@ -42,6 +43,7 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = AppI18n.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final scl = widget.manager.engine.scl;
     final allVars = widget.manager.engine.allVariables;
@@ -71,7 +73,7 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                   child: TextField(
                     controller: _searchCtrl,
                     decoration: InputDecoration(
-                      hintText: '搜索逻辑节点 / 数据对象 (如 GGIO, CSWI, stVal)...',
+                      hintText: i18n.t('searchLnDo'),
                       prefixIcon: const Icon(Icons.search, size: 20),
                       suffixIcon: _filterText.isNotEmpty
                           ? IconButton(icon: const Icon(Icons.clear, size: 18), onPressed: () => _searchCtrl.clear())
@@ -90,11 +92,11 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                       Icon(Icons.device_hub, size: 16, color: Theme.of(context).colorScheme.primary),
                       const SizedBox(width: 8),
                       Text(
-                        'IED: ${scl?.iedName ?? "未加载"} | 总变量: ${allVars.length}',
+                        'IED: ${scl?.iedName ?? i18n.t("unloaded")} | ${i18n.t("allVarsCount")}: ${allVars.length}',
                         style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                       ),
                       const Spacer(),
-                      Text('匹配: ${filteredVars.length}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                      Text('${i18n.t("matchedVars")}: ${filteredVars.length}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
                     ],
                   ),
                 ),
@@ -103,7 +105,7 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                   child: filteredVars.isEmpty
                       ? Center(
                           child: Text(
-                            scl == null ? '尚未加载 SCL 模型文件' : '无匹配变量',
+                            scl == null ? i18n.t('noSclLoaded') : i18n.t('noMatchingVars'),
                             style: const TextStyle(color: Colors.grey),
                           ),
                         )
@@ -133,7 +135,7 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                               subtitle: Row(
                                 children: [
                                   Text(
-                                    '${v.type.name}  |  值: ${v.displayValue}',
+                                    '${v.type.name}  |  ${i18n.t("valLabel")} ${v.displayValue}',
                                     style: TextStyle(
                                       fontSize: 11,
                                       color: isDark ? Colors.grey[400] : Colors.grey[600],
@@ -147,14 +149,14 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                                         color: Colors.blue.withOpacity(0.2),
                                         borderRadius: BorderRadius.circular(4),
                                       ),
-                                      child: const Text('波形中', style: TextStyle(fontSize: 10, color: Colors.blue)),
+                                      child: Text(i18n.t('waveBadge'), style: const TextStyle(fontSize: 10, color: Colors.blue)),
                                     ),
                                   ],
                                 ],
                               ),
                               trailing: IconButton(
                                 icon: const Icon(Icons.edit, size: 16),
-                                tooltip: '写入数值',
+                                tooltip: i18n.t('writeValueTooltip'),
                                 onPressed: () => _openWriteDialog(v),
                               ),
                               onTap: () {
@@ -175,8 +177,8 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
         Expanded(
           flex: 6,
           child: _selectedVariable == null
-              ? const Center(
-                  child: Text('在左侧选择一个数据属性 (Data Attribute) 查看属性详情与字典', style: TextStyle(color: Colors.grey)),
+              ? Center(
+                  child: Text(i18n.t('selectAttrHint'), style: const TextStyle(color: Colors.grey)),
                 )
               : _buildInspectorPanel(_selectedVariable!),
         ),
@@ -185,6 +187,7 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
   }
 
   Widget _buildInspectorPanel(ServerVariableModel v) {
+    final i18n = AppI18n.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final dict = DictionaryService.instance;
     final lnDesc = dict.getLogicalNode(v.lnName.replaceAll(RegExp(r'\d+'), ''));
@@ -210,7 +213,7 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
               IconButton(
                 icon: Icon(v.isMonitored ? Icons.bookmark : Icons.bookmark_border),
                 color: v.isMonitored ? Colors.amber : null,
-                tooltip: v.isMonitored ? '已加入数据监视表' : '加入数据监视表',
+                tooltip: v.isMonitored ? i18n.t('pinnedTooltip') : i18n.t('unpinnedTooltip'),
                 onPressed: () {
                   setState(() {
                     v.isMonitored = !v.isMonitored;
@@ -233,11 +236,11 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('实时运行数据', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  Text(i18n.t('liveDataCard'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      const Text('当前值 (Value): ', style: TextStyle(fontWeight: FontWeight.w600)),
+                      Text(i18n.t('currentValLabel'), style: const TextStyle(fontWeight: FontWeight.w600)),
                       Text(
                         v.displayValue,
                         style: TextStyle(
@@ -249,13 +252,13 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                       const Spacer(),
                       FilledButton.tonalIcon(
                         icon: const Icon(Icons.edit, size: 16),
-                        label: const Text('写入值'),
+                        label: Text(i18n.t('writeVal')),
                         onPressed: () => _openWriteDialog(v),
                       ),
                       const SizedBox(width: 8),
                       FilledButton.tonalIcon(
                         icon: const Icon(Icons.waves, size: 16),
-                        label: const Text('仿真波形'),
+                        label: Text(i18n.t('simWave')),
                         onPressed: () => _openSimDialog(v),
                       ),
                     ],
@@ -267,7 +270,7 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('品质状态 (Quality)', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                            Text(i18n.t('qualityTitle'), style: const TextStyle(fontSize: 11, color: Colors.grey)),
                             const SizedBox(height: 2),
                             Text(v.qualityString, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
                           ],
@@ -277,7 +280,7 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('更新时间 (Timestamp)', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                            Text(i18n.t('updateTimeTitle'), style: const TextStyle(fontSize: 11, color: Colors.grey)),
                             const SizedBox(height: 2),
                             Text(v.timestamp.toIso8601String().substring(11, 23),
                                 style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
@@ -288,7 +291,7 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('基础数据类型', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                            Text(i18n.t('baseDataType'), style: const TextStyle(fontSize: 11, color: Colors.grey)),
                             const SizedBox(height: 2),
                             Text(v.type.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
                           ],
@@ -313,13 +316,13 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                     children: [
                       Icon(Icons.library_books, size: 18),
                       SizedBox(width: 8),
-                      Text('IEC 61850 标准元数据字典解释', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text(i18n.t('standardDictTitle'), style: const TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
                   const SizedBox(height: 12),
-                  _dictRow('逻辑节点 (LN)', v.lnName, lnDesc?.display),
-                  _dictRow('数据对象 (DO)', v.doName, doDesc?.display),
-                  _dictRow('数据属性 (DA)', v.daName, daDesc?.display),
+                  _dictRow(i18n.t('dictLn'), v.lnName, lnDesc?.display),
+                  _dictRow(i18n.t('dictDo'), v.doName, doDesc?.display),
+                  _dictRow(i18n.t('dictDa'), v.daName, daDesc?.display),
                 ],
               ),
             ),
@@ -350,7 +353,7 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              explanation ?? '无内置说明',
+              explanation ?? AppI18n.instance.t('noBuiltinDesc'),
               style: TextStyle(fontSize: 12, color: explanation != null ? null : Colors.grey),
             ),
           ),

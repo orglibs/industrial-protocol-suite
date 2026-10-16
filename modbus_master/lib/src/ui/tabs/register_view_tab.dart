@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'package:flutter/material.dart';
 import '../../models/connection_config.dart';
 import '../../models/register_group.dart';
@@ -110,7 +111,7 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${_selectedGroup!.registerType.label} 为只读类型，不支持写入操作'),
+          content: Text('${_selectedGroup!.registerType.label} (Read-Only)'),
           duration: const Duration(seconds: 2),
         ),
       );
@@ -124,14 +125,14 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('编辑点号信息 [地址: ${reg.address}]'),
+        title: Text('${AppI18n.instance.t('edit')} [${AppI18n.instance.t('colAddr')}: ${reg.address}]'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: aliasCtrl,
               decoration: const InputDecoration(
-                labelText: '点位名称 / 别名 (Alias)',
+                labelText: AppI18n.instance.t('colAlias'),
                 border: OutlineInputBorder(),
               ),
             ),
@@ -139,7 +140,7 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
             TextField(
               controller: commentCtrl,
               decoration: const InputDecoration(
-                labelText: '说明备注 (Comment)',
+                labelText: AppI18n.instance.t('colComment'),
                 border: OutlineInputBorder(),
               ),
             ),
@@ -148,7 +149,7 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('取消'),
+            child: Text(AppI18n.instance.t('cancel')),
           ),
           ElevatedButton(
             onPressed: () {
@@ -159,7 +160,7 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
               widget.onConfigChanged();
               Navigator.of(ctx).pop();
             },
-            child: const Text('保存'),
+            child: Text(AppI18n.instance.t('save')),
           ),
         ],
       ),
@@ -180,16 +181,15 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
                 const Icon(Icons.device_unknown, size: 64, color: Colors.blueGrey),
                 const SizedBox(height: 16),
                 Text(
-                  '连接【${widget.activeConnection.name}】暂无从站设备',
+                  AppI18n.instance.t('noSlaveHint'),
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                const Text('请为该连接添加从站后，方可查看其寄存器点表', style: TextStyle(color: Colors.grey)),
+                Text(AppI18n.instance.t('noSlaveHint'), style: const TextStyle(color: Colors.grey)),
                 const SizedBox(height: 16),
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.indigo, foregroundColor: Colors.white),
+                FilledButton.icon(
                   icon: const Icon(Icons.add),
-                  label: const Text('添加从站到此连接 (Add Slave)'),
+                  label: Text(AppI18n.instance.t('newSlave')),
                   onPressed: widget.onAddSlave,
                 ),
               ],
@@ -240,11 +240,11 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
                       underline: const SizedBox(),
                       items: widget.connections.map((c) {
                         final desc = c.mode == ModbusTransportMode.serialRtu
-                            ? (c.serialPortName ?? '串口')
-                            : (c.mode == ModbusTransportMode.virtual ? '虚拟' : '${c.ip}:${c.port}');
+                            ? (c.serialPortName ?? AppI18n.instance.t('serialPort'))
+                            : (c.mode == ModbusTransportMode.virtual ? 'Virtual' : '${c.ip}:${c.port}');
                         return DropdownMenuItem(
                           value: c,
-                          child: Text('连接: ${c.name} ($desc)', style: const TextStyle(fontWeight: FontWeight.bold)),
+                          child: Text('${c.name} ($desc)', style: const TextStyle(fontWeight: FontWeight.bold)),
                         );
                       }).toList(),
                       onChanged: (c) {
@@ -275,7 +275,7 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
                       items: widget.activeConnection.slaves.map((s) {
                         return DropdownMenuItem(
                           value: s,
-                          child: Text('从站: ${s.name} [ID: ${s.slaveId}]', style: const TextStyle(fontWeight: FontWeight.bold)),
+                          child: Text('${s.name} [ID: ${s.slaveId}]', style: const TextStyle(fontWeight: FontWeight.bold)),
                         );
                       }).toList(),
                       onChanged: (s) {
@@ -309,7 +309,7 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
                         items: _selectedSlave!.groups.map((g) {
                           return DropdownMenuItem(
                             value: g,
-                            child: Text('${g.groupName} [${g.registerType.prefix}] (点数:${g.quantity})'),
+                            child: Text('${g.groupName} [${g.registerType.prefix}] (${g.quantity})'),
                           );
                         }).toList(),
                         onChanged: (g) {
@@ -332,7 +332,7 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('字节序: '),
+                    Text('${AppI18n.instance.t('byteOrder')}: '),
                     DropdownButton<ModbusByteOrder>(
                       value: _byteOrder,
                       underline: const SizedBox(),
@@ -359,7 +359,7 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
               // Scan Once
               FilledButton.tonalIcon(
                 icon: const Icon(Icons.refresh, size: 18),
-                label: const Text('单次刷新'),
+                label: Text(AppI18n.instance.t('refreshRate')),
                 onPressed: _scanCurrentGroup,
               ),
 
@@ -367,7 +367,7 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
               if (_selectedGroup?.registerType == ModbusRegisterType.holdingRegisters)
                 OutlinedButton.icon(
                   icon: const Icon(Icons.playlist_add_check, size: 18),
-                  label: const Text('批量写 FC16'),
+                  label: Text(AppI18n.instance.t('batchFill')),
                   onPressed: () async {
                     if (_selectedSlave == null || _selectedGroup == null) return;
                     final res = await WriteMultipleRegistersDialog.show(
@@ -384,7 +384,7 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
               if (_selectedGroup != null)
                 IconButton(
                   icon: const Icon(Icons.settings, size: 20),
-                  tooltip: '修改组配置',
+                  tooltip: AppI18n.instance.t('editGroup'),
                   onPressed: () async {
                     final res = await EditGroupDialog.show(context, group: _selectedGroup);
                     if (res != null) {
@@ -405,22 +405,22 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
             child: Row(
               children: [
                 Icon(
-                  _selectedGroup!.lastScanStatus?.contains('成功') == true
+                  (_selectedGroup!.lastScanStatus?.contains('OK') == true || (_selectedGroup!.lastScanStatus?.contains('OK') == true || _selectedGroup!.lastScanStatus?.contains('Success') == true))
                       ? Icons.check_circle_outline
                       : Icons.info_outline,
                   size: 16,
-                  color: _selectedGroup!.lastScanStatus?.contains('成功') == true
+                  color: (_selectedGroup!.lastScanStatus?.contains('OK') == true || (_selectedGroup!.lastScanStatus?.contains('OK') == true || _selectedGroup!.lastScanStatus?.contains('Success') == true))
                       ? Colors.green
                       : theme.colorScheme.outline,
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  '最新扫描状态: ${_selectedGroup!.lastScanStatus ?? "尚未采集"}  |  耗时: ${_selectedGroup!.lastLatencyMs}ms  |  成功: ${_selectedGroup!.successCount} 次  |  异常: ${_selectedGroup!.errorCount} 次',
+                  'Status: ${_selectedGroup!.lastScanStatus ?? "Ready"} | ${_selectedGroup!.lastLatencyMs}ms | OK: ${_selectedGroup!.successCount} | Err: ${_selectedGroup!.errorCount}',
                   style: TextStyle(fontSize: 12, color: theme.textTheme.bodyMedium?.color),
                 ),
                 const Spacer(),
                 Text(
-                  '上次更新: ${_selectedGroup!.lastScanTime != null ? _selectedGroup!.lastScanTime.toString().substring(11, 19) : "--:--:--"}',
+                  'Last: ${_selectedGroup!.lastScanTime != null ? _selectedGroup!.lastScanTime.toString().substring(11, 19) : "--:--:--"}',
                   style: TextStyle(fontSize: 12, color: theme.colorScheme.outline),
                 ),
               ],
@@ -430,7 +430,7 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
         // Main Table
         Expanded(
           child: _selectedGroup == null
-              ? const Center(child: Text('请先为从站添加寄存器任务组'))
+              ? Center(child: Text(AppI18n.instance.t('noGroupHint')))
               : _buildRegistersTable(),
         ),
       ],
@@ -451,13 +451,13 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
           dataRowMinHeight: 40,
           dataRowMaxHeight: 48,
           columns: const [
-            DataColumn(label: Text('地址 (PLC/原生)', style: TextStyle(fontWeight: FontWeight.bold))),
-            DataColumn(label: Text('点位别名 / 描述', style: TextStyle(fontWeight: FontWeight.bold))),
-            DataColumn(label: Text('原始十六进制 (Hex)', style: TextStyle(fontWeight: FontWeight.bold))),
-            DataColumn(label: Text('解析数值 (双击写入)', style: TextStyle(fontWeight: FontWeight.bold))),
-            DataColumn(label: Text('数据格式', style: TextStyle(fontWeight: FontWeight.bold))),
-            DataColumn(label: Text('备注说明', style: TextStyle(fontWeight: FontWeight.bold))),
-            DataColumn(label: Text('快捷操作', style: TextStyle(fontWeight: FontWeight.bold))),
+            DataColumn(label: Text(AppI18n.instance.t('colAddr'), style: const TextStyle(fontWeight: FontWeight.bold))),
+            DataColumn(label: Text(AppI18n.instance.t('colAlias'), style: const TextStyle(fontWeight: FontWeight.bold))),
+            DataColumn(label: const Text('Hex', style: TextStyle(fontWeight: FontWeight.bold))),
+            DataColumn(label: Text(AppI18n.instance.t('colValue'), style: const TextStyle(fontWeight: FontWeight.bold))),
+            DataColumn(label: Text(AppI18n.instance.t('dataFormat'), style: const TextStyle(fontWeight: FontWeight.bold))),
+            DataColumn(label: Text(AppI18n.instance.t('colComment'), style: const TextStyle(fontWeight: FontWeight.bold))),
+            DataColumn(label: Text(AppI18n.instance.t('colAction'), style: const TextStyle(fontWeight: FontWeight.bold))),
           ],
           rows: group.registers.asMap().entries.map((entry) {
             final idx = entry.key;
@@ -490,7 +490,7 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(reg.alias ?? '未命名点号', style: TextStyle(color: reg.alias != null ? Colors.black87 : Colors.grey)),
+                        Text(reg.alias ?? 'Point', style: TextStyle(color: reg.alias != null ? Colors.black87 : Colors.grey)),
                         const SizedBox(width: 4),
                         const Icon(Icons.edit, size: 14, color: Colors.grey),
                       ],
@@ -506,17 +506,11 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
                   InkWell(
                     onDoubleTap: () => _onEditCell(reg),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: isCoilOrDiscrete
-                            ? (reg.rawValue != 0 ? Colors.green.shade50 : Colors.red.shade50)
-                            : Colors.blue.shade50,
+                        color: theme.colorScheme.surfaceVariant.withOpacity(0.4),
                         borderRadius: BorderRadius.circular(4),
-                        border: Border.all(
-                          color: isCoilOrDiscrete
-                              ? (reg.rawValue != 0 ? Colors.green.shade300 : Colors.red.shade300)
-                              : Colors.blue.shade200,
-                        ),
+                        border: Border.all(color: theme.dividerColor),
                       ),
                       child: Text(
                         displayStr,
@@ -524,8 +518,8 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
                           fontFamily: 'monospace',
                           fontWeight: FontWeight.bold,
                           color: isCoilOrDiscrete
-                              ? (reg.rawValue != 0 ? Colors.green.shade800 : Colors.red.shade800)
-                              : Colors.blue.shade900,
+                              ? (reg.rawValue != 0 ? Colors.green : Colors.grey)
+                              : theme.colorScheme.primary,
                         ),
                       ),
                     ),
@@ -568,7 +562,7 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
                             color: reg.rawValue != 0 ? Colors.green : Colors.grey,
                             size: 28,
                           ),
-                          tooltip: '切换线圈状态 (FC 05)',
+                          tooltip: AppI18n.instance.t('colAction'),
                           onPressed: () async {
                             final nextVal = reg.rawValue == 0;
                             try {
@@ -581,7 +575,7 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
                             } catch (e) {
                               if (mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('写入线圈失败: $e')),
+                                  SnackBar(content: Text('${AppI18n.instance.t('parseError')}: $e')),
                                 );
                               }
                             }
@@ -590,14 +584,14 @@ class _RegisterViewTabState extends State<RegisterViewTab> {
                         ),
                       if (group.registerType == ModbusRegisterType.holdingRegisters)
                         IconButton(
-                          icon: const Icon(Icons.edit, size: 18, color: Colors.blue),
-                          tooltip: '写入保持寄存器值 (FC 06)',
+                          icon: Icon(Icons.edit, size: 18, color: theme.colorScheme.primary),
+                          tooltip: AppI18n.instance.t('colAction'),
                           onPressed: () => _onEditCell(reg),
                         ),
                       if (group.registerType == ModbusRegisterType.discreteInputs ||
                           group.registerType == ModbusRegisterType.inputRegisters)
                         const Chip(
-                          label: Text('只读', style: TextStyle(fontSize: 10)),
+                          label: const Text('RO', style: TextStyle(fontSize: 10)),
                           visualDensity: VisualDensity.compact,
                           padding: EdgeInsets.zero,
                         ),

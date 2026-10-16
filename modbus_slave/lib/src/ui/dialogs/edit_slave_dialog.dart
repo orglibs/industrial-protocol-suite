@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'package:flutter/material.dart';
 import '../../models/slave_model.dart';
 import '../../protocol/modbus_data_types.dart';
@@ -24,7 +25,7 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
   void initState() {
     super.initState();
     final s = widget.initialSlave;
-    _nameController = TextEditingController(text: s?.name ?? '新从站 (Slave)');
+    _nameController = TextEditingController(text: s?.name ?? 'Slave');
     _slaveIdController = TextEditingController(text: (s?.slaveId ?? 1).toString());
     _delayController = TextEditingController(text: (s?.responseDelay ?? 0).toString());
 
@@ -51,7 +52,7 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
         children: [
           Icon(Icons.developer_board, color: theme.colorScheme.primary),
           const SizedBox(width: 8),
-          Text(widget.initialSlave == null ? '新建从站设备' : '编辑从站配置'),
+          Text(widget.initialSlave == null ? AppI18n.instance.t('newSlaveTitle') : AppI18n.instance.t('editSlaveTitle')),
         ],
       ),
       content: SizedBox(
@@ -65,12 +66,12 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(
-                  labelText: '从站别名 (Slave Alias)',
-                  hintText: '如: 1#变压器测控从站',
+                  labelText: AppI18n.instance.t('slaveAlias'),
+                  hintText: AppI18n.instance.t('slaveAliasHint'),
                   prefixIcon: Icon(Icons.label_outline),
                   border: OutlineInputBorder(),
                 ),
-                validator: (v) => (v == null || v.trim().isEmpty) ? '从站别名不能为空' : null,
+                validator: (v) => (v == null || v.trim().isEmpty) ? AppI18n.instance.t('slaveAliasRequired') : null,
               ),
               const SizedBox(height: 16),
               Row(
@@ -80,13 +81,13 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
                       controller: _slaveIdController,
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
-                        labelText: '从站地址 (Slave ID 1-247)',
+                        labelText: AppI18n.instance.t('slaveId'),
                         prefixIcon: Icon(Icons.numbers),
                         border: OutlineInputBorder(),
                       ),
                       validator: (v) {
                         final id = int.tryParse(v ?? '');
-                        if (id == null || id < 1 || id > 247) return '范围 1-247';
+                        if (id == null || id < 1 || id > 247) return '1-247';
                         return null;
                       },
                     ),
@@ -97,14 +98,14 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
                       controller: _delayController,
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
-                        labelText: '应答延迟 (Response Delay)',
+                        labelText: AppI18n.instance.t('respDelay'),
                         suffixText: 'ms',
                         prefixIcon: Icon(Icons.timer_outlined),
                         border: OutlineInputBorder(),
                       ),
                       validator: (v) {
                         final d = int.tryParse(v ?? '');
-                        if (d == null || d < 0) return '不能为负数';
+                        if (d == null || d < 0) return '>= 0';
                         return null;
                       },
                     ),
@@ -115,14 +116,14 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
               DropdownButtonFormField<int>(
                 value: _addressType,
                 decoration: const InputDecoration(
-                  labelText: '寄存器地址编号模式',
+                  labelText: AppI18n.instance.t('addrBase'),
                   prefixIcon: Icon(Icons.format_list_numbered),
                   border: OutlineInputBorder(),
                 ),
                 items: const [
-                  DropdownMenuItem(value: 0, child: Text('0基准偏移 (00000 - 09999)')),
-                  DropdownMenuItem(value: 1, child: Text('1基准偏移 (00001 - 10000)')),
-                  DropdownMenuItem(value: 2, child: Text('PLC标准格式 (0x/1x/3x/40001+)')),
+                  DropdownMenuItem(value: 0, child: Text('0-based (00000 - 09999)')),
+                  DropdownMenuItem(value: 1, child: Text('1-based (00001 - 10000)')),
+                  DropdownMenuItem(value: 2, child: Text('PLC Modicon (0x/1x/3x/40001+)')),
                 ],
                 onChanged: (v) => setState(() => _addressType = v ?? 0),
               ),
@@ -130,7 +131,7 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
               DropdownButtonFormField<ModbusByteOrder>(
                 value: _byteOrder,
                 decoration: const InputDecoration(
-                  labelText: '大小端字节序 (Byte Order)',
+                  labelText: AppI18n.instance.t('byteOrder'),
                   prefixIcon: Icon(Icons.swap_vertical_circle_outlined),
                   border: OutlineInputBorder(),
                 ),
@@ -146,11 +147,11 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(AppI18n.instance.t('cancel')),
         ),
         FilledButton.icon(
           icon: const Icon(Icons.check),
-          label: const Text('确定'),
+          label: Text(AppI18n.instance.t('confirm')),
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               final slaveId = int.parse(_slaveIdController.text.trim());

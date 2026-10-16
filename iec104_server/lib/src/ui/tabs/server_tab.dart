@@ -1,3 +1,4 @@
+import "../../i18n/app_i18n.dart";
 import 'package:flutter/material.dart';
 import '../../server/client_session.dart';
 import '../../server/iec104_server.dart';
@@ -69,7 +70,7 @@ class _ServerTabState extends State<ServerTab> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('操作失败: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text("${AppI18n.instance.t('parseError')}: $e"), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -89,7 +90,7 @@ class _ServerTabState extends State<ServerTab> {
             children: [
               Icon(Icons.verified, color: Colors.green),
               SizedBox(width: 8),
-              Text('IEC 104 功能自动验证结果'),
+              Text('IEC 104 Self-Test Results'),
             ],
           ),
           content: SizedBox(
@@ -100,7 +101,7 @@ class _ServerTabState extends State<ServerTab> {
               separatorBuilder: (_, __) => const Divider(height: 12),
               itemBuilder: (ctx, i) {
                 final text = results[i];
-                final isSuccess = !text.contains('失败');
+                final isSuccess = !text.contains('FAIL');
                 return Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -124,7 +125,7 @@ class _ServerTabState extends State<ServerTab> {
           actions: [
             FilledButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('完成'),
+              child: Text(AppI18n.instance.t('confirm')),
             ),
           ],
         ),
@@ -132,7 +133,7 @@ class _ServerTabState extends State<ServerTab> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('验证出错: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text("${AppI18n.instance.t('parseError')}: $e"), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -178,8 +179,8 @@ class _ServerTabState extends State<ServerTab> {
                         children: [
                           Text(
                             isRunning
-                                ? (widget.server.isWebVirtualMode ? 'IEC 104 仿真服务正在运行 (Web 虚拟模式)' : 'IEC 104 服务正在运行')
-                                : 'IEC 104 服务已停止',
+                                ? (widget.server.isWebVirtualMode ? 'IEC 104 Service Running (Web Virtual)' : 'IEC 104 Service Running')
+                                : 'IEC 104 Service Stopped',
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -192,9 +193,9 @@ class _ServerTabState extends State<ServerTab> {
                           Text(
                             isRunning
                                 ? (widget.server.isWebVirtualMode
-                                    ? 'Web 浏览器沙箱环境：已激活虚拟服务端链路 | 在线客户端: ${clients.length}'
-                                    : '原生 TCP 监听: ${widget.server.host}:${widget.server.port} | 在线主站连接: ${clients.length}')
-                                : '未启动服务，配置参数后点击右侧按钮启动监听。',
+                                    ? 'Web Virtual Mode | Clients: ${clients.length}'
+                                    : 'TCP: ${widget.server.host}:${widget.server.port} | Clients: ${clients.length}')
+                                : 'Server stopped. Click Start to listen.',
                             style: TextStyle(color: theme.colorScheme.outline),
                           ),
                         ],
@@ -205,8 +206,8 @@ class _ServerTabState extends State<ServerTab> {
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                       ),
                       onPressed: _isLoading ? null : _runVerification,
-                      icon: const Icon(Icons.verified, color: Colors.blue),
-                      label: const Text('自动验证功能'),
+                      icon: Icon(Icons.verified, color: theme.colorScheme.primary),
+                      label: const Text('Self-Test'),
                     ),
                     const SizedBox(width: 12),
                     FilledButton.icon(
@@ -216,7 +217,7 @@ class _ServerTabState extends State<ServerTab> {
                       ),
                       onPressed: _isLoading ? null : _toggleServer,
                       icon: Icon(isRunning ? Icons.stop : Icons.play_arrow),
-                      label: Text(isRunning ? '停止服务' : '启动服务'),
+                      label: Text(isRunning ? AppI18n.instance.t('stopListen') : AppI18n.instance.t('startListen')),
                     ),
                   ],
                 ),
@@ -237,8 +238,7 @@ class _ServerTabState extends State<ServerTab> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        '提示：Web 浏览器受安全沙箱限制无法直接监听操作系统原生 TCP 端口 (2404)。当前已自动为您启用内置虚拟从站与协议模拟器！'
-                        '如需作为真正的原生网络服务端对外开放 2404 端口供外部物理设备连接，请在 Linux/Windows 桌面终端运行已生成的独立二进制: ./build/iec104_server',
+                        'Web environment uses virtual loopback simulation. For native TCP 2404 listening, run desktop executable: ./build/iec104_server',
                         style: TextStyle(color: isDark ? Colors.amberAccent : Colors.amber.shade900, fontSize: 13),
                       ),
                     ),
@@ -257,7 +257,7 @@ class _ServerTabState extends State<ServerTab> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('服务网络与链路参数配置', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text(AppI18n.instance.t('serverNetworkConfig'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 16),
                     Row(
                       children: [
@@ -265,10 +265,10 @@ class _ServerTabState extends State<ServerTab> {
                           child: TextField(
                             controller: _hostController,
                             enabled: !isRunning,
-                            decoration: const InputDecoration(
-                              labelText: '绑定监听 IP (Host)',
+                            decoration: InputDecoration(
+                              labelText: AppI18n.instance.t('listenIp'),
                               border: OutlineInputBorder(),
-                              helperText: '0.0.0.0 (所有网卡) 或 127.0.0.1',
+                              helperText: '0.0.0.0 | 127.0.0.1',
                             ),
                           ),
                         ),
@@ -277,10 +277,10 @@ class _ServerTabState extends State<ServerTab> {
                           child: TextField(
                             controller: _portController,
                             enabled: !isRunning,
-                            decoration: const InputDecoration(
-                              labelText: '服务端口 (Port)',
+                            decoration: InputDecoration(
+                              labelText: AppI18n.instance.t('listenPort'),
                               border: OutlineInputBorder(),
-                              helperText: '默认 2404',
+                              helperText: 'Default: 2404',
                             ),
                             keyboardType: TextInputType.number,
                           ),
@@ -290,7 +290,7 @@ class _ServerTabState extends State<ServerTab> {
                     const SizedBox(height: 16),
                     const Divider(),
                     const SizedBox(height: 8),
-                    const Text('IEC 60870-5-104 超时与窗口参数 (Timers & Windowing):',
+                    const Text('IEC 60870-5-104 Timers & Windowing:',
                         style: TextStyle(fontWeight: FontWeight.w600)),
                     const SizedBox(height: 12),
                     Row(
@@ -299,7 +299,7 @@ class _ServerTabState extends State<ServerTab> {
                           child: TextField(
                             controller: _t0Controller,
                             enabled: !isRunning,
-                            decoration: const InputDecoration(labelText: 't0: 连接超时 (s)', border: OutlineInputBorder()),
+                            decoration: InputDecoration(labelText: 't0: Connect Timeout (s)', border: OutlineInputBorder()),
                             keyboardType: TextInputType.number,
                           ),
                         ),
@@ -308,7 +308,7 @@ class _ServerTabState extends State<ServerTab> {
                           child: TextField(
                             controller: _t1Controller,
                             enabled: !isRunning,
-                            decoration: const InputDecoration(labelText: 't1: 发送超时 (s)', border: OutlineInputBorder()),
+                            decoration: InputDecoration(labelText: 't1: Send Timeout (s)', border: OutlineInputBorder()),
                             keyboardType: TextInputType.number,
                           ),
                         ),
@@ -317,7 +317,7 @@ class _ServerTabState extends State<ServerTab> {
                           child: TextField(
                             controller: _t2Controller,
                             enabled: !isRunning,
-                            decoration: const InputDecoration(labelText: 't2: 确认超时 (s)', border: OutlineInputBorder()),
+                            decoration: InputDecoration(labelText: 't2: Ack Timeout (s)', border: OutlineInputBorder()),
                             keyboardType: TextInputType.number,
                           ),
                         ),
@@ -326,7 +326,7 @@ class _ServerTabState extends State<ServerTab> {
                           child: TextField(
                             controller: _t3Controller,
                             enabled: !isRunning,
-                            decoration: const InputDecoration(labelText: 't3: 心跳间隔 (s)', border: OutlineInputBorder()),
+                            decoration: InputDecoration(labelText: 't3: Test Frame (s)', border: OutlineInputBorder()),
                             keyboardType: TextInputType.number,
                           ),
                         ),
@@ -339,7 +339,7 @@ class _ServerTabState extends State<ServerTab> {
                           child: TextField(
                             controller: _kController,
                             enabled: !isRunning,
-                            decoration: const InputDecoration(labelText: 'k: 最大未确认帧数', border: OutlineInputBorder()),
+                            decoration: InputDecoration(labelText: 'k: Max Unack Frames', border: OutlineInputBorder()),
                             keyboardType: TextInputType.number,
                           ),
                         ),
@@ -348,7 +348,7 @@ class _ServerTabState extends State<ServerTab> {
                           child: TextField(
                             controller: _wController,
                             enabled: !isRunning,
-                            decoration: const InputDecoration(labelText: 'w: 最新确认帧数', border: OutlineInputBorder()),
+                            decoration: InputDecoration(labelText: 'w: Ack Threshold', border: OutlineInputBorder()),
                             keyboardType: TextInputType.number,
                           ),
                         ),
@@ -361,10 +361,10 @@ class _ServerTabState extends State<ServerTab> {
                           child: DropdownButtonFormField<int>(
                             initialValue: widget.server.cotSize,
                             isExpanded: true,
-                            decoration: const InputDecoration(labelText: 'COT 长度', border: OutlineInputBorder()),
+                            decoration: InputDecoration(labelText: 'COT Size', border: OutlineInputBorder()),
                             items: const [
-                              DropdownMenuItem(value: 1, child: Text('1 字节')),
-                              DropdownMenuItem(value: 2, child: Text('2 字节 (标准)')),
+                              DropdownMenuItem(value: 1, child: Text('1 Byte')),
+                              DropdownMenuItem(value: 2, child: Text('2 Bytes (Standard)')),
                             ],
                             onChanged: isRunning ? null : (v) => widget.server.cotSize = v!,
                           ),
@@ -374,10 +374,10 @@ class _ServerTabState extends State<ServerTab> {
                           child: DropdownButtonFormField<int>(
                             initialValue: widget.server.ioaSize,
                             isExpanded: true,
-                            decoration: const InputDecoration(labelText: 'IOA 长度', border: OutlineInputBorder()),
+                            decoration: InputDecoration(labelText: 'IOA Size', border: OutlineInputBorder()),
                             items: const [
-                              DropdownMenuItem(value: 2, child: Text('2 字节')),
-                              DropdownMenuItem(value: 3, child: Text('3 字节 (标准)')),
+                              DropdownMenuItem(value: 2, child: Text('2 Bytes')),
+                              DropdownMenuItem(value: 3, child: Text('3 Bytes (Standard)')),
                             ],
                             onChanged: isRunning ? null : (v) => widget.server.ioaSize = v!,
                           ),
@@ -402,12 +402,12 @@ class _ServerTabState extends State<ServerTab> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('已连接主站客户端 (${clients.length})',
+                        Text("${AppI18n.instance.t('connectedMasters')} (${clients.length})",
                             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         if (clients.isNotEmpty)
                           TextButton.icon(
                             icon: const Icon(Icons.link_off, size: 18),
-                            label: const Text('断开全部'),
+                            label: Text(AppI18n.instance.t('closeAll')),
                             onPressed: () {
                               for (final c in List.from(clients)) {
                                 c.close();
@@ -422,53 +422,60 @@ class _ServerTabState extends State<ServerTab> {
                         padding: const EdgeInsets.all(24),
                         alignment: Alignment.center,
                         child: Text(
-                          isRunning ? '等待主站客户端连接...' : '服务未启动',
-                          style: TextStyle(color: Colors.grey.shade600),
+                          isRunning ? 'Waiting for client connections...' : 'Server stopped',
+                          style: TextStyle(color: theme.colorScheme.outline),
                         ),
                       )
                     else
-                      DataTable(
-                        columns: const [
-                          DataColumn(label: Text('客户端ID')),
-                          DataColumn(label: Text('远程地址 (IP:Port)')),
-                          DataColumn(label: Text('数据传输状态 (STARTDT)')),
-                          DataColumn(label: Text('发送序号 N(S)')),
-                          DataColumn(label: Text('接收序号 N(R)')),
-                          DataColumn(label: Text('操作')),
-                        ],
-                        rows: clients.map((c) {
-                          return DataRow(cells: [
-                            DataCell(Text('#${c.sessionId}')),
-                            DataCell(Text(c.remoteAddress, style: const TextStyle(fontWeight: FontWeight.bold))),
-                            DataCell(
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: (c.isDataTransferActive ? Colors.green : Colors.amber).withOpacity(0.15),
-                                  borderRadius: BorderRadius.circular(4),
-                                  border: Border.all(color: (c.isDataTransferActive ? Colors.green : Colors.amber).withOpacity(0.5)),
-                                ),
-                                child: Text(
-                                  c.isDataTransferActive ? '已激活 (STARTDT Con)' : '未激活 (Pending)',
-                                  style: TextStyle(
-                                    color: c.isDataTransferActive ? Colors.green : Colors.amber,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: DataTable(
+                          headingRowColor: WidgetStateProperty.all(theme.colorScheme.surfaceVariant.withOpacity(0.35)),
+                          headingRowHeight: 40,
+                          dataRowMinHeight: 44,
+                          dataRowMaxHeight: 44,
+                          columns: [
+                            DataColumn(label: const Text('Client ID', style: TextStyle(fontWeight: FontWeight.bold))),
+                            DataColumn(label: const Text('Remote Address', style: TextStyle(fontWeight: FontWeight.bold))),
+                            DataColumn(label: const Text('STARTDT State', style: TextStyle(fontWeight: FontWeight.bold))),
+                            DataColumn(label: const Text('N(S)', style: TextStyle(fontWeight: FontWeight.bold))),
+                            DataColumn(label: const Text('N(R)', style: TextStyle(fontWeight: FontWeight.bold))),
+                            DataColumn(label: Text(AppI18n.instance.t('operation'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                          ],
+                          rows: clients.map((c) {
+                            return DataRow(cells: [
+                              DataCell(Text('#${c.sessionId}')),
+                              DataCell(Text(c.remoteAddress, style: const TextStyle(fontWeight: FontWeight.bold))),
+                              DataCell(
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: (c.isDataTransferActive ? Colors.green : Colors.amber).withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(4),
+                                    border: Border.all(color: (c.isDataTransferActive ? Colors.green : Colors.amber).withOpacity(0.5)),
+                                  ),
+                                  child: Text(
+                                    c.isDataTransferActive ? 'ACTIVE (STARTDT)' : 'PENDING',
+                                    style: TextStyle(
+                                      color: c.isDataTransferActive ? Colors.green : Colors.amber,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            DataCell(Text('${c.txSeq}')),
-                            DataCell(Text('${c.rxSeq}')),
-                            DataCell(
-                              IconButton(
-                                icon: const Icon(Icons.close, color: Colors.red),
-                                tooltip: '断开此连接',
-                                onPressed: () => c.close(),
+                              DataCell(Text('${c.txSeq}')),
+                              DataCell(Text('${c.rxSeq}')),
+                              DataCell(
+                                IconButton(
+                                  icon: const Icon(Icons.close, color: Colors.red),
+                                  tooltip: AppI18n.instance.t('disconnect'),
+                                  onPressed: () => c.close(),
+                                ),
                               ),
-                            ),
-                          ]);
-                        }).toList(),
+                            ]);
+                          }).toList(),
+                        ),
                       ),
                   ],
                 ),

@@ -1,3 +1,4 @@
+import "../../i18n/app_i18n.dart";
 import 'package:flutter/material.dart';
 import '../../protocol/asdu.dart';
 import '../../server/station.dart';
@@ -25,7 +26,7 @@ class _BatchInitDialogState extends State<BatchInitDialog> {
   final _formKey = GlobalKey<FormState>();
   final _startIoaController = TextEditingController(text: '16385');
   final _countController = TextEditingController(text: '10');
-  final _prefixController = TextEditingController(text: '模拟遥测通道');
+  final _prefixController = TextEditingController(text: 'AnalogChannel');
   AsduTypeId _selectedType = AsduTypeId.mMeNc1;
 
   @override
@@ -39,7 +40,7 @@ class _BatchInitDialogState extends State<BatchInitDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('批量生成信息对象点位'),
+      title: Text(AppI18n.instance.t('batchInit')),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -49,17 +50,17 @@ class _BatchInitDialogState extends State<BatchInitDialog> {
               DropdownButtonFormField<AsduTypeId>(
                 initialValue: _selectedType,
                 isExpanded: true,
-                decoration: const InputDecoration(
-                  labelText: '点位类型',
+                decoration: InputDecoration(
+                  labelText: AppI18n.instance.t('pointType'),
                   border: OutlineInputBorder(),
                 ),
                 items: const [
-                  DropdownMenuItem(value: AsduTypeId.mSpNa1, child: Text('Type 1: 单点遥信 (M_SP_NA_1)')),
-                  DropdownMenuItem(value: AsduTypeId.mDpNa1, child: Text('Type 3: 双点遥信 (M_DP_NA_1)')),
-                  DropdownMenuItem(value: AsduTypeId.mMeNc1, child: Text('Type 13: 短浮点遥测 (M_ME_NC_1)')),
-                  DropdownMenuItem(value: AsduTypeId.mMeNa1, child: Text('Type 9: 归一化遥测 (M_ME_NA_1)')),
-                  DropdownMenuItem(value: AsduTypeId.mMeNb1, child: Text('Type 11: 标度化遥测 (M_ME_NB_1)')),
-                  DropdownMenuItem(value: AsduTypeId.mItNa1, child: Text('Type 15: 电能量遥脉 (M_IT_NA_1)')),
+                  DropdownMenuItem(value: AsduTypeId.mSpNa1, child: const Text('Type 1: M_SP_NA_1 (Single Point)')),
+                  DropdownMenuItem(value: AsduTypeId.mDpNa1, child: const Text('Type 3: M_DP_NA_1 (Double Point)')),
+                  DropdownMenuItem(value: AsduTypeId.mMeNc1, child: const Text('Type 13: M_ME_NC_1 (Short Float)')),
+                  DropdownMenuItem(value: AsduTypeId.mMeNa1, child: const Text('Type 9: M_ME_NA_1 (Normalized)')),
+                  DropdownMenuItem(value: AsduTypeId.mMeNb1, child: const Text('Type 11: M_ME_NB_1 (Scaled)')),
+                  DropdownMenuItem(value: AsduTypeId.mItNa1, child: const Text('Type 15: M_IT_NA_1 (Totals)')),
                 ],
                 onChanged: (v) {
                   if (v != null) {
@@ -67,16 +68,16 @@ class _BatchInitDialogState extends State<BatchInitDialog> {
                       _selectedType = v;
                       if (v == AsduTypeId.mSpNa1) {
                         _startIoaController.text = '1001';
-                        _prefixController.text = '模拟遥信开关';
+                        _prefixController.text = 'SwitchSP';
                       } else if (v == AsduTypeId.mDpNa1) {
                         _startIoaController.text = '2001';
-                        _prefixController.text = '模拟双点开关';
+                        _prefixController.text = 'SwitchDP';
                       } else if (v == AsduTypeId.mItNa1) {
                         _startIoaController.text = '25601';
-                        _prefixController.text = '模拟电能表';
+                        _prefixController.text = 'MeterIT';
                       } else {
                         _startIoaController.text = '16385';
-                        _prefixController.text = '模拟遥测通道';
+                        _prefixController.text = 'AnalogChannel';
                       }
                     });
                   }
@@ -85,39 +86,39 @@ class _BatchInitDialogState extends State<BatchInitDialog> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _startIoaController,
-                decoration: const InputDecoration(
-                  labelText: '起始 IOA 地址',
+                decoration: InputDecoration(
+                  labelText: AppI18n.instance.t('startAddr'),
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
                 validator: (v) {
                   final n = int.tryParse(v ?? '');
-                  if (n == null || n <= 0) return '请输入有效的正整数';
+                  if (n == null || n <= 0) return 'Valid positive integer';
                   return null;
                 },
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _countController,
-                decoration: const InputDecoration(
-                  labelText: '生成数量',
+                decoration: InputDecoration(
+                  labelText: AppI18n.instance.t('regQty'),
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
                 validator: (v) {
                   final n = int.tryParse(v ?? '');
-                  if (n == null || n <= 0 || n > 500) return '数量范围 1 ~ 500';
+                  if (n == null || n <= 0 || n > 500) return '1 ~ 500';
                   return null;
                 },
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _prefixController,
-                decoration: const InputDecoration(
-                  labelText: '点位名称前缀',
+                decoration: InputDecoration(
+                  labelText: 'Prefix',
                   border: OutlineInputBorder(),
                 ),
-                validator: (v) => (v == null || v.trim().isEmpty) ? '请输入名称前缀' : null,
+                validator: (v) => (v == null || v.trim().isEmpty) ? AppI18n.instance.t('valRequired') : null,
               ),
             ],
           ),
@@ -126,7 +127,7 @@ class _BatchInitDialogState extends State<BatchInitDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('取消'),
+          child: Text(AppI18n.instance.t('cancel')),
         ),
         FilledButton(
           onPressed: () {
@@ -144,7 +145,7 @@ class _BatchInitDialogState extends State<BatchInitDialog> {
               Navigator.pop(context);
             }
           },
-          child: const Text('开始生成'),
+          child: Text(AppI18n.instance.t('batchInit')),
         ),
       ],
     );

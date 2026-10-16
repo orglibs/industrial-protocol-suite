@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'package:flutter/material.dart';
 import '../../models/register_model.dart';
 import '../../protocol/modbus_data_types.dart';
@@ -61,7 +62,7 @@ class _EditRegisterDialogState extends State<EditRegisterDialog> {
         children: [
           Icon(Icons.edit_note, color: theme.colorScheme.primary),
           const SizedBox(width: 8),
-          Text('配置寄存器 [${widget.formattedAddress}]'),
+          Text('${AppI18n.instance.t('configRegTitle')} [${widget.formattedAddress}]'),
         ],
       ),
       content: SizedBox(
@@ -79,8 +80,8 @@ class _EditRegisterDialogState extends State<EditRegisterDialog> {
                       child: TextFormField(
                         controller: _aliasController,
                         decoration: const InputDecoration(
-                          labelText: '别名 / 描述 (Alias)',
-                          hintText: '如: A相电压',
+                          labelText: AppI18n.instance.t('colAlias'),
+                          hintText: 'e.g. Phase A Voltage',
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -90,17 +91,17 @@ class _EditRegisterDialogState extends State<EditRegisterDialog> {
                       child: TextFormField(
                         controller: _valueController,
                         decoration: const InputDecoration(
-                          labelText: '设定当前数值 (Value)',
+                          labelText: AppI18n.instance.t('currValue'),
                           border: OutlineInputBorder(),
                         ),
                         validator: (v) {
-                          if (v == null || v.trim().isEmpty) return '数值不能为空';
+                          if (v == null || v.trim().isEmpty) return AppI18n.instance.t('valRequired');
                           final words = ModbusDataConverter.parseInputTextToWords(
                             v.trim(),
                             _format,
                             widget.byteOrder,
                           );
-                          if (words == null) return '数值格式不符合选定类型';
+                          if (words == null) return AppI18n.instance.t('convertFailed');
                           return null;
                         },
                       ),
@@ -111,7 +112,7 @@ class _EditRegisterDialogState extends State<EditRegisterDialog> {
                 DropdownButtonFormField<RegisterDataFormat>(
                   value: _format,
                   decoration: const InputDecoration(
-                    labelText: '数据显示格式 (Data Format)',
+                    labelText: AppI18n.instance.t('dataFormat'),
                     border: OutlineInputBorder(),
                   ),
                   items: RegisterDataFormat.values.map((f) {
@@ -130,13 +131,13 @@ class _EditRegisterDialogState extends State<EditRegisterDialog> {
                 DropdownButtonFormField<int>(
                   value: _compositeType,
                   decoration: const InputDecoration(
-                    labelText: '组合模式 (Composite Multi-Word Type)',
+                    labelText: AppI18n.instance.t('colComposite'),
                     border: OutlineInputBorder(),
                   ),
                   items: const [
-                    DropdownMenuItem(value: 0, child: Text('单寄存器 (16位 Word)')),
-                    DropdownMenuItem(value: 1, child: Text('双寄存器组合 (32位 Float / Int32)')),
-                    DropdownMenuItem(value: 2, child: Text('四寄存器组合 (64位 Double / Int64)')),
+                    DropdownMenuItem(value: 0, child: Text(AppI18n.instance.t('singleWord'))),
+                    DropdownMenuItem(value: 1, child: Text(AppI18n.instance.t('doubleWord'))),
+                    DropdownMenuItem(value: 2, child: Text(AppI18n.instance.t('quadWord'))),
                   ],
                   onChanged: (v) => setState(() => _compositeType = v ?? 0),
                 ),
@@ -145,7 +146,7 @@ class _EditRegisterDialogState extends State<EditRegisterDialog> {
                   controller: _commentController,
                   maxLines: 2,
                   decoration: const InputDecoration(
-                    labelText: '备注说明 (Comment)',
+                    labelText: AppI18n.instance.t('colComment'),
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -158,8 +159,8 @@ class _EditRegisterDialogState extends State<EditRegisterDialog> {
                     ),
                     title: Text(
                       r.simulation.enabled
-                          ? '波形模拟已启用: ${r.simulation.waveType.label}'
-                          : '波形模拟未启用',
+                          ? '${AppI18n.instance.t('simRunningStatus')}: ${r.simulation.waveType.label}'
+                          : AppI18n.instance.t('enableSim'),
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: r.simulation.enabled ? Colors.green : null,
@@ -167,17 +168,17 @@ class _EditRegisterDialogState extends State<EditRegisterDialog> {
                     ),
                     subtitle: Text(
                       r.simulation.enabled
-                          ? '范围: ${r.simulation.min} ~ ${r.simulation.max}, 周期: ${r.simulation.durationMs}ms'
-                          : '点击右侧按钮配置正弦/三角/方波/随机动态数据',
+                          ? 'Min: ${r.simulation.min} ~ Max: ${r.simulation.max}, ${r.simulation.durationMs}ms'
+                          : AppI18n.instance.t('enableSimSub'),
                     ),
                     trailing: OutlinedButton(
-                      child: const Text('波形参数'),
+                      child: Text(AppI18n.instance.t('colSim')),
                       onPressed: () async {
                         final res = await showDialog<dynamic>(
                           context: context,
                           builder: (_) => SimulationConfigDialog(
                             initialConfig: r.simulation,
-                            title: '配置 [${widget.formattedAddress}] 波形模拟',
+                            title: '${AppI18n.instance.t('simConfigTitle')} [${widget.formattedAddress}]',
                           ),
                         );
                         if (res != null) {
@@ -197,11 +198,11 @@ class _EditRegisterDialogState extends State<EditRegisterDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(AppI18n.instance.t('cancel')),
         ),
         FilledButton.icon(
           icon: const Icon(Icons.check),
-          label: const Text('保存修改'),
+          label: Text(AppI18n.instance.t('save')),
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               r.alias = _aliasController.text.trim().isEmpty ? null : _aliasController.text.trim();

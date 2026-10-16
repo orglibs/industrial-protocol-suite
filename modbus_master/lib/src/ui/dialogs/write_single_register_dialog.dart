@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'package:flutter/material.dart';
 import '../../protocol/modbus_client.dart';
 
@@ -67,12 +68,12 @@ class _WriteSingleRegisterDialogState extends State<WriteSingleRegisterDialog> {
     }
 
     if (parsedVal == null) {
-      setState(() => _errorMsg = '请输入有效的数值 (支持十进制、0x十六进制)');
+      setState(() => _errorMsg = AppI18n.instance.t('valRequired'));
       return;
     }
 
     if (parsedVal < -32768 || parsedVal > 65535) {
-      setState(() => _errorMsg = '数值超出16位寄存器范围 (-32768 ~ 65535)');
+      setState(() => _errorMsg = 'Range: -32768 ~ 65535');
       return;
     }
 
@@ -94,7 +95,7 @@ class _WriteSingleRegisterDialogState extends State<WriteSingleRegisterDialog> {
       }
     } catch (e) {
       if (mounted) {
-        setState(() => _errorMsg = '写入失败: $e');
+        setState(() => _errorMsg = '${AppI18n.instance.t('parseError')}: $e');
       }
     } finally {
       if (mounted) {
@@ -105,12 +106,14 @@ class _WriteSingleRegisterDialogState extends State<WriteSingleRegisterDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.edit_note, color: Colors.blue),
-          SizedBox(width: 8),
-          Text('FC 06: 写单个保持寄存器 (Write Single Register)'),
+          Icon(Icons.edit_note, color: theme.colorScheme.primary),
+          const SizedBox(width: 8),
+          Text('FC 06: Write Single Register', style: const TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
       content: SizedBox(
@@ -119,14 +122,14 @@ class _WriteSingleRegisterDialogState extends State<WriteSingleRegisterDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('从站 Unit ID: ${widget.slaveId}  |  寄存器地址: ${widget.address} (0x${widget.address.toRadixString(16).padLeft(4, "0").toUpperCase()})'),
+            Text('Unit ID: ${widget.slaveId}  |  ${AppI18n.instance.t('colAddr')}: ${widget.address}'),
             const SizedBox(height: 16),
             TextField(
               controller: _valCtrl,
               autofocus: true,
               decoration: const InputDecoration(
-                labelText: '输入写入值 (十进制 或 0x十六进制)',
-                hintText: '如 1234 或 0x04D2',
+                labelText: AppI18n.instance.t('inputNum'),
+                hintText: '1234 | 0x04D2',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.numbers),
               ),
@@ -134,8 +137,8 @@ class _WriteSingleRegisterDialogState extends State<WriteSingleRegisterDialog> {
             ),
             const SizedBox(height: 8),
             Text(
-              '提示: 支持无符号 0..65535 或 有符号 -32768..32767',
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+              '0..65535 | -32768..32767',
+              style: TextStyle(color: theme.colorScheme.outline, fontSize: 12),
             ),
             if (_errorMsg != null) ...[
               const SizedBox(height: 12),
@@ -147,13 +150,13 @@ class _WriteSingleRegisterDialogState extends State<WriteSingleRegisterDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(AppI18n.instance.t('cancel')),
         ),
-        ElevatedButton(
+        FilledButton(
           onPressed: _isSending ? null : _send,
           child: _isSending
-              ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
-              : const Text('立即写入'),
+              ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+              : Text(AppI18n.instance.t('confirm')),
         ),
       ],
     );

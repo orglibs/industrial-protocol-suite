@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:window_manager/window_manager.dart';
+import '../i18n/app_i18n.dart';
 import '../server/iec104_server.dart';
 import '../server/workspace_storage.dart';
 import 'tabs/auto_sim_tab.dart';
@@ -8,17 +10,21 @@ import 'tabs/server_tab.dart';
 import 'tabs/station_tab.dart';
 import 'tabs/traffic_tab.dart';
 import 'widgets/iec104_slave_icon.dart';
+import 'widgets/language_picker.dart';
+import 'widgets/window_title_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   final Iec104Server server;
   final VoidCallback? onToggleTheme;
   final bool isDarkMode;
+  final VoidCallback? onLanguageChanged;
 
   const HomeScreen({
     super.key,
     required this.server,
     this.onToggleTheme,
     this.isDarkMode = true,
+    this.onLanguageChanged,
   });
 
   @override
@@ -65,39 +71,34 @@ class _HomeScreenState extends State<HomeScreen> {
       autoSimCount += s.points.values.where((p) => p.autoChangeEnabled).length;
     }
 
+    final i18n = AppI18n.instance;
+
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withAlpha(80),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: const Color(0xFF10B981), width: 1.2),
+        automaticallyImplyLeading: false,
+        titleSpacing: 0,
+        leading: WindowManagerHelper.isSupportedPlatform
+            ? DragToMoveArea(
+                child: const Padding(
+                  padding: EdgeInsets.only(left: 12),
+                  child: Iec104SlaveIcon(size: 26, color: Color(0xFF10B981)),
+                ),
+              )
+            : const Padding(
+                padding: EdgeInsets.only(left: 12),
+                child: Iec104SlaveIcon(size: 26, color: Color(0xFF10B981)),
               ),
-              child: const Iec104SlaveIcon(size: 20, color: Color(0xFF10B981)),
-            ),
-            const SizedBox(width: 10),
-            const Flexible(
-              child: Text(
-                'IEC 60870-5-104 Server Simulator',
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceVariant,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: const Text('v1.0.0', style: TextStyle(fontSize: 11)),
-            ),
-          ],
-        ),
+        flexibleSpace: WindowManagerHelper.isSupportedPlatform
+            ? const DragToMoveArea(child: SizedBox.expand())
+            : null,
+        title: WindowManagerHelper.isSupportedPlatform
+            ? DragToMoveArea(
+                child: SizedBox(
+                  height: 48,
+                  child: _buildTitleRow(theme, i18n),
+                ),
+              )
+            : _buildTitleRow(theme, i18n),
         actions: [
           // Quick Start / Stop Toggle
           FilledButton.tonalIcon(
@@ -106,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
               size: 16,
               color: isRunning ? Colors.red : Colors.green,
             ),
-            label: Text(isRunning ? '停止监听' : '启动监听'),
+            label: Text(isRunning ? i18n.t('stopListen') : i18n.t('startListen')),
             onPressed: () async {
               if (isRunning) {
                 await widget.server.stop();
@@ -116,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 } catch (e) {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('启动服务失败: $e')),
+                      SnackBar(content: Text('${AppI18n.instance.t('startListen')} failed: $e')),
                     );
                   }
                 }
@@ -128,15 +129,15 @@ class _HomeScreenState extends State<HomeScreen> {
           // Save Workspace Button
           IconButton(
             icon: const Icon(Icons.save_outlined),
-            tooltip: '保存服务端工作区 (${WorkspaceStorage.getWorkspaceFilePath()})',
+            tooltip: i18n.t('saveWorkspace'),
             onPressed: () async {
               final ok = await widget.server.saveWorkspace();
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(ok
-                        ? '服务端工作区配置已保存至: ${WorkspaceStorage.getWorkspaceFilePath()}'
-                        : '保存失败'),
+                        ? '${AppI18n.instance.t('saveWorkspace')} -> ${WorkspaceStorage.getWorkspaceFilePath()}'
+                        : '${AppI18n.instance.t('save')} failed'),
                     backgroundColor: ok ? Colors.green : Colors.red,
                   ),
                 );
@@ -147,10 +148,19 @@ class _HomeScreenState extends State<HomeScreen> {
           if (widget.onToggleTheme != null)
             IconButton(
               icon: Icon(widget.isDarkMode ? Icons.light_mode : Icons.dark_mode),
-              tooltip: widget.isDarkMode ? '切换为亮色模式' : '切换为暗色模式',
+              tooltip: widget.isDarkMode ? i18n.t('themeLight') : i18n.t('themeDark'),
               onPressed: widget.onToggleTheme,
             ),
-          const SizedBox(width: 8),
+
+          LanguagePickerButton(
+            onLanguageChanged: () {
+              setState(() {});
+              widget.onLanguageChanged?.call();
+            },
+          ),
+          const SizedBox(width: 4),
+
+          WindowControls(brightness: theme.brightness),
         ],
       ),
       body: Row(
@@ -164,31 +174,31 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: EdgeInsets.symmetric(vertical: 8),
               child: Icon(Icons.device_hub, size: 28),
             ),
-            destinations: const [
+            destinations: [
               NavigationRailDestination(
-                icon: Icon(Icons.settings_ethernet_outlined),
-                selectedIcon: Icon(Icons.settings_ethernet),
-                label: Text('服务配置与主站'),
+                icon: const Icon(Icons.settings_ethernet_outlined),
+                selectedIcon: const Icon(Icons.settings_ethernet),
+                label: Text(i18n.t('tabServer')),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.view_list_outlined),
-                selectedIcon: Icon(Icons.view_list),
-                label: Text('点位监视与控制'),
+                icon: const Icon(Icons.view_list_outlined),
+                selectedIcon: const Icon(Icons.view_list),
+                label: Text(i18n.t('tabPoints')),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.swap_horiz_outlined),
-                selectedIcon: Icon(Icons.swap_horiz),
-                label: Text('通信细节报文'),
+                icon: const Icon(Icons.swap_horiz_outlined),
+                selectedIcon: const Icon(Icons.swap_horiz),
+                label: Text(i18n.t('tabTraffic')),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.terminal_outlined),
-                selectedIcon: Icon(Icons.terminal),
-                label: Text('报文解析工具'),
+                icon: const Icon(Icons.terminal_outlined),
+                selectedIcon: const Icon(Icons.terminal),
+                label: Text(i18n.t('tabParser')),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.show_chart_outlined),
-                selectedIcon: Icon(Icons.show_chart),
-                label: Text('变化模拟配置'),
+                icon: const Icon(Icons.show_chart_outlined),
+                selectedIcon: const Icon(Icons.show_chart),
+                label: Text(i18n.t('tabAutoSim')),
               ),
             ],
           ),
@@ -226,27 +236,51 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(width: 6),
               Text(
-                isRunning ? '服务运行中 (监听端口: ${widget.server.port})' : '所有服务端已停止',
+                isRunning ? '${AppI18n.instance.t('serversRunning')} (Port: ${widget.server.port})' : AppI18n.instance.t('allServersStopped'),
                 style: const TextStyle(fontSize: 12),
               ),
               const SizedBox(width: 20),
-              Text('连接主站数: ${widget.server.clients.length}', style: const TextStyle(fontSize: 12)),
+              Text('${AppI18n.instance.t('connectedMasters')}: ${widget.server.clients.length}', style: const TextStyle(fontSize: 12)),
               const SizedBox(width: 20),
-              Text('从站(COA): ${widget.server.stations.length} 个', style: const TextStyle(fontSize: 12)),
+              Text('${AppI18n.instance.t('coa')}: ${widget.server.stations.length}', style: const TextStyle(fontSize: 12)),
               const SizedBox(width: 20),
-              Text('总监视点位: $totalPoints 点', style: const TextStyle(fontSize: 12)),
+              Text('${AppI18n.instance.t('pointsCount')}: $totalPoints', style: const TextStyle(fontSize: 12)),
               const SizedBox(width: 20),
               if (autoSimCount > 0) ...[
                 const Icon(Icons.waves, size: 14, color: Colors.green),
                 const SizedBox(width: 4),
-                Text('$autoSimCount 个点位模拟中', style: const TextStyle(fontSize: 12, color: Colors.green)),
+                Text('$autoSimCount ${AppI18n.instance.t('simRunningStatus')}', style: const TextStyle(fontSize: 12, color: Colors.green)),
                 const SizedBox(width: 20),
               ],
-              Text('IEC 60870-5-104 服务端仿真', style: TextStyle(fontSize: 11, color: theme.colorScheme.outline)),
+              Text(AppI18n.instance.t('footerNote'), style: TextStyle(fontSize: 11, color: theme.colorScheme.outline)),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTitleRow(ThemeData theme, AppI18n i18n) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Flexible(
+          child: Text(
+            i18n.t('appTitle'),
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceVariant,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: const Text('v1.0.0', style: TextStyle(fontSize: 11)),
+        ),
+      ],
     );
   }
 }

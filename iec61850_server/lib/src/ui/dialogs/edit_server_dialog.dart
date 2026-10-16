@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../i18n/app_i18n.dart';
 import '../../models/server_config.dart';
 
 class EditServerDialog extends StatefulWidget {
@@ -50,12 +51,14 @@ class _EditServerDialogState extends State<EditServerDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = AppI18n.instance;
+
     return AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.settings),
-          SizedBox(width: 8),
-          Text('IEC 61850 服务器配置'),
+          const Icon(Icons.settings),
+          const SizedBox(width: 8),
+          Text(i18n.t('editServerTitle')),
         ],
       ),
       content: SizedBox(
@@ -66,10 +69,10 @@ class _EditServerDialogState extends State<EditServerDialog> {
             children: [
               TextField(
                 controller: _nameCtrl,
-                decoration: const InputDecoration(
-                  labelText: '服务器实例名称',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.dns),
+                decoration: InputDecoration(
+                  labelText: i18n.t('serverInstanceName'),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.dns),
                 ),
               ),
               const SizedBox(height: 16),
@@ -79,11 +82,11 @@ class _EditServerDialogState extends State<EditServerDialog> {
                     flex: 3,
                     child: TextField(
                       controller: _ipCtrl,
-                      decoration: const InputDecoration(
-                        labelText: '监听 IP 地址',
-                        hintText: '0.0.0.0 或 127.0.0.1',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.lan),
+                      decoration: InputDecoration(
+                        labelText: i18n.t('listenIp'),
+                        hintText: i18n.t('listenIpHint'),
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.lan),
                       ),
                     ),
                   ),
@@ -93,11 +96,11 @@ class _EditServerDialogState extends State<EditServerDialog> {
                     child: TextField(
                       controller: _portCtrl,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'TCP 端口',
-                        hintText: '102 (或 10102)',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.numbers),
+                      decoration: InputDecoration(
+                        labelText: i18n.t('tcpPort'),
+                        hintText: i18n.t('tcpPortHint'),
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.numbers),
                       ),
                     ),
                   ),
@@ -111,14 +114,14 @@ class _EditServerDialogState extends State<EditServerDialog> {
                   borderRadius: BorderRadius.circular(6),
                   border: Border.all(color: Colors.amber.withOpacity(0.4)),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.info_outline, size: 18, color: Colors.amber),
-                    SizedBox(width: 8),
+                    const Icon(Icons.info_outline, size: 18, color: Colors.amber),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        '提示：IEC 61850 MMS 协议标准端口为 102。在 Linux 系统下，非 root 运行需超级权限；普通用户测试可将端口改为 10102 或 15502。',
-                        style: TextStyle(fontSize: 12),
+                        i18n.t('port102Help'),
+                        style: const TextStyle(fontSize: 12),
                       ),
                     ),
                   ],
@@ -127,10 +130,10 @@ class _EditServerDialogState extends State<EditServerDialog> {
               const SizedBox(height: 16),
               TextField(
                 controller: _dirCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'MMS 文件传输工作目录 (File Services)',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.folder_open),
+                decoration: InputDecoration(
+                  labelText: i18n.t('mmsFileDirectory'),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.folder_open),
                 ),
               ),
             ],
@@ -140,11 +143,11 @@ class _EditServerDialogState extends State<EditServerDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(i18n.t('cancel')),
         ),
         FilledButton.icon(
           icon: const Icon(Icons.save),
-          label: const Text('保存设置'),
+          label: Text(i18n.t('saveSettings')),
           onPressed: _save,
         ),
       ],

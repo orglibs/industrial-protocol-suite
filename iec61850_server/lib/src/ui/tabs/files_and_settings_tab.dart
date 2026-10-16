@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../protocol/iec61850_server_manager.dart';
@@ -54,6 +55,7 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = AppI18n.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final scl = widget.manager.engine.scl;
     final numOfSg = scl?.numOfSG ?? 1;
@@ -74,27 +76,27 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
                     children: [
                       const Icon(Icons.folder_shared, size: 20),
                       const SizedBox(width: 8),
-                      const Text(
-                        'MMS 文件服务工作区 (File Services: FileDirectory / FileOpen / FileRead / FileDelete)',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      Text(
+                        i18n.t('mmsFileWorkArea'),
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                       ),
                       const Spacer(),
                       OutlinedButton.icon(
                         icon: const Icon(Icons.refresh, size: 16),
-                        label: const Text('刷新列表'),
+                        label: Text(i18n.t('refreshList')),
                         onPressed: _refreshFiles,
                       ),
                       const SizedBox(width: 8),
                       FilledButton.icon(
                         icon: const Icon(Icons.add, size: 16),
-                        label: const Text('新建测试文件'),
+                        label: Text(i18n.t('newTestFile')),
                         onPressed: _createNewTestFile,
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '当前目录：${widget.manager.config.fileTransferDirectory}',
+                    '${i18n.t("currentDir")}: ${widget.manager.config.fileTransferDirectory}',
                     style: TextStyle(fontSize: 12, color: isDark ? Colors.grey[400] : Colors.grey[600]),
                   ),
                   const SizedBox(height: 12),
@@ -102,7 +104,7 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
                     Container(
                       padding: const EdgeInsets.all(24),
                       alignment: Alignment.center,
-                      child: const Text('文件服务目录当前为空，可点击右上角创建测试文件或放置 COMTRADE 录波文件。',
+                      child: Text(i18n.t('emptyFileDir'),
                           style: TextStyle(color: Colors.grey)),
                     )
                   else
@@ -119,11 +121,11 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
                       children: [
                         TableRow(
                           decoration: BoxDecoration(color: isDark ? Colors.grey[900] : Colors.grey[100]),
-                          children: const [
-                            Padding(padding: EdgeInsets.all(8), child: Text('文件名', style: TextStyle(fontWeight: FontWeight.bold))),
-                            Padding(padding: EdgeInsets.all(8), child: Text('大小', style: TextStyle(fontWeight: FontWeight.bold))),
-                            Padding(padding: EdgeInsets.all(8), child: Text('修改时间', style: TextStyle(fontWeight: FontWeight.bold))),
-                            Padding(padding: EdgeInsets.all(8), child: Text('操作', style: TextStyle(fontWeight: FontWeight.bold))),
+                          children: [
+                            Padding(padding: const EdgeInsets.all(8), child: Text(i18n.t('colFileName'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                            Padding(padding: const EdgeInsets.all(8), child: Text(i18n.t('sizeLabel'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                            Padding(padding: const EdgeInsets.all(8), child: Text(i18n.t('colModifiedTime'), style: const TextStyle(fontWeight: FontWeight.bold))),
+                            Padding(padding: const EdgeInsets.all(8), child: Text(i18n.t('operation'), style: const TextStyle(fontWeight: FontWeight.bold))),
                           ],
                         ),
                         ..._files.map((file) {
@@ -143,7 +145,7 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(8),
-                                child: Text('${stat.size} 字节', style: const TextStyle(fontSize: 12)),
+                                child: Text('${stat.size} ${i18n.t("bytesUnit")}', style: const TextStyle(fontSize: 12)),
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(8),
@@ -177,25 +179,25 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.tune, size: 20),
-                      SizedBox(width: 8),
-                      Text('定值区控制 (Setting Group Control - SGCB)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      const Icon(Icons.tune, size: 20),
+                      const SizedBox(width: 8),
+                      Text(i18n.t('sgcbTitle'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                     ],
                   ),
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      _sgMetric('支持定值区总数 (NumOfSG)', '$numOfSg 组'),
+                      _sgMetric(i18n.t('numOfSgLabel'), '$numOfSg ${i18n.t("groupsCountSuffix")}'),
                       const SizedBox(width: 24),
-                      _sgMetric('当前运行定值区 (ActSG)', '第 $_activeSg 组'),
+                      _sgMetric(i18n.t('actSgLabel'), '${i18n.t("nthGroupPrefix")} $_activeSg ${i18n.t("nthGroupSuffix")}'),
                       const SizedBox(width: 24),
-                      _sgMetric('编辑定值区 (EditSG)', '第 $_editSg 组'),
+                      _sgMetric(i18n.t('editSgLabel'), '${i18n.t("nthGroupPrefix")} $_editSg ${i18n.t("nthGroupSuffix")}'),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  const Text('快速切换当前激活定值区 (Switch ActSG):', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                  Text(i18n.t('switchActSg'), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
@@ -203,7 +205,7 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
                       final sgIdx = index + 1;
                       final isActive = _activeSg == sgIdx;
                       return ChoiceChip(
-                        label: Text('定值区 $sgIdx'),
+                        label: Text('${i18n.t("settingGroupPrefix")} $sgIdx'),
                         selected: isActive,
                         onSelected: (sel) {
                           if (sel) {

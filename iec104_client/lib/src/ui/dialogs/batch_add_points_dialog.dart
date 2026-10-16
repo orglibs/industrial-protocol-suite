@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../client/station_data.dart';
+import '../../i18n/app_i18n.dart';
 import '../../protocol/asdu.dart';
 
 class BatchAddPointsDialog extends StatefulWidget {
@@ -29,7 +30,7 @@ class _BatchAddPointsDialogState extends State<BatchAddPointsDialog> {
     super.initState();
     _startIoaCtrl = TextEditingController(text: '16385');
     _countCtrl = TextEditingController(text: '16');
-    _prefixCtrl = TextEditingController(text: '模拟遥测通道');
+    _prefixCtrl = TextEditingController(text: 'Analog #');
   }
 
   @override
@@ -46,34 +47,36 @@ class _BatchAddPointsDialogState extends State<BatchAddPointsDialog> {
       _selectedType = type;
       if (type == AsduTypeId.mSpNa1) {
         _startIoaCtrl.text = '1';
-        _prefixCtrl.text = '配电单点开关';
+        _prefixCtrl.text = 'Switch #';
       } else if (type == AsduTypeId.mDpNa1) {
         _startIoaCtrl.text = '1001';
-        _prefixCtrl.text = '双位置隔离开关';
+        _prefixCtrl.text = 'Disconnector #';
       } else if (type == AsduTypeId.mItNa1) {
         _startIoaCtrl.text = '25601';
-        _prefixCtrl.text = '进出线电能量表';
+        _prefixCtrl.text = 'Meter #';
       } else if (type == AsduTypeId.mMeNa1) {
         _startIoaCtrl.text = '16385';
-        _prefixCtrl.text = '归一化遥测通道';
+        _prefixCtrl.text = 'Normalized #';
       } else if (type == AsduTypeId.mMeNb1) {
         _startIoaCtrl.text = '16385';
-        _prefixCtrl.text = '标度化遥测通道';
+        _prefixCtrl.text = 'Scaled #';
       } else {
         _startIoaCtrl.text = '16385';
-        _prefixCtrl.text = '短浮点遥测通道';
+        _prefixCtrl.text = 'Float #';
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final i18n = AppI18n.instance;
+
     return AlertDialog(
       title: Row(
         children: [
-          const Icon(Icons.playlist_add, color: Colors.blue),
+          Icon(Icons.playlist_add, color: Theme.of(context).colorScheme.primary),
           const SizedBox(width: 8),
-          Text('批量生成点号 (从站 CA: ${widget.station.commonAddress})'),
+          Text('${i18n.t('batchAddPoints')} (COA: ${widget.station.commonAddress})'),
         ],
       ),
       content: SingleChildScrollView(
@@ -85,26 +88,26 @@ class _BatchAddPointsDialogState extends State<BatchAddPointsDialog> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  '按旧版信息对象组 (InformationObjectGroup) 批量规则，快速递增生成点号：',
-                  style: TextStyle(color: Colors.grey, fontSize: 13),
+                Text(
+                  i18n.t('batchAddPrompt'),
+                  style: const TextStyle(color: Colors.grey, fontSize: 13),
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<AsduTypeId>(
                   initialValue: _selectedType,
                   isExpanded: true,
                   decoration: const InputDecoration(
-                    labelText: '点号类型 (ASDU Type)',
+                    labelText: 'ASDU Type',
                     prefixIcon: Icon(Icons.category),
                     border: OutlineInputBorder(),
                   ),
                   items: const [
-                    DropdownMenuItem(value: AsduTypeId.mSpNa1, child: Text('Type 1: 单点遥信 (M_SP_NA_1)')),
-                    DropdownMenuItem(value: AsduTypeId.mDpNa1, child: Text('Type 3: 双点遥信 (M_DP_NA_1)')),
-                    DropdownMenuItem(value: AsduTypeId.mMeNc1, child: Text('Type 13: 短浮点遥测 (M_ME_NC_1)')),
-                    DropdownMenuItem(value: AsduTypeId.mMeNa1, child: Text('Type 9: 归一化遥测 (M_ME_NA_1)')),
-                    DropdownMenuItem(value: AsduTypeId.mMeNb1, child: Text('Type 11: 标度化遥测 (M_ME_NB_1)')),
-                    DropdownMenuItem(value: AsduTypeId.mItNa1, child: Text('Type 15: 电能量遥脉 (M_IT_NA_1)')),
+                    DropdownMenuItem(value: AsduTypeId.mSpNa1, child: Text('Type 1: M_SP_NA_1 (Single Point)')),
+                    DropdownMenuItem(value: AsduTypeId.mDpNa1, child: Text('Type 3: M_DP_NA_1 (Double Point)')),
+                    DropdownMenuItem(value: AsduTypeId.mMeNc1, child: Text('Type 13: M_ME_NC_1 (Short Float)')),
+                    DropdownMenuItem(value: AsduTypeId.mMeNa1, child: Text('Type 9: M_ME_NA_1 (Normalized)')),
+                    DropdownMenuItem(value: AsduTypeId.mMeNb1, child: Text('Type 11: M_ME_NB_1 (Scaled)')),
+                    DropdownMenuItem(value: AsduTypeId.mItNa1, child: Text('Type 15: M_IT_NA_1 (Energy Counter)')),
                   ],
                   onChanged: _onTypeChanged,
                 ),
@@ -115,17 +118,17 @@ class _BatchAddPointsDialogState extends State<BatchAddPointsDialog> {
                       flex: 3,
                       child: TextFormField(
                         controller: _startIoaCtrl,
-                        decoration: const InputDecoration(
-                          labelText: '起始点号 (Start IOA)',
-                          helperText: '常规: 遥信1 / 遥测16385',
-                          prefixIcon: Icon(Icons.pin),
-                          border: OutlineInputBorder(),
+                        decoration: InputDecoration(
+                          labelText: i18n.t('startIoa'),
+                          helperText: '1 ~ 16777215',
+                          prefixIcon: const Icon(Icons.pin),
+                          border: const OutlineInputBorder(),
                         ),
                         keyboardType: TextInputType.number,
                         validator: (v) {
                           final n = int.tryParse(v ?? '');
                           if (n == null || n <= 0 || n > 16777215) {
-                            return '请输入有效正整数';
+                            return '1 ~ 16777215';
                           }
                           return null;
                         },
@@ -136,11 +139,11 @@ class _BatchAddPointsDialogState extends State<BatchAddPointsDialog> {
                       flex: 2,
                       child: TextFormField(
                         controller: _countCtrl,
-                        decoration: const InputDecoration(
-                          labelText: '生成数量 (Count)',
-                          helperText: '1 ~ 1000',
-                          prefixIcon: Icon(Icons.format_list_numbered),
-                          border: OutlineInputBorder(),
+                        decoration: InputDecoration(
+                          labelText: i18n.t('pointCount'),
+                          helperText: '1 ~ 2000',
+                          prefixIcon: const Icon(Icons.format_list_numbered),
+                          border: const OutlineInputBorder(),
                         ),
                         keyboardType: TextInputType.number,
                         validator: (v) {
@@ -157,22 +160,21 @@ class _BatchAddPointsDialogState extends State<BatchAddPointsDialog> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _prefixCtrl,
-                  decoration: const InputDecoration(
-                    labelText: '点位名称前缀 (Prefix)',
-                    helperText: '例如: 出线断路器 -> 生成 出线断路器 #1, #2...',
-                    prefixIcon: Icon(Icons.drive_file_rename_outline),
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: i18n.t('namePrefix'),
+                    prefixIcon: const Icon(Icons.drive_file_rename_outline),
+                    border: const OutlineInputBorder(),
                   ),
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) return '前缀不能为空';
+                    if (v == null || v.trim().isEmpty) return i18n.t('valRequired');
                     return null;
                   },
                 ),
                 const SizedBox(height: 12),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('覆盖已有冲突点号', style: TextStyle(fontSize: 14)),
-                  subtitle: const Text('若目标 IOA 已存在，将替换为新生成的配置', style: TextStyle(fontSize: 12)),
+                  title: const Text('Overwrite existing points', style: TextStyle(fontSize: 14)),
+                  subtitle: const Text('Replace existing points if IOA already exists', style: TextStyle(fontSize: 12)),
                   value: _overwriteExisting,
                   onChanged: (val) => setState(() => _overwriteExisting = val),
                 ),
@@ -184,11 +186,11 @@ class _BatchAddPointsDialogState extends State<BatchAddPointsDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('取消'),
+          child: Text(i18n.t('cancel')),
         ),
         FilledButton.icon(
           icon: const Icon(Icons.bolt, size: 18),
-          label: const Text('开始生成'),
+          label: Text(i18n.t('confirm')),
           onPressed: () {
             if (_formKey.currentState?.validate() ?? false) {
               final startIoa = int.parse(_startIoaCtrl.text.trim());
@@ -227,7 +229,7 @@ class _BatchAddPointsDialogState extends State<BatchAddPointsDialog> {
               widget.onGenerated?.call();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('已批量生成 $addedCount 个点号 (起始 IOA: $startIoa)'),
+                  content: Text('${i18n.t('batchAddPoints')}: $addedCount'),
                   backgroundColor: Colors.green,
                 ),
               );

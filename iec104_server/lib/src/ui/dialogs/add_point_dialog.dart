@@ -1,3 +1,4 @@
+import "../../i18n/app_i18n.dart";
 import 'package:flutter/material.dart';
 import '../../protocol/asdu.dart';
 import '../../server/station.dart';
@@ -33,7 +34,7 @@ class _AddPointDialogState extends State<AddPointDialog> {
       nextIoa = widget.station.pointList.map((p) => p.ioa).reduce((a, b) => a > b ? a : b) + 1;
     }
     _ioaController = TextEditingController(text: nextIoa.toString());
-    _nameController = TextEditingController(text: '遥测点位 #$nextIoa');
+    _nameController = TextEditingController(text: 'Point #$nextIoa');
     _valController = TextEditingController(text: '0.0');
   }
 
@@ -48,7 +49,7 @@ class _AddPointDialogState extends State<AddPointDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('添加新信息对象点位'),
+      title: Text(AppI18n.instance.t('addPoint')),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -57,16 +58,16 @@ class _AddPointDialogState extends State<AddPointDialog> {
             children: [
               TextFormField(
                 controller: _ioaController,
-                decoration: const InputDecoration(
-                  labelText: '信息对象地址 (IOA)',
-                  helperText: '十进制整数 (1 ~ 16777215)',
+                decoration: InputDecoration(
+                  labelText: AppI18n.instance.t('ioa'),
+                  helperText: '1 ~ 16777215',
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
                 validator: (v) {
                   final n = int.tryParse(v ?? '');
-                  if (n == null || n <= 0) return '请输入有效的正整数';
-                  if (widget.station.getPoint(n) != null) return '该 IOA 已存在于当前站中';
+                  if (n == null || n <= 0) return 'Valid positive integer';
+                  if (widget.station.getPoint(n) != null) return 'IOA already exists';
                   return null;
                 },
               ),
@@ -74,38 +75,38 @@ class _AddPointDialogState extends State<AddPointDialog> {
               DropdownButtonFormField<AsduTypeId>(
                 initialValue: _selectedType,
                 isExpanded: true,
-                decoration: const InputDecoration(
-                  labelText: 'ASDU 协议类型',
+                decoration: InputDecoration(
+                  labelText: 'ASDU Type',
                   border: OutlineInputBorder(),
                 ),
                 items: const [
-                  DropdownMenuItem(value: AsduTypeId.mSpNa1, child: Text('Type 1: M_SP_NA_1 单点遥信')),
-                  DropdownMenuItem(value: AsduTypeId.mSpTb1, child: Text('Type 30: M_SP_TB_1 带时标单点遥信')),
-                  DropdownMenuItem(value: AsduTypeId.mDpNa1, child: Text('Type 3: M_DP_NA_1 双点遥信')),
-                  DropdownMenuItem(value: AsduTypeId.mDpTb1, child: Text('Type 31: M_DP_TB_1 带时标双点遥信')),
-                  DropdownMenuItem(value: AsduTypeId.mStNa1, child: Text('Type 5: M_ST_NA_1 步位置/分接头')),
-                  DropdownMenuItem(value: AsduTypeId.mBoNa1, child: Text('Type 7: M_BO_NA_1 32位二进制串')),
-                  DropdownMenuItem(value: AsduTypeId.mMeNa1, child: Text('Type 9: M_ME_NA_1 归一化遥测')),
-                  DropdownMenuItem(value: AsduTypeId.mMeNb1, child: Text('Type 11: M_ME_NB_1 标度化遥测')),
-                  DropdownMenuItem(value: AsduTypeId.mMeNc1, child: Text('Type 13: M_ME_NC_1 短浮点数遥测')),
-                  DropdownMenuItem(value: AsduTypeId.mMeTf1, child: Text('Type 36: M_ME_TF_1 带时标短浮点遥测')),
-                  DropdownMenuItem(value: AsduTypeId.mItNa1, child: Text('Type 15: M_IT_NA_1 累计量/电能量/遥脉')),
+                  DropdownMenuItem(value: AsduTypeId.mSpNa1, child: const Text('Type 1: M_SP_NA_1 (Single Point)')),
+                  DropdownMenuItem(value: AsduTypeId.mSpTb1, child: const Text('Type 30: M_SP_TB_1 (Single Point with Time)')),
+                  DropdownMenuItem(value: AsduTypeId.mDpNa1, child: const Text('Type 3: M_DP_NA_1 (Double Point)')),
+                  DropdownMenuItem(value: AsduTypeId.mDpTb1, child: const Text('Type 31: M_DP_TB_1 (Double Point with Time)')),
+                  DropdownMenuItem(value: AsduTypeId.mStNa1, child: const Text('Type 5: M_ST_NA_1 (Step Position)')),
+                  DropdownMenuItem(value: AsduTypeId.mBoNa1, child: const Text('Type 7: M_BO_NA_1 (Bitstring of 32 Bits)')),
+                  DropdownMenuItem(value: AsduTypeId.mMeNa1, child: const Text('Type 9: M_ME_NA_1 (Normalized Value)')),
+                  DropdownMenuItem(value: AsduTypeId.mMeNb1, child: const Text('Type 11: M_ME_NB_1 (Scaled Value)')),
+                  DropdownMenuItem(value: AsduTypeId.mMeNc1, child: const Text('Type 13: M_ME_NC_1 (Short Floating Point)')),
+                  DropdownMenuItem(value: AsduTypeId.mMeTf1, child: const Text('Type 36: M_ME_TF_1 (Float with Time)')),
+                  DropdownMenuItem(value: AsduTypeId.mItNa1, child: const Text('Type 15: M_IT_NA_1 (Integrated Totals)')),
                 ],
                 onChanged: (v) {
                   if (v != null) {
                     setState(() {
                       _selectedType = v;
                       if (v == AsduTypeId.mSpNa1 || v == AsduTypeId.mSpTb1) {
-                        _nameController.text = '单点遥信 #${_ioaController.text}';
+                        _nameController.text = 'SP #${_ioaController.text}';
                         _valController.text = 'false';
                       } else if (v == AsduTypeId.mDpNa1 || v == AsduTypeId.mDpTb1) {
-                        _nameController.text = '双点遥信 #${_ioaController.text}';
+                        _nameController.text = 'DP #${_ioaController.text}';
                         _valController.text = '1';
                       } else if (v == AsduTypeId.mItNa1) {
-                        _nameController.text = '电能量遥脉 #${_ioaController.text}';
+                        _nameController.text = 'IT #${_ioaController.text}';
                         _valController.text = '0';
                       } else {
-                        _nameController.text = '遥测点位 #${_ioaController.text}';
+                        _nameController.text = 'ME #${_ioaController.text}';
                         _valController.text = '0.0';
                       }
                     });
@@ -115,20 +116,20 @@ class _AddPointDialogState extends State<AddPointDialog> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: '点位名称 / 描述',
+                decoration: InputDecoration(
+                  labelText: AppI18n.instance.t('pointName'),
                   border: OutlineInputBorder(),
                 ),
-                validator: (v) => (v == null || v.trim().isEmpty) ? '请输入点位名称' : null,
+                validator: (v) => (v == null || v.trim().isEmpty) ? AppI18n.instance.t('valRequired') : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _valController,
-                decoration: const InputDecoration(
-                  labelText: '初始数值',
+                decoration: InputDecoration(
+                  labelText: AppI18n.instance.t('currValue'),
                   border: OutlineInputBorder(),
                 ),
-                validator: (v) => (v == null || v.trim().isEmpty) ? '请输入初始数值' : null,
+                validator: (v) => (v == null || v.trim().isEmpty) ? AppI18n.instance.t('valRequired') : null,
               ),
             ],
           ),
@@ -137,7 +138,7 @@ class _AddPointDialogState extends State<AddPointDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('取消'),
+          child: Text(AppI18n.instance.t('cancel')),
         ),
         FilledButton(
           onPressed: () {
@@ -169,7 +170,7 @@ class _AddPointDialogState extends State<AddPointDialog> {
               Navigator.pop(context);
             }
           },
-          child: const Text('添加'),
+          child: Text(AppI18n.instance.t('add')),
         ),
       ],
     );

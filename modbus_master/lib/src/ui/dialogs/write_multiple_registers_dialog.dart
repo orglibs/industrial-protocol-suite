@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'package:flutter/material.dart';
 import '../../protocol/modbus_client.dart';
 
@@ -61,14 +62,14 @@ class _WriteMultipleRegistersDialogState extends State<WriteMultipleRegistersDia
   Future<void> _send() async {
     final addr = int.tryParse(_addrCtrl.text.trim());
     if (addr == null || addr < 0 || addr > 65535) {
-      setState(() => _errorMsg = '请输入有效的起始地址 (0..65535)');
+      setState(() => _errorMsg = 'Start Address: 0..65535');
       return;
     }
 
     final rawText = _valuesCtrl.text.trim();
     final tokens = rawText.split(RegExp(r'[\s,]+')).where((s) => s.isNotEmpty).toList();
     if (tokens.isEmpty) {
-      setState(() => _errorMsg = '请输入至少一个寄存器数值');
+      setState(() => _errorMsg = AppI18n.instance.t('valRequired'));
       return;
     }
 
@@ -81,14 +82,14 @@ class _WriteMultipleRegistersDialogState extends State<WriteMultipleRegistersDia
         v = int.tryParse(tok);
       }
       if (v == null) {
-        setState(() => _errorMsg = '解析数值失败: "$tok"');
+        setState(() => _errorMsg = '${AppI18n.instance.t('parseError')}: $tok');
         return;
       }
       values.add(v & 0xFFFF);
     }
 
     if (values.length > 123) {
-      setState(() => _errorMsg = 'Modbus单次最大支持写入123个寄存器');
+      setState(() => _errorMsg = 'Max 123 registers');
       return;
     }
 
@@ -108,7 +109,7 @@ class _WriteMultipleRegistersDialogState extends State<WriteMultipleRegistersDia
       }
     } catch (e) {
       if (mounted) {
-        setState(() => _errorMsg = '写入失败: $e');
+        setState(() => _errorMsg = '${AppI18n.instance.t('parseError')}: $e');
       }
     } finally {
       if (mounted) {
@@ -124,7 +125,7 @@ class _WriteMultipleRegistersDialogState extends State<WriteMultipleRegistersDia
         children: [
           Icon(Icons.playlist_add_check, color: Colors.deepPurple),
           SizedBox(width: 8),
-          Text('FC 16: 写多个保持寄存器 (Write Multiple Registers)'),
+          Text('FC 16: Write Multiple Registers', style: const TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
       content: SizedBox(
@@ -133,12 +134,12 @@ class _WriteMultipleRegistersDialogState extends State<WriteMultipleRegistersDia
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('从站 Unit ID: ${widget.slaveId}'),
+            Text('Unit ID: ${widget.slaveId}'),
             const SizedBox(height: 12),
             TextField(
               controller: _addrCtrl,
               decoration: const InputDecoration(
-                labelText: '起始寄存器地址 (Start Address)',
+                labelText: AppI18n.instance.t('startAddr'),
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.pin),
               ),
@@ -149,15 +150,15 @@ class _WriteMultipleRegistersDialogState extends State<WriteMultipleRegistersDia
               controller: _valuesCtrl,
               maxLines: 4,
               decoration: const InputDecoration(
-                labelText: '写入数值列表 (逗号或空格分隔)',
-                hintText: '如: 100, 200, 0x1A2B, 450',
+                labelText: AppI18n.instance.t('currValue'),
+                hintText: '100, 200, 0x1A2B, 450',
                 border: OutlineInputBorder(),
                 alignLabelWithHint: true,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              '提示: 支持十进制与十六进制混合输入，一次性批量写入连续寄存器',
+              'Supports Decimal and Hex values',
               style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
             ),
             if (_errorMsg != null) ...[
@@ -170,13 +171,13 @@ class _WriteMultipleRegistersDialogState extends State<WriteMultipleRegistersDia
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(AppI18n.instance.t('cancel')),
         ),
         ElevatedButton(
           onPressed: _isSending ? null : _send,
           child: _isSending
               ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
-              : const Text('批量写入'),
+              : Text(AppI18n.instance.t('batchFill')),
         ),
       ],
     );

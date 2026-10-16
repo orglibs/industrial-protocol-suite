@@ -1,3 +1,4 @@
+import "../../i18n/app_i18n.dart";
 import 'package:flutter/material.dart';
 import '../../server/iec104_server.dart';
 
@@ -29,7 +30,7 @@ class _AddStationDialogState extends State<AddStationDialog> {
       nextCa++;
     }
     _caCtrl = TextEditingController(text: nextCa.toString());
-    _nameCtrl = TextEditingController(text: '变电站间隔 #$nextCa');
+    _nameCtrl = TextEditingController(text: 'Station #$nextCa');
   }
 
   @override
@@ -42,11 +43,11 @@ class _AddStationDialogState extends State<AddStationDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.add_circle_outline, color: Colors.blue),
-          SizedBox(width: 8),
-          Text('增加从站 (Add Station / RTU)'),
+          Icon(Icons.add_circle_outline, color: Theme.of(context).colorScheme.primary),
+          const SizedBox(width: 8),
+          Text(AppI18n.instance.t('addStation')),
         ],
       ),
       content: SizedBox(
@@ -58,47 +59,47 @@ class _AddStationDialogState extends State<AddStationDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                '在 IEC 104 服务端中新增一个逻辑从站设备（公共地址 COA），主站可单独向该 COA 下发总召唤和遥控指令。',
+                'Add a logical slave station (Common Address COA) to the IEC 104 server.',
                 style: TextStyle(color: Colors.grey, fontSize: 13),
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _caCtrl,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: '从站公共地址 (COA / Common Address)',
-                  helperText: '范围: 1 ~ 65535 (全局唯一)',
+                decoration: InputDecoration(
+                  labelText: AppI18n.instance.t('coa'),
+                  helperText: '1 ~ 65535',
                   prefixIcon: Icon(Icons.tag),
                   border: OutlineInputBorder(),
                 ),
                 validator: (val) {
                   final v = int.tryParse(val ?? '');
                   if (v == null || v < 1 || v > 65535) {
-                    return '请输入 1 ~ 65535 之间的有效整数';
+                    return '1 ~ 65535';
                   }
                   if (widget.server.stations.containsKey(v)) {
-                    return '从站公共地址 (COA=$v) 已存在，请使用其他地址';
+                    return 'COA=$v already exists';
                   }
                   return null;
                 },
                 onChanged: (val) {
                   final v = int.tryParse(val);
-                  if (v != null && (_nameCtrl.text.isEmpty || _nameCtrl.text.startsWith('变电站间隔 #'))) {
-                    _nameCtrl.text = '变电站间隔 #$v';
+                  if (v != null && (_nameCtrl.text.isEmpty || _nameCtrl.text.startsWith('Station #'))) {
+                    _nameCtrl.text = 'Station #$v';
                   }
                 },
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _nameCtrl,
-                decoration: const InputDecoration(
-                  labelText: '从站名称 / 设备别名 (Alias)',
+                decoration: InputDecoration(
+                  labelText: AppI18n.instance.t('stationName'),
                   prefixIcon: Icon(Icons.edit_note),
                   border: OutlineInputBorder(),
                 ),
                 validator: (val) {
                   if (val == null || val.trim().isEmpty) {
-                    return '从站名称不能为空';
+                    return AppI18n.instance.t('valRequired');
                   }
                   return null;
                 },
@@ -106,27 +107,27 @@ class _AddStationDialogState extends State<AddStationDialog> {
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 initialValue: _selectedTemplate,
-                decoration: const InputDecoration(
-                  labelText: '初始点表模板 (Point Template)',
+                decoration: InputDecoration(
+                  labelText: 'Point Template',
                   prefixIcon: Icon(Icons.auto_awesome),
                   border: OutlineInputBorder(),
                 ),
                 items: const [
                   DropdownMenuItem(
                     value: 'distribution',
-                    child: Text('典型配网工程模板 (16 YX + 8 YC + 4 DP + 2 YM)'),
+                    child: const Text('Distribution Grid (16 SP + 8 ME + 4 DP + 2 IT)'),
                   ),
                   DropdownMenuItem(
                     value: 'substation',
-                    child: Text('标准变电站模板 (32 YX + 16 YC + 8 DP + 4 YM)'),
+                    child: const Text('Substation Standard (32 SP + 16 ME + 8 DP + 4 IT)'),
                   ),
                   DropdownMenuItem(
                     value: 'default',
-                    child: Text('默认全功能综合站模板 (带自动曲线配置)'),
+                    child: const Text('Full Featured Demo with Auto-Curves'),
                   ),
                   DropdownMenuItem(
                     value: 'empty',
-                    child: Text('空白从站 (纯净手动加点)'),
+                    child: const Text('Blank Station (Manual)'),
                   ),
                 ],
                 onChanged: (val) {
@@ -140,11 +141,11 @@ class _AddStationDialogState extends State<AddStationDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('取消'),
+          child: Text(AppI18n.instance.t('cancel')),
         ),
         FilledButton.icon(
           icon: const Icon(Icons.check, size: 18),
-          label: const Text('确认新增'),
+          label: Text(AppI18n.instance.t('confirm')),
           onPressed: () {
             if (_formKey.currentState?.validate() ?? false) {
               final ca = int.parse(_caCtrl.text.trim());
@@ -158,7 +159,7 @@ class _AddStationDialogState extends State<AddStationDialog> {
               widget.onAdded?.call(ca);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('已成功创建服务端从站: $name (COA=$ca)'),
+                  content: Text('Created station: $name (COA=$ca)'),
                   backgroundColor: Colors.green,
                 ),
               );

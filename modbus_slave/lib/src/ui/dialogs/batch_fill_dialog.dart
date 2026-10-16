@@ -1,12 +1,13 @@
+import '../../i18n/app_i18n.dart';
 import 'package:flutter/material.dart';
 import '../../models/register_group.dart';
 
 enum BatchFillMode {
-  zero('全部清零 (All 0)'),
-  ones('全部置 1 (All 1 / Max)'),
-  constant('指定常数 (Constant)'),
-  increment('线性递增 (Linear Increment)'),
-  random('随机数值 (Random Range)');
+  zero('All 0'),
+  ones('All 1 / Max'),
+  constant('Constant'),
+  increment('Linear Increment'),
+  random('Random Range');
 
   final String label;
   const BatchFillMode(this.label);
@@ -49,7 +50,7 @@ class _BatchFillDialogState extends State<BatchFillDialog> {
         children: [
           Icon(Icons.auto_fix_high, color: theme.colorScheme.primary),
           const SizedBox(width: 8),
-          Text('批量填充寄存器数值 (${widget.group.groupName})'),
+          Text('${AppI18n.instance.t('batchFillTitle')} (${widget.group.groupName})'),
         ],
       ),
       content: SizedBox(
@@ -60,14 +61,14 @@ class _BatchFillDialogState extends State<BatchFillDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '目标: ${widget.group.quantity} 个寄存器 (地址范围 ${widget.group.startAddress} ~ ${widget.group.startAddress + widget.group.quantity - 1})',
+                '${widget.group.quantity} ${AppI18n.instance.t('pointsCount')} (${widget.group.startAddress} ~ ${widget.group.startAddress + widget.group.quantity - 1})',
                 style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.secondary),
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<BatchFillMode>(
                 value: _mode,
                 decoration: const InputDecoration(
-                  labelText: '填充模式',
+                  labelText: AppI18n.instance.t('fillMode'),
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.tune),
                 ),
@@ -83,7 +84,7 @@ class _BatchFillDialogState extends State<BatchFillDialog> {
                   controller: _constController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    labelText: isBit ? '常数值 (0 或 1)' : '常数值 (0-65535)',
+                    labelText: isBit ? '${AppI18n.instance.t('fillConst')} (0 / 1)' : '${AppI18n.instance.t('fillConst')} (0-65535)',
                     border: const OutlineInputBorder(),
                   ),
                 ),
@@ -95,7 +96,7 @@ class _BatchFillDialogState extends State<BatchFillDialog> {
                         controller: _startController,
                         keyboardType: TextInputType.number,
                         decoration: const InputDecoration(
-                          labelText: '起始值 (Start)',
+                          labelText: AppI18n.instance.t('startAddr'),
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -106,7 +107,7 @@ class _BatchFillDialogState extends State<BatchFillDialog> {
                         controller: _stepController,
                         keyboardType: TextInputType.number,
                         decoration: const InputDecoration(
-                          labelText: '步长 (Step)',
+                          labelText: AppI18n.instance.t('waveStep'),
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -121,7 +122,7 @@ class _BatchFillDialogState extends State<BatchFillDialog> {
                         controller: _minController,
                         keyboardType: TextInputType.number,
                         decoration: const InputDecoration(
-                          labelText: '最小值 (Min)',
+                          labelText: AppI18n.instance.t('waveMin'),
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -132,7 +133,7 @@ class _BatchFillDialogState extends State<BatchFillDialog> {
                         controller: _maxController,
                         keyboardType: TextInputType.number,
                         decoration: const InputDecoration(
-                          labelText: '最大值 (Max)',
+                          labelText: AppI18n.instance.t('waveMax'),
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -147,11 +148,11 @@ class _BatchFillDialogState extends State<BatchFillDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(AppI18n.instance.t('cancel')),
         ),
         FilledButton.icon(
           icon: const Icon(Icons.flash_on),
-          label: const Text('执行填充'),
+          label: Text(AppI18n.instance.t('confirm')),
           onPressed: () {
             switch (_mode) {
               case BatchFillMode.zero:

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../i18n/app_i18n.dart';
 import '../../services/traffic_logger.dart';
 
 class TrafficTab extends StatefulWidget {
@@ -15,8 +16,8 @@ class _TrafficTabState extends State<TrafficTab> {
   StreamSubscription<TrafficEntry>? _sub;
 
   bool _autoScroll = true;
-  String _filterConnection = '全部连接';
-  String _filterDirection = '全部方向';
+  String _filterConnection = 'ALL';
+  String _filterDirection = 'ALL';
   String _searchKeyword = '';
 
   @override
@@ -50,13 +51,13 @@ class _TrafficTabState extends State<TrafficTab> {
   List<TrafficEntry> _filteredEntries() {
     final list = TrafficLogger.instance.entries;
     return list.where((e) {
-      if (_filterConnection != '全部连接' && e.connectionName != _filterConnection) {
+      if (_filterConnection != 'ALL' && e.connectionName != _filterConnection) {
         return false;
       }
-      if (_filterDirection == '仅RX接收' && e.direction != TrafficDirection.rx) {
+      if (_filterDirection == 'RX' && e.direction != TrafficDirection.rx) {
         return false;
       }
-      if (_filterDirection == '仅TX发送' && e.direction != TrafficDirection.tx) {
+      if (_filterDirection == 'TX' && e.direction != TrafficDirection.tx) {
         return false;
       }
       if (_searchKeyword.isNotEmpty) {
@@ -73,11 +74,12 @@ class _TrafficTabState extends State<TrafficTab> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final i18n = AppI18n.instance;
     final allEntries = TrafficLogger.instance.entries;
     final filtered = _filteredEntries();
 
     // Distinct connections for filter
-    final connNames = <String>{'全部连接'};
+    final connNames = <String>{'ALL'};
     for (final e in allEntries) {
       connNames.add(e.connectionName);
     }
@@ -95,30 +97,37 @@ class _TrafficTabState extends State<TrafficTab> {
             child: Row(
               children: [
                 DropdownButton<String>(
-                  value: connNames.contains(_filterConnection) ? _filterConnection : '全部连接',
+                  value: connNames.contains(_filterConnection) ? _filterConnection : 'ALL',
                   underline: const SizedBox(),
-                  items: connNames.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
-                  onChanged: (v) => setState(() => _filterConnection = v ?? '全部连接'),
+                  items: connNames
+                      .map((c) => DropdownMenuItem(
+                            value: c,
+                            child: Text(c == 'ALL' ? i18n.t('allConn') : c),
+                          ))
+                      .toList(),
+                  onChanged: (v) => setState(() => _filterConnection = v ?? 'ALL'),
                 ),
                 const SizedBox(width: 12),
                 DropdownButton<String>(
                   value: _filterDirection,
                   underline: const SizedBox(),
-                  items: const ['全部方向', '仅RX接收', '仅TX发送']
-                      .map((d) => DropdownMenuItem(value: d, child: Text(d)))
-                      .toList(),
-                  onChanged: (v) => setState(() => _filterDirection = v ?? '全部方向'),
+                  items: [
+                    DropdownMenuItem(value: 'ALL', child: Text(i18n.t('allDir'))),
+                    DropdownMenuItem(value: 'RX', child: Text(i18n.t('rxOnly'))),
+                    DropdownMenuItem(value: 'TX', child: Text(i18n.t('txOnly'))),
+                  ],
+                  onChanged: (v) => setState(() => _filterDirection = v ?? 'ALL'),
                 ),
                 const SizedBox(width: 12),
                 SizedBox(
                   width: 180,
                   child: TextField(
-                    decoration: const InputDecoration(
-                      hintText: '搜索 Hex/说明...',
-                      prefixIcon: Icon(Icons.search, size: 18),
+                    decoration: InputDecoration(
+                      hintText: i18n.t('searchHexHint'),
+                      prefixIcon: const Icon(Icons.search, size: 18),
                       isDense: true,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                      border: OutlineInputBorder(),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      border: const OutlineInputBorder(),
                     ),
                     onChanged: (v) => setState(() => _searchKeyword = v.trim()),
                   ),
@@ -130,29 +139,29 @@ class _TrafficTabState extends State<TrafficTab> {
                       value: _autoScroll,
                       onChanged: (v) => setState(() => _autoScroll = v ?? true),
                     ),
-                    const Text('自动滚屏'),
+                    Text(i18n.t('autoScroll')),
                     const SizedBox(width: 8),
                     IconButton(
                       icon: Icon(
                         TrafficLogger.instance.isPaused ? Icons.play_arrow : Icons.pause,
                         color: TrafficLogger.instance.isPaused ? Colors.green : Colors.orange,
                       ),
-                      tooltip: TrafficLogger.instance.isPaused ? '恢复监听记录' : '暂停记录',
+                      tooltip: TrafficLogger.instance.isPaused ? i18n.t('resumeLog') : i18n.t('pauseLog'),
                       onPressed: () => setState(() => TrafficLogger.instance.isPaused = !TrafficLogger.instance.isPaused),
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete_sweep_outlined),
-                      tooltip: '清空报文记录',
+                      tooltip: i18n.t('clearLog'),
                       onPressed: () => setState(() => TrafficLogger.instance.clear()),
                     ),
                     IconButton(
                       icon: const Icon(Icons.copy_all),
-                      tooltip: '复制所有报文为文本',
+                      tooltip: i18n.t('copyLogText'),
                       onPressed: () {
                         final text = TrafficLogger.instance.exportToText();
                         Clipboard.setData(ClipboardData(text: text));
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('已复制所有报文记录到剪贴板')),
+                          SnackBar(content: Text(i18n.t('copiedClipboard'))),
                         );
                       },
                     ),
@@ -170,7 +179,14 @@ class _TrafficTabState extends State<TrafficTab> {
                       children: [
                         Icon(Icons.sync_alt, size: 48, color: theme.colorScheme.outline),
                         const SizedBox(height: 12),
-                        const Text('暂无通信报文数据，启动服务端后外部主站发起请求时在此实时展示'),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 32),
+                          child: Text(
+                            i18n.t('emptyTrafficHint'),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: theme.colorScheme.outline),
+                          ),
+                        ),
                       ],
                     ),
                   )
@@ -265,12 +281,12 @@ class _TrafficTabState extends State<TrafficTab> {
                             ),
                             IconButton(
                               icon: const Icon(Icons.copy, size: 16),
-                              tooltip: '复制十六进制报文',
+                              tooltip: AppI18n.instance.t('copyHex'),
                               onPressed: () {
                                 Clipboard.setData(ClipboardData(text: item.hexString));
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text('已复制: ${item.hexString}'),
+                                    content: Text('${AppI18n.instance.t('copiedClipboard')}: ${item.hexString}'),
                                     duration: const Duration(seconds: 1),
                                   ),
                                 );

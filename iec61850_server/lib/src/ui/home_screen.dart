@@ -15,16 +15,22 @@ import 'tabs/model_explorer_tab.dart';
 import 'tabs/reports_tab.dart';
 import 'tabs/scl_tools_tab.dart';
 import 'tabs/traffic_tab.dart';
+import 'package:window_manager/window_manager.dart';
+import '../i18n/app_i18n.dart';
 import 'widgets/iec61850_server_icon.dart';
+import 'widgets/language_picker.dart';
+import 'widgets/window_title_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   final VoidCallback onToggleTheme;
   final bool isDarkMode;
+  final VoidCallback? onLanguageChanged;
 
   const HomeScreen({
     super.key,
     required this.onToggleTheme,
     required this.isDarkMode,
+    this.onLanguageChanged,
   });
 
   @override
@@ -112,23 +118,24 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showPortSwitchDialog() {
+    final i18n = AppI18n.instance;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.warning_amber, color: Colors.amber),
-            SizedBox(width: 8),
-            Text('端口 102 权限提示'),
+            const Icon(Icons.warning_amber, color: Colors.amber),
+            const SizedBox(width: 8),
+            Text(i18n.t('port102WarnTitle')),
           ],
         ),
-        content: const Text(
-          'IEC 61850 默认端口 102 属于特权端口（< 1024）。在非 root 权限下启动失败 (EACCES)。\n\n是否立即切换为用户端口 10102 并启动？',
+        content: Text(
+          i18n.t('port102WarnMsg'),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('取消'),
+            child: Text(i18n.t('cancel')),
           ),
           FilledButton(
             onPressed: () async {
@@ -136,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
               _config.port = 10102;
               await _manager.startServer();
             },
-            child: const Text('切换至 10102 并启动'),
+            child: Text(i18n.t('switchTo10102')),
           ),
         ],
       ),
@@ -162,70 +169,70 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final i18n = AppI18n.instance;
+
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF0F1E29) : const Color(0xFFE0F2FE),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(
-                  color: isDark ? const Color(0xFF06B6D4) : const Color(0xFF0284C7),
-                  width: 1.2,
+        automaticallyImplyLeading: false,
+        titleSpacing: 0,
+        leading: WindowManagerHelper.isSupportedPlatform
+            ? DragToMoveArea(
+                child: const Padding(
+                  padding: EdgeInsets.only(left: 12),
+                  child: Iec61850ServerIcon(
+                    size: 26,
+                    color: Color(0xFF06B6D4),
+                    accentColor: Color(0xFFF59E0B),
+                  ),
+                ),
+              )
+            : const Padding(
+                padding: EdgeInsets.only(left: 12),
+                child: Iec61850ServerIcon(
+                  size: 26,
+                  color: Color(0xFF06B6D4),
+                  accentColor: Color(0xFFF59E0B),
                 ),
               ),
-              child: const Iec61850ServerIcon(
-                size: 20,
-                color: Color(0xFF06B6D4),
-                accentColor: Color(0xFFF59E0B),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: const Text(
-                'IEC 61850',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Text(_config.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            const SizedBox(width: 12),
-            // Server IP:Port Chip
-            ActionChip(
-              avatar: const Icon(Icons.settings, size: 16),
-              label: Text('${_config.ip}:${_config.port}'),
-              onPressed: _openEditServerDialog,
-            ),
-          ],
-        ),
+        flexibleSpace: WindowManagerHelper.isSupportedPlatform
+            ? const DragToMoveArea(child: SizedBox.expand())
+            : null,
+        title: WindowManagerHelper.isSupportedPlatform
+            ? DragToMoveArea(
+                child: SizedBox(
+                  height: 48,
+                  child: _buildTitleRow(context, isDark, i18n),
+                ),
+              )
+            : _buildTitleRow(context, isDark, i18n),
         actions: [
           // Status Metrics Badges
           _statusBadge(
-            label: _config.isRunning ? '服务运行中' : '服务已停止',
+            label: _config.isRunning ? i18n.t('serverRunning') : i18n.t('serverStopped'),
             color: _config.isRunning ? Colors.green : Colors.red,
             icon: _config.isRunning ? Icons.check_circle : Icons.stop_circle,
           ),
           const SizedBox(width: 8),
-          _metricChip(icon: Icons.people, label: '客户端: ${_manager.clientCount}'),
+          _metricChip(icon: Icons.people, label: '${i18n.t('clients')}: ${_manager.clientCount}'),
           const SizedBox(width: 6),
           _metricChip(icon: Icons.swap_vert, label: 'RX: ${_config.rxCount} | TX: ${_config.txCount}'),
           const SizedBox(width: 6),
           _metricChip(icon: Icons.send, label: 'GOOSE: ${_manager.gooseService.items.length}'),
-          const SizedBox(width: 12),
+          const SizedBox(width: 8),
           // Theme Toggle
           IconButton(
             icon: Icon(widget.isDarkMode ? Icons.light_mode : Icons.dark_mode),
-            tooltip: widget.isDarkMode ? '切换为亮色模式' : '切换为暗色模式',
+            tooltip: widget.isDarkMode ? i18n.t('themeLight') : i18n.t('themeDark'),
             onPressed: widget.onToggleTheme,
           ),
-          const SizedBox(width: 8),
+          LanguagePickerButton(
+            onLanguageChanged: () {
+              setState(() {});
+              widget.onLanguageChanged?.call();
+            },
+          ),
+          const SizedBox(width: 4),
+          WindowControls(brightness: Theme.of(context).brightness),
         ],
       ),
       body: Row(
@@ -246,7 +253,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     backgroundColor: _config.isRunning ? Colors.green[700] : Colors.red[700],
                   ),
                   icon: Icon(_config.isRunning ? Icons.power_settings_new : Icons.play_arrow),
-                  tooltip: _config.isRunning ? '停止服务器' : '启动服务器',
+                  tooltip: _config.isRunning ? i18n.t('stopServer') : i18n.t('startServer'),
                   onPressed: _toggleServer,
                 ),
                 const SizedBox(height: 4),
@@ -261,41 +268,41 @@ class _HomeScreenState extends State<HomeScreen> {
                 const Divider(height: 24, thickness: 1),
               ],
             ),
-            destinations: const [
+            destinations: [
               NavigationRailDestination(
-                icon: Icon(Icons.account_tree_outlined),
-                selectedIcon: Icon(Icons.account_tree),
-                label: Text('模型资源'),
+                icon: const Icon(Icons.account_tree_outlined),
+                selectedIcon: const Icon(Icons.account_tree),
+                label: Text(i18n.t('tabModel')),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.speed_outlined),
-                selectedIcon: Icon(Icons.speed),
-                label: Text('数据监视'),
+                icon: const Icon(Icons.speed_outlined),
+                selectedIcon: const Icon(Icons.speed),
+                label: Text(i18n.t('tabMonitor')),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.notifications_none),
-                selectedIcon: Icon(Icons.notifications_active),
-                label: Text('报告控制'),
+                icon: const Icon(Icons.notifications_none),
+                selectedIcon: const Icon(Icons.notifications_active),
+                label: Text(i18n.t('tabReports')),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.send_outlined),
-                selectedIcon: Icon(Icons.send),
-                label: Text('GOOSE/SV'),
+                icon: const Icon(Icons.send_outlined),
+                selectedIcon: const Icon(Icons.send),
+                label: Text(i18n.t('tabGoose')),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.folder_outlined),
-                selectedIcon: Icon(Icons.folder_shared),
-                label: Text('文件与定值'),
+                icon: const Icon(Icons.folder_outlined),
+                selectedIcon: const Icon(Icons.folder_shared),
+                label: Text(i18n.t('tabFiles')),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.receipt_long_outlined),
-                selectedIcon: Icon(Icons.receipt_long),
-                label: Text('报文监视'),
+                icon: const Icon(Icons.receipt_long_outlined),
+                selectedIcon: const Icon(Icons.receipt_long),
+                label: Text(i18n.t('tabTraffic')),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.menu_book_outlined),
-                selectedIcon: Icon(Icons.menu_book),
-                label: Text('SCL工具'),
+                icon: const Icon(Icons.menu_book_outlined),
+                selectedIcon: const Icon(Icons.menu_book),
+                label: Text(i18n.t('tabScl')),
               ),
             ],
           ),
@@ -350,12 +357,12 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(width: 6),
             Text(
-              _config.statusMessage ?? (_config.isRunning ? '服务就绪' : '已停止'),
+              _config.statusMessage ?? (_config.isRunning ? i18n.t('serverReady') : i18n.t('serverStopped')),
               style: const TextStyle(fontSize: 11),
             ),
             const Spacer(),
             Text(
-              '模型: ${_manager.engine.scl?.iedName ?? "未载入"} | 变量总数: ${_manager.engine.allVariables.length}',
+              '${i18n.t("modelLabel")}: ${_manager.engine.scl?.iedName ?? i18n.t("unloaded")} | ${i18n.t("totalVarsCount")}: ${_manager.engine.allVariables.length}',
               style: const TextStyle(fontSize: 11, color: Colors.grey),
             ),
             const SizedBox(width: 16),
@@ -405,4 +412,32 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+  Widget _buildTitleRow(BuildContext context, bool isDark, AppI18n i18n) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: const Text(
+            'IEC 61850',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(i18n.t('appTitle'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        const SizedBox(width: 12),
+        // Server IP:Port Chip
+        ActionChip(
+          avatar: const Icon(Icons.settings, size: 16),
+          label: Text('${_config.ip}:${_config.port}'),
+          onPressed: _openEditServerDialog,
+        ),
+      ],
+    );
+  }
 }
+

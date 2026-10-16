@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../models/client_variable_model.dart';
@@ -81,7 +82,7 @@ class _ControlOperationDialogState extends State<ControlOperationDialog> {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('控制命令已成功执行：${widget.variable.shortRef} -> ${_commandVal ? "合闸 (ON)" : "分闸 (OFF)"}'),
+            content: Text('${AppI18n.instance.t("commandResult")}: ${widget.variable.shortRef} -> ${_commandVal ? AppI18n.instance.t("switchOn") : AppI18n.instance.t("switchOff")}'),
             backgroundColor: Colors.green[700],
           ),
         );
@@ -93,6 +94,7 @@ class _ControlOperationDialogState extends State<ControlOperationDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = AppI18n.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return AlertDialog(
@@ -100,7 +102,7 @@ class _ControlOperationDialogState extends State<ControlOperationDialog> {
         children: [
           Icon(Icons.power_settings_new, color: Theme.of(context).colorScheme.primary),
           const SizedBox(width: 8),
-          const Text('IEC 61850 遥控与点控操作 (Control Window)'),
+          Text(i18n.t('controlWinTitle')),
         ],
       ),
       content: SizedBox(
@@ -137,7 +139,7 @@ class _ControlOperationDialogState extends State<ControlOperationDialog> {
                           padding: EdgeInsets.zero,
                         ),
                         const SizedBox(width: 8),
-                        Text('当前状态: ${widget.variable.displayValue}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                        Text('${i18n.t("currValue")}: ${widget.variable.displayValue}', style: const TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ],
@@ -148,10 +150,10 @@ class _ControlOperationDialogState extends State<ControlOperationDialog> {
               // Control Mode Selection
               Row(
                 children: [
-                  const Text('控制模式 (Control Model):', style: TextStyle(fontWeight: FontWeight.w600)),
+                  Text(i18n.t('controlModel'), style: const TextStyle(fontWeight: FontWeight.w600)),
                   const SizedBox(width: 12),
                   ChoiceChip(
-                    label: const Text('选择后执行 (SBO)'),
+                    label: Text(i18n.t('sboMode')),
                     selected: _isSbo,
                     onSelected: (sel) {
                       if (sel) setState(() => _isSbo = true);
@@ -159,7 +161,7 @@ class _ControlOperationDialogState extends State<ControlOperationDialog> {
                   ),
                   const SizedBox(width: 8),
                   ChoiceChip(
-                    label: const Text('直接执行 (Direct)'),
+                    label: Text(i18n.t('directMode')),
                     selected: !_isSbo,
                     onSelected: (sel) {
                       if (sel) setState(() => _isSbo = false);
@@ -170,7 +172,7 @@ class _ControlOperationDialogState extends State<ControlOperationDialog> {
               const SizedBox(height: 16),
 
               // Command Value Selection
-              const Text('遥控目标动作 (Control Command):', style: TextStyle(fontWeight: FontWeight.w600)),
+              Text(i18n.t('controlCmd'), style: const TextStyle(fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
               Row(
                 children: [
@@ -182,7 +184,7 @@ class _ControlOperationDialogState extends State<ControlOperationDialog> {
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       icon: const Icon(Icons.flash_on),
-                      label: const Text('合闸 (CLOSE / ON / 1)', style: TextStyle(fontWeight: FontWeight.bold)),
+                      label: Text(i18n.t('cmdClose'), style: const TextStyle(fontWeight: FontWeight.bold)),
                       onPressed: () => setState(() => _commandVal = true),
                     ),
                   ),
@@ -195,7 +197,7 @@ class _ControlOperationDialogState extends State<ControlOperationDialog> {
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       icon: const Icon(Icons.flash_off),
-                      label: const Text('分闸 (TRIP / OFF / 0)', style: TextStyle(fontWeight: FontWeight.bold)),
+                      label: Text(i18n.t('cmdTrip'), style: const TextStyle(fontWeight: FontWeight.bold)),
                       onPressed: () => setState(() => _commandVal = false),
                     ),
                   ),
@@ -204,18 +206,18 @@ class _ControlOperationDialogState extends State<ControlOperationDialog> {
               const SizedBox(height: 16),
 
               // Check Conditions
-              const Text('检定条件 (Check Conditions):', style: TextStyle(fontWeight: FontWeight.w600)),
+              Text(i18n.t('checkConditions'), style: const TextStyle(fontWeight: FontWeight.w600)),
               CheckboxListTile(
                 contentPadding: EdgeInsets.zero,
                 dense: true,
-                title: const Text('同步检定 (Synchrocheck)'),
+                title: Text(i18n.t('synchroCheck')),
                 value: _synchroCheck,
                 onChanged: (val) => setState(() => _synchroCheck = val ?? false),
               ),
               CheckboxListTile(
                 contentPadding: EdgeInsets.zero,
                 dense: true,
-                title: const Text('电气防误闭锁检定 (Interlock Check)'),
+                title: Text(i18n.t('interlockCheck')),
                 value: _interlockCheck,
                 onChanged: (val) => setState(() => _interlockCheck = val ?? false),
               ),
@@ -235,7 +237,7 @@ class _ControlOperationDialogState extends State<ControlOperationDialog> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'SBO 控前选择已确认成功！请在 $_sboRemainingSeconds 秒内确认执行。',
+                          'SBO ($_sboRemainingSeconds s) -> ${i18n.t("step2Operate")}',
                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                         ),
                       ),
@@ -250,23 +252,23 @@ class _ControlOperationDialogState extends State<ControlOperationDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(i18n.t('cancel')),
         ),
         if (_isSbo) ...[
           OutlinedButton.icon(
             icon: _isSelecting ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.touch_app),
-            label: const Text('1. 控前选择 (Select)'),
+            label: Text(i18n.t('step1Select')),
             onPressed: _isSelecting || _isSelectSuccess ? null : _doSelect,
           ),
           FilledButton.icon(
             icon: _isOperating ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.play_arrow),
-            label: const Text('2. 确认执行 (Operate)'),
+            label: Text(i18n.t('step2Operate')),
             onPressed: _isSelectSuccess && !_isOperating ? _doOperate : null,
           ),
         ] else ...[
           FilledButton.icon(
             icon: _isOperating ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.send),
-            label: const Text('立即执行控令 (Operate Now)'),
+            label: Text(i18n.t('operateNow')),
             onPressed: _isOperating ? null : _doOperate,
           ),
         ],

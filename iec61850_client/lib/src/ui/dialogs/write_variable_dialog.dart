@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'package:flutter/material.dart';
 import '../../models/client_variable_model.dart';
 import '../../models/scl_models.dart';
@@ -56,6 +57,7 @@ class _WriteVariableDialogState extends State<WriteVariableDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = AppI18n.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return AlertDialog(
@@ -63,7 +65,7 @@ class _WriteVariableDialogState extends State<WriteVariableDialog> {
         children: [
           Icon(Icons.edit_note, color: Theme.of(context).colorScheme.primary),
           const SizedBox(width: 8),
-          const Text('写入数据属性 (MMS Write)'),
+          Text(i18n.t('writeValClientTitle')),
         ],
       ),
       content: SizedBox(
@@ -105,18 +107,18 @@ class _WriteVariableDialogState extends State<WriteVariableDialog> {
                           padding: EdgeInsets.zero,
                         ),
                         const Spacer(),
-                        Text('当前值: ${widget.variable.displayValue}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                        Text('${i18n.t("currValue")}: ${widget.variable.displayValue}', style: const TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 16),
-              const Text('写入目标数值 (Target Value):', style: TextStyle(fontWeight: FontWeight.w600)),
+              Text(i18n.t('targetValue'), style: const TextStyle(fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
               if (widget.variable.type == IecBasicType.boolean)
                 SwitchListTile(
-                  title: Text(_boolVal ? 'TRUE (合闸 / 动作 / 1)' : 'FALSE (分闸 / 复位 / 0)'),
+                  title: Text(_boolVal ? i18n.t('boolTrueDesc') : i18n.t('boolFalseDesc')),
                   value: _boolVal,
                   onChanged: (val) {
                     setState(() {
@@ -130,7 +132,7 @@ class _WriteVariableDialogState extends State<WriteVariableDialog> {
                   controller: _valCtrl,
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),
-                    hintText: '输入数值，如 220.5 或 1',
+                    hintText: i18n.t('inputValHint'),
                     suffixIcon: IconButton(
                       icon: const Icon(Icons.clear),
                       onPressed: () => _valCtrl.clear(),
@@ -144,11 +146,11 @@ class _WriteVariableDialogState extends State<WriteVariableDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(i18n.t('cancel')),
         ),
         FilledButton.icon(
           icon: const Icon(Icons.send),
-          label: const Text('发送写入请求'),
+          label: Text(i18n.t('sendWriteReq')),
           onPressed: _submit,
         ),
       ],

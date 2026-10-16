@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'package:flutter/material.dart';
 import '../../models/connection_config.dart';
 import '../../protocol/serial_port_adapter.dart';
@@ -47,7 +48,7 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
   List<String> _availablePorts = [];
   static const List<int> _baudRates = [1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200];
   static const List<int> _dataBitsList = [8, 7];
-  static const Map<int, String> _parityLabels = {0: '无校验 (None)', 1: '奇校验 (Odd)', 2: '偶校验 (Even)'};
+  static const Map<int, String> _parityLabels = {0: 'None (0)', 1: 'Odd (1)', 2: 'Even (2)'};
   static const List<int> _stopBitsList = [1, 2];
 
   @override
@@ -87,18 +88,18 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('手动指定串口设备节点'),
+        title: Text(AppI18n.instance.t('serialPort')),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('请输入物理串口设备节点路径 (如 /dev/ttyUSB0 或 COM1):', style: TextStyle(fontSize: 13)),
+            Text(AppI18n.instance.t('serialPort'), style: const TextStyle(fontSize: 13)),
             const SizedBox(height: 12),
             TextField(
               controller: textCtrl,
               autofocus: true,
               decoration: const InputDecoration(
-                labelText: '串口设备路径',
+                labelText: AppI18n.instance.t('serialPort'),
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.usb),
               ),
@@ -106,7 +107,7 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('取消')),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text(AppI18n.instance.t('cancel'))),
           ElevatedButton(
             onPressed: () {
               final val = textCtrl.text.trim();
@@ -120,7 +121,7 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
               }
               Navigator.of(ctx).pop();
             },
-            child: const Text('确定'),
+            child: Text(AppI18n.instance.t('confirm')),
           ),
         ],
       ),
@@ -177,14 +178,15 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final isEdit = widget.connection != null;
 
     return AlertDialog(
       title: Row(
         children: [
-          Icon(isEdit ? Icons.edit : Icons.add_link, color: Colors.indigo),
+          Icon(isEdit ? Icons.edit : Icons.add_link, color: theme.colorScheme.primary),
           const SizedBox(width: 8),
-          Text(isEdit ? '编辑连接配置' : '新建通信连接 (Create Connection)'),
+          Text(isEdit ? AppI18n.instance.t('editConnTitle') : AppI18n.instance.t('newConnTitle')),
         ],
       ),
       content: SizedBox(
@@ -197,7 +199,7 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
               TextField(
                 controller: _nameCtrl,
                 decoration: const InputDecoration(
-                  labelText: '连接别名 (Connection Alias)',
+                  labelText: AppI18n.instance.t('connAlias'),
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.label_outline),
                 ),
@@ -209,7 +211,7 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                 isExpanded: true,
                 initialValue: _mode,
                 decoration: const InputDecoration(
-                  labelText: '工作模式 (Transport Mode)',
+                  labelText: AppI18n.instance.t('protoType'),
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.settings_ethernet),
                 ),
@@ -234,7 +236,7 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                             ? _serialPortName
                             : (_availablePorts.isNotEmpty ? _availablePorts.first : null),
                         decoration: const InputDecoration(
-                          labelText: '串口设备 (Port)',
+                          labelText: AppI18n.instance.t('serialPort'),
                           border: OutlineInputBorder(),
                           prefixIcon: Icon(Icons.usb),
                         ),
@@ -244,12 +246,12 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.edit_note),
-                      tooltip: '手动输入串口路径',
+                      tooltip: AppI18n.instance.t('serialPort'),
                       onPressed: _showManualPortDialog,
                     ),
                     IconButton(
                       icon: const Icon(Icons.refresh),
-                      tooltip: '重新扫描串口',
+                      tooltip: AppI18n.instance.t('rescan'),
                       onPressed: _scanPorts,
                     ),
                   ],
@@ -262,7 +264,7 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                         key: ValueKey(_baudRate),
                         isExpanded: true,
                         initialValue: _baudRate,
-                        decoration: const InputDecoration(labelText: '波特率', border: OutlineInputBorder()),
+                        decoration: InputDecoration(labelText: AppI18n.instance.t('baudRate'), border: const OutlineInputBorder()),
                         items: _baudRates.map((b) => DropdownMenuItem(value: b, child: Text(b.toString()))).toList(),
                         onChanged: (v) => setState(() => _baudRate = v ?? 9600),
                       ),
@@ -273,8 +275,8 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                         key: ValueKey(_dataBits),
                         isExpanded: true,
                         initialValue: _dataBits,
-                        decoration: const InputDecoration(labelText: '数据位', border: OutlineInputBorder()),
-                        items: _dataBitsList.map((d) => DropdownMenuItem(value: d, child: Text('$d 位'))).toList(),
+                        decoration: InputDecoration(labelText: AppI18n.instance.t('dataBits'), border: const OutlineInputBorder()),
+                        items: _dataBitsList.map((d) => DropdownMenuItem(value: d, child: Text('$d Bits'))).toList(),
                         onChanged: (v) => setState(() => _dataBits = v ?? 8),
                       ),
                     ),
@@ -288,7 +290,7 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                         key: ValueKey(_parity),
                         isExpanded: true,
                         initialValue: _parity,
-                        decoration: const InputDecoration(labelText: '校验位', border: OutlineInputBorder()),
+                        decoration: InputDecoration(labelText: AppI18n.instance.t('parity'), border: const OutlineInputBorder()),
                         items: _parityLabels.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
                         onChanged: (v) => setState(() => _parity = v ?? 0),
                       ),
@@ -299,8 +301,8 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                         key: ValueKey(_stopBits),
                         isExpanded: true,
                         initialValue: _stopBits,
-                        decoration: const InputDecoration(labelText: '停止位', border: OutlineInputBorder()),
-                        items: _stopBitsList.map((s) => DropdownMenuItem(value: s, child: Text('$s 位'))).toList(),
+                        decoration: InputDecoration(labelText: AppI18n.instance.t('stopBits'), border: const OutlineInputBorder()),
+                        items: _stopBitsList.map((s) => DropdownMenuItem(value: s, child: Text('$s Bits'))).toList(),
                         onChanged: (v) => setState(() => _stopBits = v ?? 1),
                       ),
                     ),
@@ -318,7 +320,7 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                       child: TextField(
                         controller: _ipCtrl,
                         decoration: const InputDecoration(
-                          labelText: '目标 IP 地址 / 主机名',
+                          labelText: AppI18n.instance.t('listenIp'),
                           border: OutlineInputBorder(),
                           prefixIcon: Icon(Icons.dns),
                         ),
@@ -330,7 +332,7 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                       child: TextField(
                         controller: _portCtrl,
                         decoration: const InputDecoration(
-                          labelText: '端口 (Port)',
+                          labelText: AppI18n.instance.t('listenPort'),
                           border: OutlineInputBorder(),
                           prefixIcon: Icon(Icons.numbers),
                         ),
@@ -346,15 +348,20 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
+                    color: theme.colorScheme.primaryContainer.withAlpha(50),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.blue.shade200),
+                    border: Border.all(color: theme.colorScheme.primary.withAlpha(80)),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(Icons.memory, color: Colors.indigo),
-                      SizedBox(width: 8),
-                      Expanded(child: Text('本地虚拟仿真连接：无需外部硬件设备，连接后即可读写仿真电表与开关数据。', style: TextStyle(fontSize: 12, color: Colors.indigo))),
+                      Icon(Icons.memory, color: theme.colorScheme.primary),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          AppI18n.instance.t('footerNote'),
+                          style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -364,7 +371,7 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
               TextField(
                 controller: _timeoutCtrl,
                 decoration: const InputDecoration(
-                  labelText: '超时时间 (Timeout ms)',
+                  labelText: AppI18n.instance.t('respDelay'),
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.timer),
                 ),
@@ -375,8 +382,8 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                 const SizedBox(height: 8),
                 CheckboxListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('预置默认从站和寄存器点表 (推荐)', style: TextStyle(fontSize: 14)),
-                  subtitle: const Text('自动包含示例电力模拟量与遥信点号任务', style: TextStyle(fontSize: 12)),
+                  title: Text(AppI18n.instance.t('regGroups'), style: const TextStyle(fontSize: 14)),
+                  subtitle: Text(AppI18n.instance.t('enableSimSub'), style: const TextStyle(fontSize: 12)),
                   value: _presetDefaultSlave,
                   onChanged: (v) => setState(() => _presetDefaultSlave = v ?? true),
                 ),
@@ -386,11 +393,11 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('取消')),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.indigo, foregroundColor: Colors.white),
+        TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(AppI18n.instance.t('cancel'))),
+        FilledButton.icon(
+          icon: const Icon(Icons.check, size: 18),
           onPressed: _save,
-          child: Text(isEdit ? '保存更改' : '创建连接'),
+          label: Text(isEdit ? AppI18n.instance.t('save') : AppI18n.instance.t('confirm')),
         ),
       ],
     );

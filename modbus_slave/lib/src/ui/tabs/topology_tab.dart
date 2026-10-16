@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../i18n/app_i18n.dart';
 import '../../models/connection_config.dart';
 import '../../models/register_group.dart';
 import '../../models/slave_model.dart';
@@ -81,7 +82,7 @@ class _TopologyTabState extends State<TopologyTab> {
               children: [
                 FilledButton.icon(
                   icon: const Icon(Icons.play_arrow, size: 18),
-                  label: const Text('启动全部连接 (Open All)'),
+                  label: Text(AppI18n.instance.t('openAll')),
                   style: FilledButton.styleFrom(backgroundColor: Colors.green),
                   onPressed: () async {
                     await ModbusServerManager.instance.startAll(widget.connections);
@@ -92,7 +93,7 @@ class _TopologyTabState extends State<TopologyTab> {
                 const SizedBox(width: 8),
                 OutlinedButton.icon(
                   icon: const Icon(Icons.stop, size: 18),
-                  label: const Text('停止全部连接 (Close All)'),
+                  label: Text(AppI18n.instance.t('closeAll')),
                   style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
                   onPressed: () async {
                     await ModbusServerManager.instance.stopAll(widget.connections);
@@ -103,7 +104,7 @@ class _TopologyTabState extends State<TopologyTab> {
                 const Spacer(),
                 OutlinedButton.icon(
                   icon: const Icon(Icons.file_upload_outlined, size: 18),
-                  label: const Text('导入工作区'),
+                  label: Text(AppI18n.instance.t('importWorkspace')),
                   onPressed: () async {
                     final path = WorkspaceStorage.defaultFilePath;
                     try {
@@ -115,13 +116,13 @@ class _TopologyTabState extends State<TopologyTab> {
                       widget.onDataChanged();
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('已从 $path 成功导入')),
+                          SnackBar(content: Text('${AppI18n.instance.t('importWorkspace')}: $path')),
                         );
                       }
                     } catch (e) {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('导入失败: $e')),
+                          SnackBar(content: Text('${AppI18n.instance.t('parseError')}: $e')),
                         );
                       }
                     }
@@ -130,12 +131,12 @@ class _TopologyTabState extends State<TopologyTab> {
                 const SizedBox(width: 8),
                 OutlinedButton.icon(
                   icon: const Icon(Icons.file_download_outlined, size: 18),
-                  label: const Text('保存工作区'),
+                  label: Text(AppI18n.instance.t('saveWorkspace')),
                   onPressed: () async {
                     await WorkspaceStorage.saveConnections(widget.connections);
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('已保存至 ${WorkspaceStorage.defaultFilePath}')),
+                        SnackBar(content: Text('${AppI18n.instance.t('saveWorkspace')} -> ${WorkspaceStorage.defaultFilePath}')),
                       );
                     }
                   },
@@ -174,10 +175,10 @@ class _TopologyTabState extends State<TopologyTab> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('连接服务端 (${widget.connections.length})', style: theme.textTheme.titleMedium),
+              Text('${AppI18n.instance.t('connServers')} (${widget.connections.length})', style: theme.textTheme.titleMedium),
               IconButton(
                 icon: const Icon(Icons.add_circle, color: Colors.blue),
-                tooltip: '新建连接 (New Connection)',
+                tooltip: AppI18n.instance.t('newConn'),
                 onPressed: () async {
                   final newConn = await showDialog<ConnectionConfig>(
                     context: context,
@@ -198,7 +199,7 @@ class _TopologyTabState extends State<TopologyTab> {
         const Divider(height: 1),
         Expanded(
           child: widget.connections.isEmpty
-              ? const Center(child: Text('暂无连接，请点击右上角添加'))
+              ? Center(child: Text(AppI18n.instance.t('noConnHint')))
               : ListView.builder(
                   itemCount: widget.connections.length,
                   itemBuilder: (context, idx) {
@@ -229,7 +230,7 @@ class _TopologyTabState extends State<TopologyTab> {
                                 isRunning ? Icons.stop_circle : Icons.play_circle,
                                 color: isRunning ? Colors.red : Colors.green,
                               ),
-                              tooltip: isRunning ? '停止服务' : '启动服务',
+                              tooltip: isRunning ? AppI18n.instance.t('stopService') : AppI18n.instance.t('startListen'),
                               onPressed: () async {
                                 if (isRunning) {
                                   await ModbusServerManager.instance.stopServer(conn);
@@ -239,7 +240,7 @@ class _TopologyTabState extends State<TopologyTab> {
                                   } catch (e) {
                                     if (context.mounted) {
                                       ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('启动服务失败: $e')),
+                                        SnackBar(content: Text('${AppI18n.instance.t('startListen')} failed: $e')),
                                       );
                                     }
                                   }
@@ -271,8 +272,8 @@ class _TopologyTabState extends State<TopologyTab> {
                                 }
                               },
                               itemBuilder: (_) => [
-                                const PopupMenuItem(value: 'edit', child: Text('编辑参数')),
-                                const PopupMenuItem(value: 'delete', child: Text('删除连接', style: TextStyle(color: Colors.red))),
+                                PopupMenuItem(value: 'edit', child: Text(AppI18n.instance.t('editParams'))),
+                                PopupMenuItem(value: 'delete', child: Text(AppI18n.instance.t('deleteConn'), style: const TextStyle(color: Colors.red))),
                               ],
                             ),
                           ],
@@ -305,10 +306,10 @@ class _TopologyTabState extends State<TopologyTab> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('从站设备 (${slaves.length})', style: theme.textTheme.titleMedium),
+              Text('${AppI18n.instance.t('slavesList')} (${slaves.length})', style: theme.textTheme.titleMedium),
               IconButton(
                 icon: const Icon(Icons.add_circle, color: Colors.blue),
-                tooltip: '添加从站 (New Slave)',
+                tooltip: AppI18n.instance.t('newSlave'),
                 onPressed: _selectedConnection == null
                     ? null
                     : () async {
@@ -334,9 +335,9 @@ class _TopologyTabState extends State<TopologyTab> {
         const Divider(height: 1),
         Expanded(
           child: _selectedConnection == null
-              ? const Center(child: Text('请先在左侧选择一个连接'))
+              ? Center(child: Text(AppI18n.instance.t('selectConnFirst')))
               : slaves.isEmpty
-                  ? const Center(child: Text('当前连接下无从站设备，请点击右上角添加'))
+                  ? Center(child: Text(AppI18n.instance.t('noSlaveHint')))
                   : ListView.builder(
                       itemCount: slaves.length,
                       itemBuilder: (context, idx) {
@@ -352,7 +353,7 @@ class _TopologyTabState extends State<TopologyTab> {
                             ),
                             title: Text(s.name, style: const TextStyle(fontWeight: FontWeight.bold)),
                             subtitle: Text(
-                              '组数: ${s.groups.length} | 延迟: ${s.responseDelay}ms | ${s.byteOrder.name.toUpperCase()}',
+                              '${AppI18n.instance.t('regGroups')}: ${s.groups.length} | ${AppI18n.instance.t('respDelay')}: ${s.responseDelay}ms | ${s.byteOrder.name.toUpperCase()}',
                               style: const TextStyle(fontSize: 12),
                             ),
                             trailing: PopupMenuButton<String>(
@@ -370,7 +371,7 @@ class _TopologyTabState extends State<TopologyTab> {
                                   // Replicates MSE Copy Slave
                                   final nextId = (slaves.map((e) => e.slaveId).fold(0, (a, b) => a > b ? a : b)) + 1;
                                   final clone = s.copyWith(
-                                    name: '${s.name} (副本)',
+                                    name: '${s.name} (${AppI18n.instance.t('copy')})',
                                     slaveId: nextId.clamp(1, 247),
                                   );
                                   setState(() {
@@ -387,9 +388,9 @@ class _TopologyTabState extends State<TopologyTab> {
                                 }
                               },
                               itemBuilder: (_) => [
-                                const PopupMenuItem(value: 'edit', child: Text('编辑从站')),
-                                const PopupMenuItem(value: 'copy', child: Text('复制从站 (Copy Slave)')),
-                                const PopupMenuItem(value: 'delete', child: Text('删除从站', style: TextStyle(color: Colors.red))),
+                                PopupMenuItem(value: 'edit', child: Text(AppI18n.instance.t('editSlave'))),
+                                PopupMenuItem(value: 'copy', child: Text(AppI18n.instance.t('copySlave'))),
+                                PopupMenuItem(value: 'delete', child: Text(AppI18n.instance.t('deleteSlave'), style: const TextStyle(color: Colors.red))),
                               ],
                             ),
                             onTap: () {
@@ -419,10 +420,10 @@ class _TopologyTabState extends State<TopologyTab> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('寄存器组 (${groups.length})', style: theme.textTheme.titleMedium),
+              Text('${AppI18n.instance.t('regGroups')} (${groups.length})', style: theme.textTheme.titleMedium),
               IconButton(
                 icon: const Icon(Icons.add_circle, color: Colors.blue),
-                tooltip: '添加寄存器组 (Add Register Group)',
+                tooltip: AppI18n.instance.t('addGroup'),
                 onPressed: _selectedSlave == null
                     ? null
                     : () async {
@@ -445,9 +446,9 @@ class _TopologyTabState extends State<TopologyTab> {
         const Divider(height: 1),
         Expanded(
           child: _selectedSlave == null
-              ? const Center(child: Text('请先选择一个从站设备'))
+              ? Center(child: Text(AppI18n.instance.t('selectSlaveFirst')))
               : groups.isEmpty
-                  ? const Center(child: Text('当前从站下无寄存器组，请点击右上角添加'))
+                  ? Center(child: Text(AppI18n.instance.t('noGroupHint')))
                   : ListView.builder(
                       itemCount: groups.length,
                       itemBuilder: (context, idx) {
@@ -471,7 +472,7 @@ class _TopologyTabState extends State<TopologyTab> {
                             ),
                             title: Text(g.groupName, style: const TextStyle(fontWeight: FontWeight.bold)),
                             subtitle: Text(
-                              '类型: ${g.registerType.label} | 起始: ${g.startAddress} | 点数: ${g.quantity}',
+                              '${AppI18n.instance.t('regType')}: ${g.registerType.label} | ${AppI18n.instance.t('startAddr')}: ${g.startAddress} | ${AppI18n.instance.t('pointsCount')}: ${g.quantity}',
                               style: const TextStyle(fontSize: 12),
                             ),
                             trailing: PopupMenuButton<String>(
@@ -497,7 +498,7 @@ class _TopologyTabState extends State<TopologyTab> {
                                     context: context,
                                     builder: (_) => SimulationConfigDialog(
                                       initialConfig: g.registers.first.simulation,
-                                      title: '全组寄存器波形配置 (${g.groupName})',
+                                      title: '${AppI18n.instance.t('batchWave')} (${g.groupName})',
                                     ),
                                   );
                                   if (simCfg != null) {
@@ -518,11 +519,11 @@ class _TopologyTabState extends State<TopologyTab> {
                                 }
                               },
                               itemBuilder: (_) => [
-                                const PopupMenuItem(value: 'edit', child: Text('编辑寄存器组')),
-                                const PopupMenuItem(value: 'batch_fill', child: Text('批量填充数值 (Batch Fill)')),
-                                const PopupMenuItem(value: 'batch_sim', child: Text('全组波形配置 (Wave Simulation)')),
-                                const PopupMenuItem(value: 'reset', child: Text('整组数值清零')),
-                                const PopupMenuItem(value: 'delete', child: Text('删除寄存器组', style: TextStyle(color: Colors.red))),
+                                PopupMenuItem(value: 'edit', child: Text(AppI18n.instance.t('editGroup'))),
+                                PopupMenuItem(value: 'batch_fill', child: Text(AppI18n.instance.t('batchFill'))),
+                                PopupMenuItem(value: 'batch_sim', child: Text(AppI18n.instance.t('batchWave'))),
+                                PopupMenuItem(value: 'reset', child: Text(AppI18n.instance.t('resetAll'))),
+                                PopupMenuItem(value: 'delete', child: Text(AppI18n.instance.t('deleteGroup'), style: const TextStyle(color: Colors.red))),
                               ],
                             ),
                             onTap: () => setState(() => _selectedGroup = g),

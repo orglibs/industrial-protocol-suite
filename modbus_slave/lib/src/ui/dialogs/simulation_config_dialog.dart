@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'package:flutter/material.dart';
 import '../../models/simulation_config.dart';
 
@@ -8,7 +9,7 @@ class SimulationConfigDialog extends StatefulWidget {
   const SimulationConfigDialog({
     super.key,
     required this.initialConfig,
-    this.title = '配置数据模拟 / 缓动波形 (EaseFunctionConfig)',
+    this.title,
   });
 
   @override
@@ -80,8 +81,8 @@ class _SimulationConfigDialogState extends State<SimulationConfigDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SwitchListTile(
-                title: const Text('启用此寄存器波形模拟'),
-                subtitle: const Text('开启后后台服务将按所选波形动态自动刷新该点数据'),
+                title: Text(AppI18n.instance.t('enableSim')),
+                subtitle: Text(AppI18n.instance.t('enableSimSub')),
                 value: _enabled,
                 onChanged: (val) => setState(() => _enabled = val),
               ),
@@ -89,7 +90,7 @@ class _SimulationConfigDialogState extends State<SimulationConfigDialog> {
               DropdownButtonFormField<EaseWaveType>(
                 value: _waveType,
                 decoration: const InputDecoration(
-                  labelText: '波形 / 缓动曲线类型 (Ease / Wave Type)',
+                  labelText: AppI18n.instance.t('waveType'),
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.show_chart),
                 ),
@@ -106,7 +107,7 @@ class _SimulationConfigDialogState extends State<SimulationConfigDialog> {
                       controller: _minController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       decoration: const InputDecoration(
-                        labelText: '波谷下限 (Min)',
+                        labelText: AppI18n.instance.t('waveMin'),
                         border: OutlineInputBorder(),
                       ),
                       onChanged: (_) => setState(() {}),
@@ -118,7 +119,7 @@ class _SimulationConfigDialogState extends State<SimulationConfigDialog> {
                       controller: _maxController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       decoration: const InputDecoration(
-                        labelText: '波峰上限 (Max)',
+                        labelText: AppI18n.instance.t('waveMax'),
                         border: OutlineInputBorder(),
                       ),
                       onChanged: (_) => setState(() {}),
@@ -134,7 +135,7 @@ class _SimulationConfigDialogState extends State<SimulationConfigDialog> {
                       controller: _durationController,
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
-                        labelText: '波动周期 (Duration)',
+                        labelText: AppI18n.instance.t('wavePeriod'),
                         suffixText: 'ms',
                         border: OutlineInputBorder(),
                       ),
@@ -147,7 +148,7 @@ class _SimulationConfigDialogState extends State<SimulationConfigDialog> {
                       controller: _stepController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       decoration: const InputDecoration(
-                        labelText: '递增步长 (Step)',
+                        labelText: AppI18n.instance.t('waveStep'),
                         border: OutlineInputBorder(),
                       ),
                       onChanged: (_) => setState(() {}),
@@ -156,7 +157,7 @@ class _SimulationConfigDialogState extends State<SimulationConfigDialog> {
                 ],
               ),
               const SizedBox(height: 16),
-              const Text('波形曲线预览 (Waveform Preview):', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text('${AppI18n.instance.t('colSim')}:', style: const TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               Container(
                 height: 100,
@@ -180,11 +181,11 @@ class _SimulationConfigDialogState extends State<SimulationConfigDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(AppI18n.instance.t('cancel')),
         ),
         FilledButton.icon(
           icon: const Icon(Icons.check),
-          label: const Text('确定应用'),
+          label: Text(AppI18n.instance.t('confirm')),
           onPressed: () {
             Navigator.of(context).pop(_currentConfig());
           },

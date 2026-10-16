@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -56,6 +57,7 @@ class _GooseTabState extends State<GooseTab> {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = AppI18n.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final messages = _filteredMessages;
 
@@ -81,7 +83,7 @@ class _GooseTabState extends State<GooseTab> {
                     Icon(Icons.radar, size: 16, color: Colors.white),
                     SizedBox(width: 6),
                     Text(
-                      'GOOSE 报文监视器 (IEC 61850-8-1)',
+                      i18n.t('gooseMonitorTitle'),
                       style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
                     ),
                   ],
@@ -96,7 +98,7 @@ class _GooseTabState extends State<GooseTab> {
                   border: Border.all(color: Colors.teal.withOpacity(0.4)),
                 ),
                 child: Text(
-                  '已捕获: ${_gooseService.messages.length} 帧',
+                  '${_gooseService.messages.length} ${i18n.t("frames")}',
                   style: const TextStyle(fontSize: 12, color: Colors.tealAccent, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -108,7 +110,7 @@ class _GooseTabState extends State<GooseTab> {
                 child: TextField(
                   controller: _filterController,
                   decoration: InputDecoration(
-                    hintText: '按 GOCB / APPID 过滤...',
+                    hintText: i18n.t('filterGooseHint'),
                     hintStyle: const TextStyle(fontSize: 12),
                     prefixIcon: const Icon(Icons.search, size: 16),
                     suffixIcon: _filter.isNotEmpty
@@ -135,13 +137,13 @@ class _GooseTabState extends State<GooseTab> {
                   visualDensity: VisualDensity.compact,
                 ),
                 icon: const Icon(Icons.flash_on, size: 16, color: Colors.amber),
-                label: const Text('模拟接收 GOOSE 帧', style: TextStyle(fontSize: 12)),
+                label: Text(i18n.t('simReceiveGoose'), style: const TextStyle(fontSize: 12)),
                 onPressed: _injectSampleGoosePacket,
               ),
               const SizedBox(width: 8),
               IconButton(
                 icon: const Icon(Icons.delete_outline, size: 20),
-                tooltip: '清空 GOOSE 缓存',
+                tooltip: i18n.t('clearGooseTooltip'),
                 onPressed: () {
                   setState(() {
                     _gooseService.clear();
@@ -163,12 +165,12 @@ class _GooseTabState extends State<GooseTab> {
                       Icon(Icons.stream, size: 56, color: isDark ? Colors.grey[700] : Colors.grey[400]),
                       const SizedBox(height: 12),
                       const Text(
-                        '暂无捕获的 GOOSE 广播报文',
+                        i18n.t('emptyGoosePrompt'),
                         style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.grey),
                       ),
                       const SizedBox(height: 6),
                       const Text(
-                        '点击上方 "模拟接收 GOOSE 帧" 或在局域网内广播 IEC 61850-8-1 GOOSE 报文',
+                        i18n.t('emptyGooseSubPrompt'),
                         style: TextStyle(fontSize: 12, color: Colors.grey),
                       ),
                     ],
@@ -287,7 +289,7 @@ class _GooseTabState extends State<GooseTab> {
                       child: _selectedMessage == null
                           ? const Center(
                               child: Text(
-                                '在左侧列表中选择一帧 GOOSE 报文以查看 ASN.1 解码详情与十六进制原始帧',
+                                i18n.t('selectGooseFrameHint'),
                                 style: TextStyle(color: Colors.grey, fontSize: 13),
                                 textAlign: TextAlign.center,
                               ),
@@ -313,12 +315,12 @@ class _GooseTabState extends State<GooseTab> {
             const Icon(Icons.info_outline, size: 18, color: Colors.tealAccent),
             const SizedBox(width: 8),
             const Text(
-              'GOOSE 报文 ASN.1 解码明细',
+              i18n.t('gooseAsnTitle'),
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
             const Spacer(),
             Text(
-              '捕获大小: ${msg.rawBytes.length} 字节',
+              '${msg.rawBytes.length} ${i18n.t("bytesUnit")}',
               style: TextStyle(fontSize: 11, color: isDark ? Colors.grey[400] : Colors.grey[600]),
             ),
           ],
@@ -342,11 +344,11 @@ class _GooseTabState extends State<GooseTab> {
                 _buildFieldRow('datSet', msg.datSet),
                 _buildFieldRow('APPID', '0x${msg.appId.toRadixString(16).padLeft(4, '0').toUpperCase()} (${msg.appId})'),
                 _buildFieldRow('timeAllowedToLive', '${msg.timeAllowedToLive} ms'),
-                _buildFieldRow('stNum (状态号)', '${msg.stNum}'),
-                _buildFieldRow('sqNum (序号)', '${msg.sqNum}'),
-                _buildFieldRow('test (测试位)', '${msg.test}'),
-                _buildFieldRow('confRev (配置版本)', '${msg.confRev}'),
-                _buildFieldRow('ndsCom (配置改变)', '${msg.ndsCom}'),
+                _buildFieldRow(i18n.t('stNumTag'), '${msg.stNum}'),
+                _buildFieldRow(i18n.t('sqNumTag'), '${msg.sqNum}'),
+                _buildFieldRow(i18n.t('testTag'), '${msg.test}'),
+                _buildFieldRow(i18n.t('confRevTag'), '${msg.confRev}'),
+                _buildFieldRow(i18n.t('ndsComTag'), '${msg.ndsCom}'),
                 _buildFieldRow('numDatSetEntries', '${msg.numDatSetEntries}'),
                 _buildFieldRow('Timestamp (t)', msg.timestamp.toIso8601String()),
               ],
@@ -357,7 +359,7 @@ class _GooseTabState extends State<GooseTab> {
         const SizedBox(height: 12),
         // AllData Entries
         const Text(
-          '数据集内容 (allData):',
+          i18n.t('datasetContent'),
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
         ),
         const SizedBox(height: 6),
@@ -369,7 +371,7 @@ class _GooseTabState extends State<GooseTab> {
             border: Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[300]!),
           ),
           child: msg.allData.isEmpty
-              ? const Text('无数据项', style: TextStyle(color: Colors.grey, fontSize: 12))
+              ? Text(i18n.t('noDataItems'), style: const TextStyle(color: Colors.grey, fontSize: 12))
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: List.generate(msg.allData.length, (i) {
@@ -406,7 +408,7 @@ class _GooseTabState extends State<GooseTab> {
         const SizedBox(height: 12),
         // Raw Hex Dump
         const Text(
-          '原始以太网 / PDU 帧 Hex Dump:',
+          i18n.t('rawEthHexDump'),
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
         ),
         const SizedBox(height: 6),

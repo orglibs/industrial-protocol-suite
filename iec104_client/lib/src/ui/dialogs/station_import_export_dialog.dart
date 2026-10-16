@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../client/iec104_client.dart';
 import '../../client/station_data.dart';
+import '../../i18n/app_i18n.dart';
 
 class StationImportExportDialog extends StatefulWidget {
   final Iec104Client client;
@@ -47,6 +48,7 @@ class _StationImportExportDialogState extends State<StationImportExportDialog> {
   }
 
   void _doImport() {
+    final i18n = AppI18n.instance;
     try {
       final json = jsonDecode(_textCtrl.text);
       if (json is Map<String, dynamic>) {
@@ -64,7 +66,7 @@ class _StationImportExportDialogState extends State<StationImportExportDialog> {
           Navigator.pop(context);
           widget.onImported?.call();
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('成功导入 $count 个从站及其点号表'), backgroundColor: Colors.green),
+            SnackBar(content: Text('${i18n.t('importSuccess')}: $count'), backgroundColor: Colors.green),
           );
         } else if (json.containsKey('commonAddress')) {
           // Import single station
@@ -74,29 +76,31 @@ class _StationImportExportDialogState extends State<StationImportExportDialog> {
           Navigator.pop(context);
           widget.onImported?.call();
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('成功导入从站 [CA=$ca] 点号表 (${st.points.length} 点)'), backgroundColor: Colors.green),
+            SnackBar(content: Text('${i18n.t('importSuccess')}: CA=$ca (${st.points.length})'), backgroundColor: Colors.green),
           );
         } else {
-          throw const FormatException('未识别到有效的从站 JSON 格式 (缺少 commonAddress 或 stations 键)');
+          throw FormatException(i18n.t('invalidJson'));
         }
       } else {
-        throw const FormatException('JSON 必须是对象格式');
+        throw const FormatException('Invalid JSON Object');
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('导入解析失败: $e'), backgroundColor: Colors.red),
+        SnackBar(content: Text('${i18n.t('importFailed')}: $e'), backgroundColor: Colors.red),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final i18n = AppI18n.instance;
+
     return AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.import_export, color: Colors.blue),
-          SizedBox(width: 8),
-          Text('从站点号表 导入 / 导出 (Export & Import)'),
+          Icon(Icons.import_export, color: Theme.of(context).colorScheme.primary),
+          const SizedBox(width: 8),
+          Text(i18n.t('importExportTitle')),
         ],
       ),
       content: SizedBox(
@@ -108,7 +112,7 @@ class _StationImportExportDialogState extends State<StationImportExportDialog> {
             Row(
               children: [
                 ChoiceChip(
-                  label: Text('当前站 (${widget.currentStation.name})'),
+                  label: Text('${i18n.t('currentStation')} (${widget.currentStation.name})'),
                   selected: !_exportAll,
                   onSelected: (sel) {
                     if (sel) {
@@ -121,7 +125,7 @@ class _StationImportExportDialogState extends State<StationImportExportDialog> {
                 ),
                 const SizedBox(width: 8),
                 ChoiceChip(
-                  label: Text('全部从站 (${widget.client.stations.length} 站)'),
+                  label: Text('${i18n.t('allStations')} (${widget.client.stations.length})'),
                   selected: _exportAll,
                   onSelected: (sel) {
                     if (sel) {
@@ -135,11 +139,11 @@ class _StationImportExportDialogState extends State<StationImportExportDialog> {
                 const Spacer(),
                 FilledButton.tonalIcon(
                   icon: const Icon(Icons.copy, size: 16),
-                  label: const Text('复制配置'),
+                  label: Text(i18n.t('copyJson')),
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: _textCtrl.text));
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('配置已复制到剪贴板')),
+                      SnackBar(content: Text(i18n.t('copiedToClipboard'))),
                     );
                   },
                 ),
@@ -153,7 +157,7 @@ class _StationImportExportDialogState extends State<StationImportExportDialog> {
                 expands: true,
                 style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
                 decoration: const InputDecoration(
-                  labelText: '点号 JSON 文本 (可直接编辑或粘贴导入)',
+                  labelText: 'JSON',
                   border: OutlineInputBorder(),
                   alignLabelWithHint: true,
                 ),
@@ -167,13 +171,13 @@ class _StationImportExportDialogState extends State<StationImportExportDialog> {
           children: [
             OutlinedButton.icon(
               icon: const Icon(Icons.file_upload, size: 18),
-              label: const Text('从上方 JSON 文本导入'),
+              label: Text(i18n.t('importFromJson')),
               onPressed: _doImport,
             ),
             const Spacer(),
             FilledButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('关闭'),
+              child: Text(i18n.t('close')),
             ),
           ],
         ),

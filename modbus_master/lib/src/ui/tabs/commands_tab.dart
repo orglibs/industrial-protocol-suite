@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../../models/connection_config.dart';
@@ -80,68 +81,66 @@ class _CommandsTabState extends State<CommandsTab> {
           final bits = await widget.client.readCoils(unitId: unitId, startAddress: addr, quantity: qty);
           sw.stop();
           final bitLines = bits.asMap().entries.map((e) => '  [${addr + e.key}]: ${e.value ? "ON (1)" : "OFF (0)"}').join('\n');
-          resultStr = '【FC 01 读取线圈成功】\n从机ID: $unitId, 起始地址: $addr, 读取点数: $qty\n响应线圈状态: \n$bitLines';
+          resultStr = "[FC01 Read Coils OK]\nUnit: $unitId, Addr: $addr, Qty: $qty\n$bitLines";
           break;
 
         case 2: // FC 02: Read Discrete Inputs
           final bits = await widget.client.readDiscreteInputs(unitId: unitId, startAddress: addr, quantity: qty);
           sw.stop();
           final discLines = bits.asMap().entries.map((e) => '  [${addr + e.key}]: ${e.value ? "1" : "0"}').join('\n');
-          resultStr = '【FC 02 读取离散输入成功】\n从机ID: $unitId, 起始地址: $addr, 读取点数: $qty\n响应输入状态: \n$discLines';
+          resultStr = "[FC02 Read Discrete Inputs OK]\nUnit: $unitId, Addr: $addr, Qty: $qty\n$discLines";
           break;
 
         case 3: // FC 03: Read Holding Registers
           final words = await widget.client.readHoldingRegisters(unitId: unitId, startAddress: addr, quantity: qty);
           sw.stop();
           final holdLines = words.asMap().entries.map((e) => '  [${addr + e.key}]: ${e.value} (0x${e.value.toRadixString(16).padLeft(4, "0").toUpperCase()})').join('\n');
-          resultStr = '【FC 03 读取保持寄存器成功】\n从机ID: $unitId, 起始地址: $addr, 数量: $qty\n寄存器值: \n$holdLines';
+          resultStr = "[FC03 Read Holding Registers OK]\nUnit: $unitId, Addr: $addr, Qty: $qty\n$holdLines";
           break;
 
         case 4: // FC 04: Read Input Registers
           final words = await widget.client.readInputRegisters(unitId: unitId, startAddress: addr, quantity: qty);
           sw.stop();
           final inputLines = words.asMap().entries.map((e) => '  [${addr + e.key}]: ${e.value} (0x${e.value.toRadixString(16).padLeft(4, "0").toUpperCase()})').join('\n');
-          resultStr = '【FC 04 读取输入寄存器成功】\n从机ID: $unitId, 起始地址: $addr, 数量: $qty\n寄存器值: \n$inputLines';
+          resultStr = "[FC04 Read Input Registers OK]\nUnit: $unitId, Addr: $addr, Qty: $qty\n$inputLines";
           break;
 
 
         case 5: // FC 05: Write Single Coil
           await widget.client.writeSingleCoil(unitId: unitId, address: addr, value: _coilBoolVal);
           sw.stop();
-          resultStr = '【FC 05 写单个线圈成功】\n'
-              '从机ID: $unitId, 地址: $addr, 目标状态: ${_coilBoolVal ? "ON (0xFF00)" : "OFF (0x0000)"}\n'
-              '从站已正确应答确认！';
+          resultStr = "[FC05 Write Single Coil OK]\n";
+          resultStr += "Unit: $unitId, Addr: $addr, Val: ${_coilBoolVal ? \"ON\" : \"OFF\"}";
           break;
 
         case 6: // FC 06: Write Single Register
           final val = _parseNumber(_valCtrl.text);
           await widget.client.writeSingleRegister(unitId: unitId, address: addr, value: val & 0xFFFF);
           sw.stop();
-          resultStr = '【FC 06 写单个保持寄存器成功】\n'
-              '从机ID: $unitId, 地址: $addr, 写入值: $val (0x${(val & 0xFFFF).toRadixString(16).padLeft(4, "0").toUpperCase()})\n'
-              '从站已确认写入！';
+          resultStr = "[FC06 Write Single Register OK]\n";
+          resultStr += "Unit: $unitId, Addr: $addr, Val: $val";
           break;
 
         case 15: // FC 15: Write Multiple Coils
           final tokens = _multiValsCtrl.text.split(RegExp(r'[\s,]+')).where((s) => s.isNotEmpty).toList();
           final bools = tokens.map((t) => t == '1' || t.toLowerCase() == 'true' || t.toLowerCase() == 'on').toList();
-          if (bools.isEmpty) throw Exception('请输入要写入的布尔值 (如 1, 0, 1, 1)');
+          if (bools.isEmpty) throw Exception('Enter boolean values (e.g. 1, 0, 1)');
           await widget.client.writeMultipleCoils(unitId: unitId, startAddress: addr, values: bools);
           sw.stop();
-          resultStr = '【FC 15 写多个线圈成功】\n'
-              '从机ID: $unitId, 起始地址: $addr, 写入数量: ${bools.length}\n'
-              '状态列表: ${bools.map((b) => b ? 1 : 0).join(", ")}';
+          resultStr = "[FC15 Write Multiple Coils OK]\n";
+          resultStr += "Unit: $unitId, Addr: $addr, Qty: ${bools.length}\n";
+          resultStr += "Values: ${bools.map((b) => b ? 1 : 0).join(\", \")}";
           break;
 
         case 16: // FC 16: Write Multiple Registers
           final tokens = _multiValsCtrl.text.split(RegExp(r'[\s,]+')).where((s) => s.isNotEmpty).toList();
           final vals = tokens.map((t) => _parseNumber(t) & 0xFFFF).toList();
-          if (vals.isEmpty) throw Exception('请输入要写入的寄存器值 (如 100, 200, 0x1A)');
+          if (vals.isEmpty) throw Exception('Enter register values (e.g. 100, 200, 0x1A)');
           await widget.client.writeMultipleRegisters(unitId: unitId, startAddress: addr, values: vals);
           sw.stop();
-          resultStr = '【FC 16 批量写多个保持寄存器成功】\n'
-              '从机ID: $unitId, 起始地址: $addr, 写入数量: ${vals.length}\n'
-              '数值列表: ${vals.join(", ")}';
+          resultStr = "[FC16 Write Multiple Registers OK]\n";
+          resultStr += "Unit: $unitId, Addr: $addr, Qty: ${vals.length}\n";
+          resultStr += "Values: ${vals.join(\", \")}";
           break;
 
         case 22: // FC 22: Mask Write Register
@@ -155,11 +154,10 @@ class _CommandsTabState extends State<CommandsTab> {
           );
 
           sw.stop();
-          resultStr = '【FC 22 掩码写入保持寄存器成功】\n'
-              '从机ID: $unitId, 地址: $addr\n'
-              'AND 掩码: 0x${andMask.toRadixString(16).padLeft(4, "0").toUpperCase()}\n'
-              'OR 掩码: 0x${orMask.toRadixString(16).padLeft(4, "0").toUpperCase()}\n'
-              '从站确认已按掩码执行运算: [新值 = (当前值 AND AndMask) OR (OrMask AND (NOT AndMask))]';
+          resultStr = "[FC22 Mask Write Register OK]\n";
+          resultStr += "Unit: $unitId, Addr: $addr\n";
+          resultStr += "AND: 0x${andMask.toRadixString(16).padLeft(4, \"0\").toUpperCase()}\n";
+          resultStr += "OR: 0x${orMask.toRadixString(16).padLeft(4, \"0\").toUpperCase()}";
           break;
 
         case 17: // FC 17: Report Slave ID
@@ -169,13 +167,13 @@ class _CommandsTabState extends State<CommandsTab> {
           );
           sw.stop();
           final bytesStr = pdu.map((b) => b.toRadixString(16).padLeft(2, '0').toUpperCase()).join(' ');
-          resultStr = '【FC 17 读取从站标识成功】\n'
-              '从机ID: $unitId\n'
-              'PDU响应十六进制: $bytesStr';
+          resultStr = "[FC17 Report Slave ID OK]\n";
+          resultStr += "Unit: $unitId\n";
+          resultStr += "PDU Hex: $bytesStr";
           break;
 
         default:
-          throw Exception('未知功能码: $_selectedFc');
+          throw Exception('Unknown FC: $_selectedFc');
       }
 
       setState(() {
@@ -186,7 +184,7 @@ class _CommandsTabState extends State<CommandsTab> {
     } catch (e) {
       sw.stop();
       setState(() {
-        _executionResult = '执行错误 (异常应答 / 通信故障):\n$e';
+        _executionResult = "Error: $e";
         _isResultError = true;
         _executionLatencyMs = sw.elapsedMilliseconds;
       });
@@ -197,6 +195,7 @@ class _CommandsTabState extends State<CommandsTab> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -210,22 +209,22 @@ class _CommandsTabState extends State<CommandsTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('选择 Modbus 功能码 (Function Code)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(AppI18n.instance.t('protoType'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
                     children: [
-                      _fcChoice(1, '01: 读线圈 (FC01)'),
-                      _fcChoice(2, '02: 读离散输入 (FC02)'),
-                      _fcChoice(3, '03: 读保持寄存器 (FC03)'),
-                      _fcChoice(4, '04: 读输入寄存器 (FC04)'),
-                      _fcChoice(5, '05: 写单个线圈 (FC05)'),
-                      _fcChoice(6, '06: 写单个寄存器 (FC06)'),
-                      _fcChoice(15, '15: 写多个线圈 (FC15)'),
-                      _fcChoice(16, '16: 写多个寄存器 (FC16)'),
-                      _fcChoice(22, '22: 掩码写寄存器 (FC22)'),
-                      _fcChoice(17, '17: 读从站标识 (FC17)'),
+                      _fcChoice(1, 'FC01 Read Coils'),
+                      _fcChoice(2, 'FC02 Read Discrete Inputs'),
+                      _fcChoice(3, 'FC03 Read Holding Registers'),
+                      _fcChoice(4, 'FC04 Read Input Registers'),
+                      _fcChoice(5, 'FC05 Write Single Coil'),
+                      _fcChoice(6, 'FC06 Write Single Register'),
+                      _fcChoice(15, 'FC15 Write Multiple Coils'),
+                      _fcChoice(16, 'FC16 Write Multiple Registers'),
+                      _fcChoice(22, 'FC22 Mask Write Register'),
+                      _fcChoice(17, 'FC17 Report Server ID'),
                     ],
                   ),
                 ],
@@ -243,7 +242,7 @@ class _CommandsTabState extends State<CommandsTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('指令目标与执行参数', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(AppI18n.instance.t('operation'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 16),
                   Wrap(
                     spacing: 16,
@@ -254,7 +253,7 @@ class _CommandsTabState extends State<CommandsTab> {
                         width: 140,
                         child: TextField(
                           controller: _unitIdCtrl,
-                          decoration: const InputDecoration(labelText: '从站 ID (Unit ID)', border: OutlineInputBorder()),
+                          decoration: InputDecoration(labelText: AppI18n.instance.t('slaveId'), border: const OutlineInputBorder()),
                           keyboardType: TextInputType.number,
                         ),
                       ),
@@ -263,7 +262,7 @@ class _CommandsTabState extends State<CommandsTab> {
                           width: 160,
                           child: TextField(
                             controller: _addrCtrl,
-                            decoration: const InputDecoration(labelText: '起始地址 (Address)', border: OutlineInputBorder()),
+                            decoration: InputDecoration(labelText: AppI18n.instance.t('startAddr'), border: const OutlineInputBorder()),
                             keyboardType: TextInputType.number,
                           ),
                         ),
@@ -272,7 +271,7 @@ class _CommandsTabState extends State<CommandsTab> {
                           width: 140,
                           child: TextField(
                             controller: _qtyCtrl,
-                            decoration: const InputDecoration(labelText: '读取点数 (Quantity)', border: OutlineInputBorder()),
+                            decoration: InputDecoration(labelText: AppI18n.instance.t('regQty'), border: const OutlineInputBorder()),
                             keyboardType: TextInputType.number,
                           ),
                         ),
@@ -280,15 +279,15 @@ class _CommandsTabState extends State<CommandsTab> {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Text('线圈状态: '),
+                            Text('${AppI18n.instance.t('status')}: '),
                             ChoiceChip(
-                              label: const Text('ON (置1)'),
+                              label: const Text('ON (1)'),
                               selected: _coilBoolVal,
                               onSelected: (_) => setState(() => _coilBoolVal = true),
                             ),
                             const SizedBox(width: 8),
                             ChoiceChip(
-                              label: const Text('OFF (置0)'),
+                              label: const Text('OFF (0)'),
                               selected: !_coilBoolVal,
                               onSelected: (_) => setState(() => _coilBoolVal = false),
                             ),
@@ -299,7 +298,7 @@ class _CommandsTabState extends State<CommandsTab> {
                           width: 220,
                           child: TextField(
                             controller: _valCtrl,
-                            decoration: const InputDecoration(labelText: '写入值 (Value - 支持 0xHex)', border: OutlineInputBorder()),
+                            decoration: InputDecoration(labelText: AppI18n.instance.t('currValue'), border: const OutlineInputBorder()),
                           ),
                         ),
                       if (_selectedFc == 15 || _selectedFc == 16)
@@ -308,7 +307,7 @@ class _CommandsTabState extends State<CommandsTab> {
                           child: TextField(
                             controller: _multiValsCtrl,
                             decoration: InputDecoration(
-                              labelText: _selectedFc == 15 ? '布尔值列表 (如 1, 0, 1)' : '寄存器值列表 (如 100, 200, 0x1A)',
+                              labelText: AppI18n.instance.t('currValue'),
                               border: const OutlineInputBorder(),
                             ),
                           ),
@@ -318,14 +317,14 @@ class _CommandsTabState extends State<CommandsTab> {
                           width: 160,
                           child: TextField(
                             controller: _andMaskCtrl,
-                            decoration: const InputDecoration(labelText: 'AND 掩码 (0xFFFF)', border: OutlineInputBorder()),
+                            decoration: const InputDecoration(labelText: 'AND Mask (0xFFFF)', border: OutlineInputBorder()),
                           ),
                         ),
                         SizedBox(
                           width: 160,
                           child: TextField(
                             controller: _orMaskCtrl,
-                            decoration: const InputDecoration(labelText: 'OR 掩码 (0x0001)', border: OutlineInputBorder()),
+                            decoration: const InputDecoration(labelText: 'OR Mask (0x0001)', border: OutlineInputBorder()),
                           ),
                         ),
                       ],
@@ -336,7 +335,7 @@ class _CommandsTabState extends State<CommandsTab> {
                         icon: _isExecuting
                             ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                             : const Icon(Icons.send),
-                        label: const Text('立即执行指令'),
+                        label: Text(AppI18n.instance.t('operation')),
                         onPressed: _isExecuting ? null : _executeCommand,
                       ),
                     ],
@@ -360,16 +359,16 @@ class _CommandsTabState extends State<CommandsTab> {
                     children: [
                       const Icon(Icons.terminal, color: Colors.blueGrey),
                       const SizedBox(width: 8),
-                      const Text('指令响应结果 (Response Inspector)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      Text(AppI18n.instance.t('status'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       const Spacer(),
                       if (_executionLatencyMs > 0)
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: Colors.blueGrey.shade50,
+                            color: theme.colorScheme.surfaceVariant.withOpacity(0.5),
                             borderRadius: BorderRadius.circular(4),
                           ),
-                          child: Text('耗时: ${_executionLatencyMs}ms', style: const TextStyle(fontSize: 12)),
+                          child: Text('${_executionLatencyMs} ms', style: const TextStyle(fontSize: 12)),
                         ),
                     ],
                   ),
@@ -386,7 +385,7 @@ class _CommandsTabState extends State<CommandsTab> {
                     ),
                     constraints: const BoxConstraints(minHeight: 140),
                     child: SelectableText(
-                      _executionResult ?? '等待下发指令...',
+                      _executionResult ?? AppI18n.instance.t('waitingInput'),
                       style: TextStyle(
                         fontFamily: 'monospace',
                         fontSize: 13,

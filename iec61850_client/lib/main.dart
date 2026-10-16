@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'src/i18n/app_i18n.dart';
 import 'src/ui/home_screen.dart';
+import 'src/ui/widgets/window_title_bar.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await WindowManagerHelper.initialize();
   runApp(const Iec61850ClientApp());
 }
 
@@ -22,10 +25,16 @@ class _Iec61850ClientAppState extends State<Iec61850ClientApp> {
     });
   }
 
+  void _onLanguageChanged() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
+    final i18n = AppI18n.instance;
+
     return MaterialApp(
-      title: 'IEC 61850 MMS & GOOSE Client Simulator',
+      title: i18n.t('appTitle'),
       debugShowCheckedModeBanner: false,
       themeMode: _themeMode,
       theme: ThemeData(
@@ -64,9 +73,13 @@ class _Iec61850ClientAppState extends State<Iec61850ClientApp> {
           selectedIconTheme: IconThemeData(color: Colors.white),
         ),
       ),
-      home: HomeScreen(
-        onToggleTheme: _toggleTheme,
-        isDarkMode: _themeMode == ThemeMode.dark,
+      home: Directionality(
+        textDirection: i18n.currentLanguage.isRtl ? TextDirection.rtl : TextDirection.ltr,
+        child: HomeScreen(
+          onToggleTheme: _toggleTheme,
+          isDarkMode: _themeMode == ThemeMode.dark,
+          onLanguageChanged: _onLanguageChanged,
+        ),
       ),
     );
   }

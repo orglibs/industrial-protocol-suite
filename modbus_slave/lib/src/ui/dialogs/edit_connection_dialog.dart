@@ -1,3 +1,4 @@
+import '../../i18n/app_i18n.dart';
 import 'package:flutter/material.dart';
 import '../../models/connection_config.dart';
 import '../../protocol/serial_port_adapter.dart';
@@ -30,7 +31,7 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
   void initState() {
     super.initState();
     final c = widget.initialConfig;
-    _nameController = TextEditingController(text: c?.name ?? '新连接 (Connection)');
+    _nameController = TextEditingController(text: c?.name ?? 'Connection');
     _ipController = TextEditingController(text: c?.ip ?? '0.0.0.0');
     _portController = TextEditingController(text: (c?.port ?? 502).toString());
     _serialPortController = TextEditingController(text: c?.serialPortName ?? '/dev/ttyUSB0');
@@ -80,7 +81,7 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
             color: theme.colorScheme.primary,
           ),
           const SizedBox(width: 8),
-          Text(widget.initialConfig == null ? '新建连接服务端' : '编辑连接参数'),
+          Text(widget.initialConfig == null ? AppI18n.instance.t('newConnTitle') : AppI18n.instance.t('editConnTitle')),
         ],
       ),
       content: SizedBox(
@@ -95,18 +96,18 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                 TextFormField(
                   controller: _nameController,
                   decoration: const InputDecoration(
-                    labelText: '连接别名 (Connection Alias)',
-                    hintText: '如: Modbus TCP 默认从站服务',
+                    labelText: AppI18n.instance.t('connAlias'),
+                    hintText: AppI18n.instance.t('connAliasHint'),
                     prefixIcon: Icon(Icons.label_outline),
                     border: OutlineInputBorder(),
                   ),
-                  validator: (v) => (v == null || v.trim().isEmpty) ? '连接别名不能为空' : null,
+                  validator: (v) => (v == null || v.trim().isEmpty) ? AppI18n.instance.t('connAliasRequired') : null,
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<ModbusTransportMode>(
                   value: _mode,
                   decoration: const InputDecoration(
-                    labelText: '通信模式 (Connection Mode)',
+                    labelText: AppI18n.instance.t('protoType'),
                     prefixIcon: Icon(Icons.swap_horiz),
                     border: OutlineInputBorder(),
                   ),
@@ -127,11 +128,11 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                         child: TextFormField(
                           controller: _ipController,
                           decoration: const InputDecoration(
-                            labelText: '监听 IP (0.0.0.0 为所有网卡)',
+                            labelText: '${AppI18n.instance.t('listenIp')} (0.0.0.0)',
                             prefixIcon: Icon(Icons.computer),
                             border: OutlineInputBorder(),
                           ),
-                          validator: (v) => (v == null || v.trim().isEmpty) ? 'IP不能为空' : null,
+                          validator: (v) => (v == null || v.trim().isEmpty) ? AppI18n.instance.t('valRequired') : null,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -141,7 +142,7 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                           controller: _portController,
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(
-                            labelText: '端口 (Port)',
+                            labelText: AppI18n.instance.t('listenPort'),
                             prefixIcon: Icon(Icons.tag),
                             border: OutlineInputBorder(),
                           ),
@@ -161,17 +162,17 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                         child: TextFormField(
                           controller: _serialPortController,
                           decoration: InputDecoration(
-                            labelText: '串口设备 (Serial Port)',
-                            hintText: '/dev/ttyUSB0 或 COM1',
+                            labelText: AppI18n.instance.t('serialPort'),
+                            hintText: '/dev/ttyUSB0 | COM1',
                             prefixIcon: const Icon(Icons.usb),
                             border: const OutlineInputBorder(),
                             suffixIcon: IconButton(
                               icon: const Icon(Icons.refresh),
-                              tooltip: '扫描可用串口',
+                              tooltip: AppI18n.instance.t('rescan'),
                               onPressed: _refreshSerialPorts,
                             ),
                           ),
-                          validator: (v) => (v == null || v.trim().isEmpty) ? '串口名称不能为空' : null,
+                          validator: (v) => (v == null || v.trim().isEmpty) ? AppI18n.instance.t('valRequired') : null,
                         ),
                       ),
                     ],
@@ -196,7 +197,7 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                         child: DropdownButtonFormField<int>(
                           value: _baudRate,
                           decoration: const InputDecoration(
-                            labelText: '波特率 (BaudRate)',
+                            labelText: AppI18n.instance.t('baudRate'),
                             border: OutlineInputBorder(),
                           ),
                           items: const [1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200]
@@ -210,11 +211,11 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                         child: DropdownButtonFormField<int>(
                           value: _dataBits,
                           decoration: const InputDecoration(
-                            labelText: '数据位 (Data Bits)',
+                            labelText: AppI18n.instance.t('dataBits'),
                             border: OutlineInputBorder(),
                           ),
                           items: const [7, 8]
-                              .map((d) => DropdownMenuItem(value: d, child: Text('$d 位')))
+                              .map((d) => DropdownMenuItem(value: d, child: Text('$d Bits')))
                               .toList(),
                           onChanged: (v) => setState(() => _dataBits = v ?? 8),
                         ),
@@ -228,13 +229,13 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                         child: DropdownButtonFormField<int>(
                           value: _parity,
                           decoration: const InputDecoration(
-                            labelText: '校验位 (Parity)',
+                            labelText: AppI18n.instance.t('parity'),
                             border: OutlineInputBorder(),
                           ),
                           items: const [
-                            DropdownMenuItem(value: 0, child: Text('无校验 (None)')),
-                            DropdownMenuItem(value: 1, child: Text('奇校验 (Odd)')),
-                            DropdownMenuItem(value: 2, child: Text('偶校验 (Even)')),
+                            DropdownMenuItem(value: 0, child: Text('None (0)')),
+                            DropdownMenuItem(value: 1, child: Text('Odd (1)')),
+                            DropdownMenuItem(value: 2, child: Text('Even (2)')),
                           ],
                           onChanged: (v) => setState(() => _parity = v ?? 0),
                         ),
@@ -244,11 +245,11 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                         child: DropdownButtonFormField<int>(
                           value: _stopBits,
                           decoration: const InputDecoration(
-                            labelText: '停止位 (Stop Bits)',
+                            labelText: AppI18n.instance.t('stopBits'),
                             border: OutlineInputBorder(),
                           ),
                           items: const [1, 2]
-                              .map((s) => DropdownMenuItem(value: s, child: Text('$s 位')))
+                              .map((s) => DropdownMenuItem(value: s, child: Text('$s Bits')))
                               .toList(),
                           onChanged: (v) => setState(() => _stopBits = v ?? 1),
                         ),
@@ -264,11 +265,11 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(AppI18n.instance.t('cancel')),
         ),
         FilledButton.icon(
           icon: const Icon(Icons.check),
-          label: const Text('保存'),
+          label: Text(AppI18n.instance.t('save')),
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               final port = int.tryParse(_portController.text.trim()) ?? 502;

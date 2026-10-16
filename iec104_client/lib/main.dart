@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'src/client/iec104_client.dart';
+import 'src/i18n/app_i18n.dart';
 import 'src/ui/home_screen.dart';
+import 'src/ui/widgets/window_title_bar.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await WindowManagerHelper.initialize();
+
   final client = Iec104Client();
   await client.loadWorkspace();
 
@@ -28,10 +32,16 @@ class _Iec104ClientAppState extends State<Iec104ClientApp> {
     });
   }
 
+  void _onLanguageChanged() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
+    final i18n = AppI18n.instance;
+
     return MaterialApp(
-      title: 'IEC 60870-5-104 Client Simulator',
+      title: i18n.t('appTitle'),
       debugShowCheckedModeBanner: false,
       themeMode: _themeMode,
       theme: ThemeData(
@@ -60,10 +70,14 @@ class _Iec104ClientAppState extends State<Iec104ClientApp> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
-      home: HomeScreen(
-        client: widget.client,
-        onToggleTheme: _toggleTheme,
-        isDarkMode: _themeMode == ThemeMode.dark,
+      home: Directionality(
+        textDirection: i18n.currentLanguage.isRtl ? TextDirection.rtl : TextDirection.ltr,
+        child: HomeScreen(
+          client: widget.client,
+          onToggleTheme: _toggleTheme,
+          isDarkMode: _themeMode == ThemeMode.dark,
+          onLanguageChanged: _onLanguageChanged,
+        ),
       ),
     );
   }
