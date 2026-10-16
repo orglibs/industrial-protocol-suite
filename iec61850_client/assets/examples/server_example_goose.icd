@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SCL version="2007" revision="B" xmlns="http://www.iec.ch/61850/2003/SCL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<Header id="" version="1.0" revision="0" toolID="IEC61850ServerSimulator" nameStructure="IEDName" />
+	<Communication>
+		<SubNetwork name="SubNetwork1" type="8-MMS">
+			<ConnectedAP iedName="IED_GOOSE" apName="AP1">
+				<Address>
+					<P type="IP">127.0.0.1</P>
+					<P type="MMS-Port">102</P>
+				</Address>
+				<GSE ldInst="PROT" cbName="gcbTrip">
+					<Address>
+						<P type="MAC-Address">01-0C-CD-01-00-01</P>
+						<P type="APPID">0001</P>
+						<P type="VLAN-ID">000</P>
+						<P type="VLAN-PRIORITY">4</P>
+					</Address>
+					<MinTime unit="s" multiplier="m">4</MinTime>
+					<MaxTime unit="s" multiplier="m">1000</MaxTime>
+				</GSE>
+			</ConnectedAP>
+		</SubNetwork>
+	</Communication>
+	<IED name="IED_GOOSE">
+		<AccessPoint name="AP1">
+			<Server>
+				<Authentication none="true" />
+				<LDevice inst="PROT">
+					<LN0 lnType="PROT.LLN0" lnClass="LLN0" inst="">
+						<DataSet name="dsGooseTrip">
+							<FCDA ldInst="PROT" prefix="" lnClass="PTRC" lnInst="1" doName="Tr" daName="general" fc="ST" />
+							<FCDA ldInst="PROT" prefix="" lnClass="PTRC" lnInst="1" doName="Tr" daName="q" fc="ST" />
+							<FCDA ldInst="PROT" prefix="" lnClass="PTRC" lnInst="1" doName="Tr" daName="t" fc="ST" />
+						</DataSet>
+						<GSEControl name="gcbTrip" type="GOOSE" appID="0001" datSet="dsGooseTrip" confRev="1" />
+					</LN0>
+					<LN lnType="PROT.PTRC1" prefix="" lnClass="PTRC" inst="1" />
+				</LDevice>
+			</Server>
+		</AccessPoint>
+	</IED>
+	<DataTypeTemplates>
+		<LNodeType id="PROT.LLN0" lnClass="LLN0">
+			<DO name="Mod" type="PROT.INC" />
+			<DO name="Beh" type="PROT.INS" />
+			<DO name="Health" type="PROT.INS" />
+		</LNodeType>
+		<LNodeType id="PROT.PTRC1" lnClass="PTRC">
+			<DO name="Mod" type="PROT.INC" />
+			<DO name="Beh" type="PROT.INS" />
+			<DO name="Health" type="PROT.INS" />
+			<DO name="Tr" type="PROT.ACT" />
+		</LNodeType>
+		<DOType id="PROT.INC" cdc="INC">
+			<DA name="stVal" bType="INT32" fc="ST" />
+			<DA name="q" bType="Quality" fc="ST" />
+			<DA name="t" bType="Timestamp" fc="ST" />
+		</DOType>
+		<DOType id="PROT.INS" cdc="INS">
+			<DA name="stVal" bType="INT32" fc="ST" />
+			<DA name="q" bType="Quality" fc="ST" />
+			<DA name="t" bType="Timestamp" fc="ST" />
+		</DOType>
+		<DOType id="PROT.ACT" cdc="ACT">
+			<DA name="general" bType="BOOLEAN" fc="ST" />
+			<DA name="q" bType="Quality" fc="ST" />
+			<DA name="t" bType="Timestamp" fc="ST" />
+		</DOType>
+	</DataTypeTemplates>
+</SCL>

@@ -1,0 +1,822 @@
+[
+  {
+    "name": "actVal",
+    "desc_zh": "用整数值表示的二进制计数器状态",
+    "desc_en": "Binary counter status represented as an integer value."
+  },
+  {
+    "name": "addInfo",
+    "desc_zh": "对最近检出的违例进行进一步闸明的附加信息",
+    "desc_en": "Additional information that may give further clarification as to the last detected violation."
+  },
+  {
+    "name": "addr",
+    "desc_zh": "最新导致计数器增加的远方源地址。注1：无论服务器能检测到何种类型的地址（应用地址、IP地址、链路地址）都储存下来，这取决于特定的映射",
+    "desc_en": "Address of the remote source that last caused the count to be incremented. NOTE 1 The kind of address stored (application address, IP address, link address,... is whatever the server can detect. This may depend on the specific mapping."
+  },
+  {
+    "name": "altitude",
+    "desc_zh": "高度，WGS84坐标图中的高",
+    "desc_en": "Geographical position of device in WGS84 coordinates - altitude."
+  },
+  {
+    "name": "angRef",
+    "desc_zh": "角度基准，指示用于相角参考基准的值。对于被指示的量，按惯例该值以基波频率（index=1）作为参考基准。angRef=\"Synchrophasor\"意味着角度的基准按照IEEE C37118的4.2定义",
+    "desc_en": "Angle reference. Indicates the quantity that is used as reference for the phase angle. For the indicated quantity, the fundamental frequency (index= 1) is used as reference by convention. angRef = \"\"Synchrophasor\"\" means that the reference of the angle is as defined in 4.2 of IEEE C37.118.\""
+  },
+  {
+    "name": "angSVC",
+    "desc_zh": "角度的换算值配咒。用于配置公共数据类（CDC）CMV中的insCVal、cVal和rangeAngC中的限值等角度数据属性的换算值",
+    "desc_en": "Scaled value configuration for angles. Shall be used to configure the scaled value repres entation of the angle of the atrbutes instCVal and cVal and the limits in rangeAngC of the CDC CMV."
+  },
+  {
+    "name": "blkEna",
+    "desc_zh": "如果是真的，操作员锁定的质量标志会置上，并且过程值不再更新",
+    "desc_en": "If TRUE, the operator-blocked quality flag is set, and the process value no longer updated."
+  },
+  {
+    "name": "c1",
+    "desc_zh": "序分量组件1。语义参见scqT",
+    "desc_en": "Sequence component 1. For the semantic meaning, see seqT."
+  },
+  {
+    "name": "c2",
+    "desc_zh": "序分量组件2。语义参见seqT",
+    "desc_en": "Sequence component 2. For the semantic meaning, see seqT."
+  },
+  {
+    "name": "c3",
+    "desc_zh": "序分量组件3。语义参见seqT",
+    "desc_en": "Sequence component 3. For the semantic meaning, see seqT."
+  },
+  {
+    "name": "cdcName",
+    "desc_zh": "公用数据类的名称，与cdcNs一起使用，详见DL/T860.71",
+    "desc_en": "Name of the common data class. Used together with cdcNs, for details, see IEC 61850-7-1."
+  },
+  {
+    "name": "cdcNs",
+    "desc_zh": "公用数据类命名空间详见DL/T860.71",
+    "desc_en": "Common data class name space. For details, see IEC 61850-7-1."
+  },
+  {
+    "name": "cnt",
+    "desc_zh": "安全违例计数器值",
+    "desc_en": "Counter value of security violations."
+  },
+  {
+    "name": "configRev",
+    "desc_zh": "唯一标识了逻辑设备实例的配置。个少当与客户功能相关的逻辑设备的数据模型语义发生任何变化时，LLNO（在LD层面）中的configRev必须改变。如何检测和实施由用户进行，关系到其 他逻辑节点的configRev语义也由用户定义。细节部分参见附件C",
+    "desc_en": "Uniquely identiies the configuration of a logical device instance. ConfigRev in LLNO (at LD level) has to be changed at least on any semantic change of the data model of this LD related to the client functionality. How this is detected and performed is left to the user. Also the semantics of configRev concerning other LNs is left to the user. For further details, see as well Annex C."
+  },
+  {
+    "name": "crvPts",
+    "desc_zh": "规定了曲线形状的点的阵列",
+    "desc_en": "The array with the points specifying a curve shape."
+  },
+  {
+    "name": "ctlModel",
+    "desc_zh": "规定DL/T 860.72部分反映数据行为的控制模式。status-only：该对象是不可控的，仅支持用于状态对象的服务，属性ctlVval不存在。direct-with-normal-security：遵照DL/T 860.72部分的带一般安全（措施）的直接控制。sbo-with-normal-security：遵照DL/T 860.72部分的带一般安全（措施）的SBO控制。direct-with-enhanced-security：遵照DL/T 860.72部分的带增强安全（措施）的直接控制。sbo-with-enhanced-security：遵照DL/T 860.72部分的带增强安全（措施）的SBO控制。注2：如个控制类的数据实例没有相关的状态信息，那么属性stVal不存在。在此情况下，ctlModel的值域限定为direct-with-normal-security和sbo-with-normal-security",
+    "desc_en": "Specifies the control model of IEC 61850-7-2 that corresponds to the behaviour of the data."
+  },
+  {
+    "name": "ctlNum",
+    "desc_zh": "最后一个控制服务的控制序列号",
+    "desc_en": "The control sequence number of the last control service."
+  },
+  {
+    "name": "ctlVal",
+    "desc_zh": "此属性决定控制行为。对于公用数据类INC，应发送值0来复位此值。对于公用数据类BSC，如数据属性persistent是FALSE，那么higher和lower是指数据属性valWTr的属性posVal中的一步。对于公用数据类ISC，整数值总是指数据属性valWTr的属性posVal中的专有位置服务参数对下列服务是适用的：SelVal(Request,Response+,Response-)；Operate(Request,Response+,Response-)；TimOper(Request,Response+,Response-)",
+    "desc_en": "Service parameter that determines the control activity."
+  },
+  {
+    "name": "Cur",
+    "desc_zh": "根据ISO4217的三个字符的代码",
+    "desc_en": "3-character currency code according to IsSo 4217."
+  },
+  {
+    "name": "cVal",
+    "desc_zh": "复数死区值。基于从instCVal算得的死区。分别独立地在基于配置参数db的instCVaLmag与基于配置参数dbAng的instCVaLang上计算死区。死区计算的详细情况见mag",
+    "desc_en": "Deadbanded complex value. Based on a deadband calculation from instCVal. The deadband calculation is done both on instCVal.mag based on the configuration parameter db as well as on instCVal. ang based on the configuration parameter dbAng independenty. For details on deadband calculation, see mag."
+  },
+  {
+    "name": "d",
+    "desc_zh": "数据的文字描述。对公用数据类LPL，是指对逻辑节点的描述数据命名空间，详见DL/T860.71",
+    "desc_en": "Textual description of the data. In case of the common data class LPL, the description refers to the logical node."
+  },
+  {
+    "name": "dataNs",
+    "desc_zh": "数据命名空间，详见DL/T860.71",
+    "desc_en": "Data name space. For details, see IEC 61850-7-1."
+  },
+  {
+    "name": "db",
+    "desc_zh": "死区。应表示为用以计算所有带死区属性（例如CDCMV的mag属性）的配置参数，这个值应表示为最大值和最小值的差值百分比（以0.001百分比为单位）。如用积分计算以确定带死区的值，该值应表示为0.001%s。dB值为零时，不得压制报告事件的模拟值，因此，只有值域的变化会导致事件",
+    "desc_en": "Deadband. Shall represent a configuration parameter used to calculate all deadbanded attributes (for example mag atbute in the CDC MV). The value shall represent the percentage of difference between max. and min. in units of 0,001 %. If an integral calculation is used to determine the deadbanded value, the value shall be represented as 0,001 %s. A dB value of 0 shall suppress reporting events on the analog value, so that only changes of the range value will lead to events."
+  },
+  {
+    "name": "dbAng",
+    "desc_zh": "角度的死区。表示当数据属性为通常数据属性类型的向量形式用以计算带死区属性（例如CDCCMV的cVal属性）角度的配置参数，这个值应表示为最大值和最小值的差值的百分比（以0.001百分比为单位)。如用积分计算以确定带死区的值，该值应表示为0.001%s",
+    "desc_en": "Deadband for angles. Shall represent a configuration parameter used to calculate deadbanded attributes for the angle in the case the data atrbute is of the common data atrbute type vector (for example cVal atbute of the CDC CMV). The value shall represent the percentage of difference between max. and min. in units of 0,001 %. If an integral calculation is used to determine the deadbanded value, the value shall be represented as 0,001 %s."
+  },
+  {
+    "name": "dirGeneral",
+    "desc_zh": "故障的总方向。如各相故障的方向不同，该属性应设为both",
+    "desc_en": "General direction of the fault. If the faults of individual phases have different directions, this attribute shall be set to both ."
+  },
+  {
+    "name": "dirNeut",
+    "desc_zh": "中线故障的方向",
+    "desc_en": "Direction of the fault for neut."
+  },
+  {
+    "name": "dirPhsA",
+    "desc_zh": "A相故障的方向",
+    "desc_en": "Direction of the fault for phase A."
+  },
+  {
+    "name": "dirPhsB",
+    "desc_zh": "B相故障的方向",
+    "desc_en": "Direction of the fault for phase B."
+  },
+  {
+    "name": "dirPhsC",
+    "desc_zh": "C相故障的方向",
+    "desc_en": "Direction of the fault for phase C."
+  },
+  {
+    "name": "dU",
+    "desc_zh": "使用UNICODE字符的数据的文字描述。更具体内容，见d",
+    "desc_en": "Textual description of the data using unicode characters. For further details, see d."
+  },
+  {
+    "name": "ePSName",
+    "desc_zh": "设备连接的电力系统名称",
+    "desc_en": "Name of electric power system the device is connected to."
+  },
+  {
+    "name": "evalTm",
+    "desc_zh": "应用于谐间波计算的时间窗口。该值应用毫秒为单位表示，详见har",
+    "desc_en": "Time window applied to interharmonic calculations. The value shall be represented in ms. For further details, see har."
+  },
+  {
+    "name": "frEna",
+    "desc_zh": "控制冻结过程的BOOLEAN值。如为TRUE，按规定的strTm、frPd和frRes冻结：为FALSE，则不冻结",
+    "desc_en": "BOOLEAN value, which controls the freezing process. If TRUE, freezing shall occur as specified in strTm, frPd and frRs. If FALSE, no freezing shall occur."
+  },
+  {
+    "name": "frequency",
+    "desc_zh": "电力系统的额定频率或其他基频，单位为Hz",
+    "desc_en": "Nominal frequency of the power system or some other fundamental frequency in Hz."
+  },
+  {
+    "name": "frPd",
+    "desc_zh": "以毫秒为单位的两次冻结操作之间的时间间隔。如为0，则在strTim指示的时刻仅执行一次冻结",
+    "desc_en": "Time interval in ms between freeze operations. If frPd is 0, only a single freeze is performed at the time indicated in strTm."
+  },
+  {
+    "name": "frRs",
+    "desc_zh": "每次冻结过程后，将计数器自动复位为零",
+    "desc_en": "Indicates that counter is to be automatically reset to zero after each freezing process."
+  },
+  {
+    "name": "frTm",
+    "desc_zh": "最近一次计数器冻结时间",
+    "desc_en": "Time of the last counter freeze."
+  },
+  {
+    "name": "frVal",
+    "desc_zh": "以整数值表示冻结的二进制计数器状态",
+    "desc_en": "Frozen binary counter status represented as an integer value."
+  },
+  {
+    "name": "general",
+    "desc_zh": "相值的“或”关系，例如：跳闸或启动。即使并非所有相都在故障情况下，此属性也应置位",
+    "desc_en": "Logical \"or\" of the phase values, for example trip or start. The atrbute shall also be set if not all phases have a fault condition."
+  },
+  {
+    "name": "har",
+    "desc_zh": "这个数组包含谐波和次谐波或问谐波值。谐波和次谐波值（evalTim等于工频周期）：第1个数组元素应包含直流分量。其后的数组元素应包含1至numHar次谐波。如numCycl大于1，则该数组应包含谐波和次谐波和它们的倍数。在这种情况下，编号n*2^(numCy-1)的是谐波，其余元素都是次谐波或次谐波的倍数。间谐波值（evalTim不等于工频周期）：第1个数组元素应包含直流分量。其后的数组元素应包含1至numHar次谐波",
+    "desc_en": "This array shall contain the harmonic and subharmonic or the interharmonic values."
+  },
+  {
+    "name": "hstRangeC",
+    "desc_zh": "这个数组包含柱状图的范围值信息，详见hstVal",
+    "desc_en": "This array shall contain the values for the configuration of the ranges for the histogram. For details, see hstVal."
+  },
+  {
+    "name": "hstVal",
+    "desc_zh": "包含柱状图实例值。柱状图可以基于一维或二维的范围值计算",
+    "desc_en": "This array shall contain the values for the histogram entries. A histogram can be calculated based on a one-dimensional or a two-dimensional range."
+  },
+  {
+    "name": "hvRef",
+    "desc_zh": "该属性规定引用类型（也就是谐波对基波值、什效值或绝对值的比率）。它在数据属性类型Vector数据属性mag中包含",
+    "desc_en": "Specifies the reference type (i.e. ratio of harmonic to fundamental, to RMS or to absolute), which the data attribute mag of the data attribute type Vector contain."
+  },
+  {
+    "name": "hwRev",
+    "desc_zh": "硬件版本",
+    "desc_en": "HW-revision."
+  },
+  {
+    "name": "instCVal",
+    "desc_zh": "向量类型的即时值",
+    "desc_en": "Instant value of a vector type value."
+  },
+  {
+    "name": "instMag",
+    "desc_zh": "测量值的瞬时值的幅值。注3：该属性是可选的，它只影响值对交流的可见性。瞬时值对运行的内部行为是必须的，如在解释mag属性时对死区的计算",
+    "desc_en": "Magnitude of the instantaneous value of a measured value. NOTE3 The presence of the attrbute instMag is optional, that only affects the visibility of that value to the communication. The instantaneous value may be required for the internal behaviour of the function, e.g. to perform the deadband calculation as explained with the attribute mag."
+  },
+  {
+    "name": "intAddr",
+    "desc_zh": "此值代表一个特定制造商的内部地址",
+    "desc_en": "This value represents a manufacturer specific internal address."
+  },
+  {
+    "name": "latitude",
+    "desc_zh": "方位，WGS84坐标图中的纬度",
+    "desc_en": "Geographical position of device in WGS84 coordinates - latitude."
+  },
+  {
+    "name": "ldNs",
+    "desc_zh": "逻辑设备命名空间，详见DL/T860.71",
+    "desc_en": "Logical device name space. For details, see IEC 61850-7-1."
+  },
+  {
+    "name": "lnNs",
+    "desc_zh": "逻辑节点命名空问，详见DL/T860.71",
+    "desc_en": "Logical node name space. For details, see IEC 61850-7-1."
+  },
+  {
+    "name": "location",
+    "desc_zh": "设备安装的位置",
+    "desc_en": "Location, where the equipment is installed."
+  },
+  {
+    "name": "longitude",
+    "desc_zh": "方位，WGS84坐标图中的经度",
+    "desc_en": "Geographical position of device in WGS84 coordinates - longitude."
+  },
+  {
+    "name": "mag",
+    "desc_zh": "死区值",
+    "desc_en": "Deadbanded value. Shall be based on a dead band calculation from the instantaneous value (modelled as instMag) as ilustrated below. The value of mag shall be updated to the current instantaneous value when the value has changed according the configuration parameter db. If db=0, the value of mag is identical to the value of instMag."
+  },
+  {
+    "name": "magSVC",
+    "desc_zh": "幅值的换算值配置，用以配置CDCCMV的属性instCVal、cVal、rangeC的幅值换算值表示",
+    "desc_en": "Scaled value configuration for magnitude. Shall be used to configure the scaled value representation of the magnitude of the attributes instCVal, cVal, rangeC of the CDC CMV."
+  },
+  {
+    "name": "max",
+    "desc_zh": "最大过程测量值，其i和f值在过程限度内。如值再高一点，q将相应地被置位（validity=questionable，detailQual=outOfRange）",
+    "desc_en": "Maximum process measurement for which values of i or f are considered within process limits. If the value is higher, q shall be set accordingly (validity = questionable, detailQual = outOfRange)."
+  },
+  {
+    "name": "maxPts",
+    "desc_zh": "曲线或柱状图能够支持的最大数据个数",
+    "desc_en": "The maximal number of points that is supported to be set as number of points for a given curve setting or as a number of cells for a histogram."
+  },
+  {
+    "name": "maxVal",
+    "desc_zh": "和minVal一起，定义了ctlVal（INC，BSC，ISC）、setVal（ING）或setMag（APC，ASG）的设置范围",
+    "desc_en": "Defines together with minVal the setting range for ctIVal (CDC INC, BSC, ISC), setVal (CDC ING) or setMag (CDC APC, ASG)."
+  },
+  {
+    "name": "min",
+    "desc_zh": "最小过程测量值，其i和f值在过程限度内。如值冉低一点，q将相应地被置位（validity=questionable，detailQual=outOfRange）",
+    "desc_en": "Minimum process measurement for which values of i or f are considered within process limits. If the value is lower, q shall be set accordingly (validity = questionable, detailQual= outOfRange)."
+  },
+  {
+    "name": "minVal",
+    "desc_zh": "和maxVal一起，定义了ctlVal（INC，BSC，ISC）、 setVal（ING）或setMag（APC，ASG）的定值范围",
+    "desc_en": "Defines together with maxVal the setting range for ctIVal (CDC INC, BSC, ISC), setVal (CDC ING) or setMag (CDC APC, ASG)."
+  },
+  {
+    "name": "model",
+    "desc_zh": "卖方特定的产品名称",
+    "desc_en": "Vendor specific product name."
+  },
+  {
+    "name": "mRID",
+    "desc_zh": "控制资源ID，资产或设备的特有标示",
+    "desc_en": "Master resource ID - unique identification of an asset or device."
+  },
+  {
+    "name": "mxVal",
+    "desc_zh": "模拟过程测量值。可控模拟过程当前值的返回信息。值能够作为告警的死限",
+    "desc_en": "Measured analogue process value. The return information with the current value of the controllable analogue process value. The value can be dead banded for reporting."
+  },
+  {
+    "name": "name",
+    "desc_zh": "IED（如果DPL用在LPHD中）或类似断路器的设备（如果用于数据EEName）名字",
+    "desc_en": "The name of the IED (if DPL is used in the context of a LPHD) or of a device like a circuit breaker (if used for the data EEName)."
+  },
+  {
+    "name": "net",
+    "desc_zh": "净电流。净电流是流经电器设备柴一电路点的所有带电导线（相电流的和）和中性点的电流瞬时值的代数和，详见phsA（WYE）",
+    "desc_en": "Net current. Net current is the algebraic sum of the instantaneous values of currents flowing through all live conductors (sum over phase currents) and neutral of a circuit at a point of the electrical installation. For further details, see phsA (WYE)."
+  },
+  {
+    "name": "netHar",
+    "desc_zh": "该阵列应包含和净电流有关的谐波和次谐波或间谐波值，详见har",
+    "desc_en": "This array shall contain the harmonic and subharmonics or interharmonic values related to net current. For further details, see Har."
+  },
+  {
+    "name": "neut(ACT,ACD)",
+    "desc_zh": "利用接地电流启动事件",
+    "desc_en": "Start event with earth current."
+  },
+  {
+    "name": "neut(WYE)",
+    "desc_zh": "中性线的值。如果不能直接获得测量值，可利用各相导体电流瞬时值的代数和进行估算。此时，neut等时于res，详见phsA（WYE）",
+    "desc_en": "Value of the measured phase neutral. If a direct measurement of this value is not available, it is acceptable to substitute an estimate computed by creating the algebraic sum of the instantaneous values of currents flowing through all live conductors. In that case, 'neut' is identical to 'res'. For further details, see phsA (WYE)."
+  },
+  {
+    "name": "neutHar",
+    "desc_zh": "该阵列应包含和中线有关的谐波和分谐波或谐问波值，详见har",
+    "desc_en": "This array shall contain the harmonic and subharmonics or interharmonic values related to neutral. For further details, see Har."
+  },
+  {
+    "name": "numCyc",
+    "desc_zh": "用于谐波、分谐波和谐向波计算的工频周期数，详见har",
+    "desc_en": "Number of cycles of power frequency, which are used for harmonic, subharmonic and interharmonic calculation. For further details, see har."
+  },
+  {
+    "name": "numHar",
+    "desc_zh": "作为值属性返回的谐波和分谐波或谐间波次数值。其值域应大于等于1。1代表第一个谐波值。0代表直流分量。",
+    "desc_en": "Number of harmonic and subharmonics or interharmonic values that can be accessed. The range of the numHar value shall be 1 or greater. The array element \"\"1\"\" shall represent the first harmonic value. The value 0 shall refer to the dc component."
+  },
+  {
+    "name": "numPts",
+    "desc_zh": "用于定义曲线或柱状图的数据个数",
+    "desc_en": "Number of points or cells used to define a curve or a histogram."
+  },
+  {
+    "name": "operTimeout",
+    "desc_zh": "说明根据本标准中定义的控制模型，管理一次操作需要暂停的时间。当operTimeout在没有新的非法状态下超时，命令行为将被终止。对安全性要求更高的控制模型，将产生相反命令终止指令。值以ms为单位",
+    "desc_en": "This atbute specifies the timeout used to supervise an operation according the control model defined in IEC 61850-7-2. When operTimeout expires without an indication of a new valid state, the command action shall be terminated. In the control models with enhanced security, a negative command termination is sent as response. The value shall be in ms."
+  },
+  {
+    "name": "operTmPhsA",
+    "desc_zh": "A相的操作时间，用于定波形点合分（point on wave switching）",
+    "desc_en": "Operation Time for Phase A. Is used for point on wave switching."
+  },
+  {
+    "name": "operTmPhsB",
+    "desc_zh": "B相的操作时间，用于定波形点合分（point on wave switching）",
+    "desc_en": "Operation Time for Phase B. Is used for point on wave switching."
+  },
+  {
+    "name": "operTmPhsC",
+    "desc_zh": "C相的操作时间，用于定波形点介分（point on wave switching）",
+    "desc_en": "Operation Time for Phase c. Is used for point on wave switching."
+  },
+  {
+    "name": "opOk",
+    "desc_zh": "表明一个可控数据对象的操作命令已被评估和接受，详见opRcvd",
+    "desc_en": "Indication that an operate command for a controllable data object has been evaluated and accepted. For details, see opRcvd."
+  },
+  {
+    "name": "opRcvd",
+    "desc_zh": "表明接收到一个对可控数据对象的操作命令。与iopOk、tOp0k一起在LN模式为TEST-BLOCKED时用于检测的目的。 ",
+    "desc_en": "Indication that a operate command for a controllable data object has been received. Used for testing purposes together with opOk and tOpOk in particular when the LN mode is TEST-BLOCKED."
+  },
+  {
+    "name": "origin",
+    "desc_zh": "这个属性包含有关可控数据值最近一次变化的发起者信息。如果过程值变化的发起者未知，那么origin.oCat应该置为过程，而且origin.oldent应该置为NULL。取代不应影响origin的值",
+    "desc_en": "Origin contains information related to the originator of the last change of the process value of the cntrollable object. If the initiator of a change of the process value is not known, origin.orCat shall be set to process and orini.ordent shalil be set to NULL. Substitution shall not affect the value of origin."
+  },
+  {
+    "name": "originSrc",
+    "desc_zh": "包含由GOOSE信号发起的控制操作的源信息",
+    "desc_en": "originSrc contains the information related to the originator of a control action forwarded by a GOOSE message."
+  },
+  {
+    "name": "owner",
+    "desc_zh": "设备所有者",
+    "desc_en": "Owner of the device."
+  },
+  {
+    "name": "paramRev",
+    "desc_zh": "唯一定义了逻辑设备或逻辑节点实例的修订参数。",
+    "desc_en": "Uniquely identifies the parameter revision of a logical device or logical node instance. ParamRev has to be changed at least on any change of a parameter (FC=SE or FC=SP) within this logical device or logical node. How this is detected and performed is left to the user. For further details, see as well Annex C. The change of ParamRev shall be done with the following semantic: if the parameter change is done in the IED only through communication services or through the local HMI, the value shall be increased by one; if the parameter change is done in the configuration file, the value shall be increased by 10 000."
+  },
+  {
+    "name": "persistent",
+    "desc_zh": "配置控制输出。如设为FALSE，operate服务将只产生一步更高或更低（和ctlVal一同定义）的变化；如设为TRUE，operate服务将导致输出持续激活。输出的停止激活由带stop值的operate服务或由当地的超时完成。客户可通过重复发送operate服务以重新触发输出。如果persistent设置为TRUE，ctlModel应设为direct-with-normal-security",
+    "desc_en": "Configures the control output. If set to FALSE, the operate service results in the change of exactly one step higher or lower. If set to TRUE, the operate service initiates the persistent activation of the output. The output shall be deactivated by an operate service with the value stop or by a local timeout. A client may repeat sending the operate service in order to retrigger the output. If persitent is set to TRUE, ctlModel shall be set to direct-with-normal-security."
+  },
+  {
+    "name": "phsA(ACT,ACD)",
+    "desc_zh": "A相跳闸或启动事件",
+    "desc_en": "Trip or start event of phase A."
+  },
+  {
+    "name": "phsA(WYE)",
+    "desc_zh": "A相的值",
+    "desc_en": "Value of phase A. In the W YE class, values for phsA, phsB, phsC neut, net and res have been simultaneously acquired or determined. It shall be assumed that any jttr between the acquisition times dedicated for phsA, phsB, phsC neut, net and res is neglectable. The jtter for simultaneity shall be as indicated in the time quality field."
+  },
+  {
+    "name": "phsAB",
+    "desc_zh": "AB相间的测显值。在DEL类中，phsAB、phsBC、phsCA的值是同时采集或确定的。应假设phsAB、phsBC和phsCA的采集时问的任何偏差都可忽略。同时性偏差应在时间品质域中指出",
+    "desc_en": "Value of phase A to phase B measurement. In the DEL class, values for phsAB. phsBC and phsCA have been simultaneously acquired or determined. It shall be assumed that any jttr between the acquisition times dedicated for phsAB, phsBC and phsCA is neglectable. The jttter for simultaneity shall be as indicated in the time quality field."
+  },
+  {
+    "name": "phsABHar",
+    "desc_zh": "该数组应包含和AB相间有关的谐波和分谐波或谐间波值，详见har",
+    "desc_en": "This array shall contain the harmonic and subharmonics or interharmonic values related to phase A to phase B. For further details, see Har."
+  },
+  {
+    "name": "phsAHar",
+    "desc_zh": "该数组应包含和A相值有关的谐波和分谐波或谐问波值，详见har",
+    "desc_en": "This array shall contain the harmonic and subharmonics or interharmonic values related to phase A. For further details, see Har."
+  },
+  {
+    "name": "phsB(ACT,ACD)",
+    "desc_zh": "B相跳闸或启动事件",
+    "desc_en": "Trip or start event of phase B."
+  },
+  {
+    "name": "phsB(WYE)",
+    "desc_zh": "B相的值，详见phsA(WYE)",
+    "desc_en": "Value of phase B. For further details, see phsA (WYE)."
+  },
+  {
+    "name": "phsBC",
+    "desc_zh": "BC相间的测量值，详见phsAB",
+    "desc_en": "Value of phase B to phase C measurement. For further details, see phsAB."
+  },
+  {
+    "name": "phsBCHar",
+    "desc_zh": "该数组应包含和BC相间有关的谐波和次谐波或谐间波值，详见har",
+    "desc_en": "This array shall contain the harmonic and subharmonics or interharmonic values related to phase B to phase C. For further details, see Har."
+  },
+  {
+    "name": "phsBHar",
+    "desc_zh": "该数组应包含和B相值有关的谐波和次谐波或谐间波值，详见har",
+    "desc_en": "This array shall contain the harmonic and subharmonics or interharmonic values related to phase B. For further details, see Har."
+  },
+  {
+    "name": "phsC(ACT,ACD)",
+    "desc_zh": "C相跳闸或启动事件",
+    "desc_en": "Trip or start event of phase C."
+  },
+  {
+    "name": "phsC(WYE)",
+    "desc_zh": "C相的值，详见phsA(WYE)",
+    "desc_en": "Value of phase c. For further details, see phsA (WYE)."
+  },
+  {
+    "name": "phsCA",
+    "desc_zh": "CA相间的测量值，详见phsAB",
+    "desc_en": "Value of phase C to phase A measurement. For further details, see phsAB."
+  },
+  {
+    "name": "phsCAHar",
+    "desc_zh": "该数组应包含和CA相间有关的谐波和分谐波或谐间波值，详见har",
+    "desc_en": "This array shall contain the harmonic and subharmonics or interharmonic values related to phase C to phase A. For further details, see Har."
+  },
+  {
+    "name": "phsCHar",
+    "desc_zh": "该数组应包含和C值有关的谐波和分谐波或谐问波值，详见har",
+    "desc_en": "This array shall contain the harmonic and subharmonics or interharmonic values related to phase C. For further details, see Har."
+  },
+  {
+    "name": "phsRef",
+    "desc_zh": "对于相值到顺序值的转换，指明哪一相作为基准",
+    "desc_en": "Indicates which phase has been used as reference for the transformation of phase values to sequence values."
+  },
+  {
+    "name": "phsToNeut",
+    "desc_zh": "这个配置参数指明WYE类用于相位到中性值替代相位到地值。Neut数据属性一直说明中性 phsToNeut 值到地值",
+    "desc_en": "This configuration parameter indicates that the WYE class is used for phase to neutral values instead of phase to ground values. The data atrbute neut willl always indicate the neutral to ground value."
+  },
+  {
+    "name": "pointZ",
+    "desc_zh": "Z轴曲线的位置",
+    "desc_en": "Position of the curve on z-axis."
+  },
+  {
+    "name": "primeOper",
+    "desc_zh": "设备主要操作者",
+    "desc_en": "Primary operator of device."
+  },
+  {
+    "name": "pulseConfig",
+    "desc_zh": "用以配置由命令产生的输出脉冲",
+    "desc_en": "Used to configure the output pulse generated with the command if applicable."
+  },
+  {
+    "name": "pulsQty",
+    "desc_zh": "每个计数单位代表的计数值的大小",
+    "desc_en": "Magnitude of the counted value per count."
+  },
+  {
+    "name": "purpose",
+    "desc_zh": "描述参考对象的目的",
+    "desc_en": "Description of the purpose of the object reference."
+  },
+  {
+    "name": "q",
+    "desc_zh": "代表数据值的属性的品质",
+    "desc_en": "Quality of the attribute(s) representing the value of the data. For the different CDCs"
+  },
+  {
+    "name": "range",
+    "desc_zh": "InstMag、instCVal或mag的当前值范围。如当前值变化并且进入了其他范围，就将产生事件。",
+    "desc_en": "Range in which the current value of instMag or instCVal.mag is. It may be used to issue an event if the current value changes and transitions to another range."
+  },
+  {
+    "name": "rangeAng",
+    "desc_zh": "instCVal.ang当前值的范围，详见range",
+    "desc_en": "Range in which the current value of instCVal.ang is. For further details, see range."
+  },
+  {
+    "name": "rangeAngC",
+    "desc_zh": "用于rangeAng属性内容中的配置参数",
+    "desc_en": "Configuration parameters as used in the context with the rangeAng attribute."
+  },
+  {
+    "name": "rangeC",
+    "desc_zh": "用于range属性上内容中的配置参数",
+    "desc_en": "Configuration parameters as used in the context with the range attribute."
+  },
+  {
+    "name": "res",
+    "desc_zh": "剩余电流。剩余电流是流经电器设备某电路点的所有带电导线（相电流的和）电流瞬时值的代数和，详见phsA(WYE)",
+    "desc_en": "Residual current. Residual current is the algebraic sum of the instantaneous values of currents flowing through all live conductors (i.e. sum over phase currents) of a circuit at a point of the electrical installation. For further details, see phsA (WYE)."
+  },
+  {
+    "name": "resHar",
+    "desc_zh": "该数组应包含和剩余电流有关的谐波和分谐波或谐间波值，详见har",
+    "desc_en": "This array shall contain the harmonic and subharmonics or interharmonic values related to residual current. For further details, see Har."
+  },
+  {
+    "name": "rmsCyc",
+    "desc_zh": "工频的周波数，用于计算rms值",
+    "desc_en": "Number of cycles of power frequency, which are used for the calculation of rms values."
+  },
+  {
+    "name": "sboClass",
+    "desc_zh": "按照DL/T 860.72部分反映数据行为的控制模式规定的SBO类，定义了如下值：operate-once：操作请求后，控制对象将返回到非选择状态。operate-many：操作请求后，sboTimeout超时没到前，控制对象将保持在准备就绪状态",
+    "desc_en": "Specifies the sBO-class according to the control model of IEC 61850-7-2 that corresponds to the behaviour of the data."
+  },
+  {
+    "name": "sboTimeout",
+    "desc_zh": "按DL/T 860.72部分反映数据行为的控制模式规定的超时时间，以ms为单位",
+    "desc_en": "Specifies the timeout between a select and an operate command according to the control model of IEC 61850-7-2. The value shall be in ms.,,,,,"
+  },
+  {
+    "name": "secondOper",
+    "desc_zh": "设备的二次操作",
+    "desc_en": "Secondary operator of device."
+  },
+  {
+    "name": "seqT",
+    "desc_zh": "用以指定顺序值类型",
+    "desc_en": "This attribute shall specify the type of the sequence."
+  },
+  {
+    "name": "serNum",
+    "desc_zh": "序列号",
+    "desc_en": "Serial number."
+  },
+  {
+    "name": "setCal",
+    "desc_zh": "与日期一起设置时的时间值",
+    "desc_en": "The value of a time setting, if the time is set with a calendar time."
+  },
+  {
+    "name": "setCharact",
+    "desc_zh": "该属性描述曲线特性",
+    "desc_en": "This attribute shall describe the curve characteristic."
+  },
+  {
+    "name": "setMag",
+    "desc_zh": "模拟设置或设置点的值",
+    "desc_en": "The value of an analogue setting or set point."
+  },
+  {
+    "name": "setParA",
+    "desc_zh": "用以规定定值曲线公式的参数A（详见 setCharact）",
+    "desc_en": "Attribute used to set the parameter A of the setting curve (see detailed description under setCharact)."
+  },
+  {
+    "name": "setParB",
+    "desc_zh": "用以规定定值曲线公式的参数B（详见 setCharact）",
+    "desc_en": "Attribute used to set the parameter B of the setting curve (see detailed description under setCharact)."
+  },
+  {
+    "name": "setParC",
+    "desc_zh": "用以规定定值曲线公式的参数C（详见 setCharact）",
+    "desc_en": "Attribute used to set the parameter c of the setting curve (see detailed description under setCharact)."
+  },
+  {
+    "name": "setParD",
+    "desc_zh": "用以规定定值曲线公式的参数D（详见 setCharact）",
+    "desc_en": "Attribute used to set the parameter D of the setting curve (see detailed description under setCharact)."
+  },
+  {
+    "name": "setParE",
+    "desc_zh": "用以规定定值曲线公式的参数E（详见 setCharact）",
+    "desc_en": "Attribute used to set the parameter E of the setting curve (see detailed description under setCharact)."
+  },
+  {
+    "name": "setParF",
+    "desc_zh": "用以规定定值曲线公式的参数F（详见 setCharact）",
+    "desc_en": "Attribute used to set the parameter F of the setting curve (see detailed description under setCharact)."
+  },
+  {
+    "name": "setSrcCB",
+    "desc_zh": "控制模块的对象参考值指明参考用 setSrcRef接收的对象",
+    "desc_en": "The value of the object reference to the control block indicating from where the object referred to with setSrcRef shall be received."
+  },
+  {
+    "name": "setSrcRef",
+    "desc_zh": "对象参考定值属性用于参考逻辑结点实例或数据对象实例",
+    "desc_en": "The value of the object reference setting. The attribute may be used to reference e.g. a logical node instance or a data object instance."
+  },
+  {
+    "name": "setTm",
+    "desc_zh": "若时间是时间戳的集介，时间设置值",
+    "desc_en": "The value of a time setting, if the time is set with a time stamp."
+  },
+  {
+    "name": "setTstCB",
+    "desc_zh": "控制模块的对象参考值指明用setTstRef接收的对象，详见tstEna",
+    "desc_en": "The value of the object reference to the control block indicating from where the object referred to with setTstRef shall be received. For details, see tstEna."
+  },
+  {
+    "name": "setTstRef",
+    "desc_zh": "当tstEna在测试中为True时，对象参考设置值作为用setSrcRef的对象定值使用的参考值，详见tstEna",
+    "desc_en": "The value of the object reference setting used when tstEna is true for testing purpose as an alternate reference to the reference set with setSrcRef. For details, see tstEna."
+  },
+  {
+    "name": "setVal",
+    "desc_zh": "状态定值的值",
+    "desc_en": "The value of a status setting."
+  },
+  {
+    "name": "sev",
+    "desc_zh": "最近检出的违例的严重性。其值为：unknown：不能确定严重性。critical：在安全操作或名数据被认为是危急的，以及试图进行特权访问等时刻，严重性是危急的。major：在安全操作或者数据被认为是非常重要的，以及试图进行特权访问等时刻，严重性足非常的。minor：在被认为是特权数据的访问控制受到拒绝的意义上的严重性是次要的。warming：比minor还轻",
+    "desc_en": "Severity of the last violation detected."
+  },
+  {
+    "name": "smpRate(HMV,HWYE,HDEL)",
+    "desc_zh": "根据采样原理，smpRate属性决定了可检出的最高次谐波和谐间波。其最小值是2xfrequency。该值表示每个额定周期的采样次数。在直流系统中，该值代表每秒采样次数",
+    "desc_en": "Determines acording to the sampling theorem the highest possible harmonic or interharmonic detectable. The minimum is 2 x frequency. The value shall represent the number of samples per nominal period. In the case of ad.c. system, the value shall represent the number of samples per s."
+  },
+  {
+    "name": "smpRate(MV,CMV,WYE,DEL)",
+    "desc_zh": "采样速率用以决定模拟量值的采样速率。该值表示每个额定周期的采样次数。在直流系统中，该值代表每秒采样次数",
+    "desc_en": "Sampling rate that has been used to determine the analogue values. The value shall represent the number of samples per nominal period. In the case of a d.c. system, the value shall' represent the number of samples per s."
+  },
+  {
+    "name": "stepSize",
+    "desc_zh": "定义ctlVal(INC,BSC,ISC)、setVal(ING)或setMag(APC,ASG)接受的两个值之间的步的大小",
+    "desc_en": "Defines the step between individual values that ctIVal (CDC INC, APC, BAC), setVal (CDC ING) or setMag (CDC ASG) will accept."
+  },
+  {
+    "name": "strTm",
+    "desc_zh": "冻结过程的启动时间。如当前时间比启动时间晚，第1次冻结发生在从启动时间设定算起的下一个冻结问隔（frPd）期满",
+    "desc_en": "Starting time of the freeze process. If the current time is later than the start time, the first freeze shall occur at the next freeze interval (frPd) expiration, computed from the start time setting."
+  },
+  {
+    "name": "stSeld",
+    "desc_zh": "可控数据在“已选择”状态",
+    "desc_en": "The controllable data is in the status \"selected\"."
+  },
+  {
+    "name": "stVal",
+    "desc_zh": "数据的状态值",
+    "desc_en": "Status value of the data."
+  },
+  {
+    "name": "subCVal",
+    "desc_zh": "用于取代数据属性instCVal的值",
+    "desc_en": "Value used to substitute the data attribute instCVal."
+  },
+  {
+    "name": "subEna",
+    "desc_zh": "用于取代的使能。如该属性设为TRUE，代表数据实例的值的数据属性将一直被设为存储数据实例取代值的数据属性的同样的值，如该属性设为FALSE，代表数据实例的值的数据属性将基于过程值。",
+    "desc_en": "Used to enable substitution. If this attribute is set to true, the attribute(s) representing the value of the data instance shall always be set to the same value as the atribute(s) used to store the substitution value of the data."
+  },
+  {
+    "name": "subID",
+    "desc_zh": "实现取代的设备地址。如subEna为FALSE或设备未知，此值为NULL",
+    "desc_en": "Shows the address of the device that made the substitution. The value of null shall be used if subEna is false or if the device is not known."
+  },
+  {
+    "name": "subMag",
+    "desc_zh": "用于取代数据属性instMag的值",
+    "desc_en": "Value used to substitute the data attribute instMag."
+  },
+  {
+    "name": "subQ",
+    "desc_zh": "用于取代数据属性q的值",
+    "desc_en": "Value used to substitute the data attribute q."
+  },
+  {
+    "name": "subVal",
+    "desc_zh": "用于取代代表数据实例值的属性",
+    "desc_en": "Value used to substitute the attribute representing the value of the data instance."
+  },
+  {
+    "name": "sVC",
+    "desc_zh": "换算值配置",
+    "desc_en": "Scaled value configuration. Shall be used to configure the scaled value representation. "
+  },
+  {
+    "name": "swRev",
+    "desc_zh": "软件版本号",
+    "desc_en": "SW-revision"
+  },
+  {
+    "name": "t",
+    "desc_zh": "最后一次数据或q属性值更改的时间戳",
+    "desc_en": "Timestamp of the last change in one of the attribute(s) representing the value of the data or in the q attribute."
+  },
+  {
+    "name": "tOpOk",
+    "desc_zh": "时间戳，使用控制命令激活可控对象输出，详见opRcvd",
+    "desc_en": "The time stamp with the time, when an output of a controllable object is activated following a control command. For details, see opRcvd"
+  },
+  {
+    "name": "tstEna",
+    "desc_zh": "在原先数据源的交换作为参考（用setSrcRef和setSrcCB定义）和测试数据源（用setTstRef和setTstCB）",
+    "desc_en": "Switch between original data source (as defined with setSrcRef and setSrcCB)for a referenc and test data source (as defined with setTstRef and setTstCB)."
+  },
+  {
+    "name": "units",
+    "desc_zh": "代表数据值属性的单位",
+    "desc_en": "Units of the attribute(s) representing the value of the data."
+  },
+  {
+    "name": "valRev",
+    "desc_zh": "通过SCL文件唯一地定义了逻辑设备或逻辑节点实例预配置的配置值（FC=CF）的修订版本。",
+    "desc_en": "Uniquely identifies the revision of the preconfiguration of configuration values (FC= CF) in a logical device or logical node instance through a SCL file. ValRev has to be changed at least on any change of preconfigured values within an SCL file for this logical device or logical node. How this is detected and performed is left to the user. For further details, see as weli Annex C."
+  },
+  {
+    "name": "valWTr",
+    "desc_zh": "带瞬变指示的值",
+    "desc_en": "Value with transient indication."
+  },
+  {
+    "name": "vendor",
+    "desc_zh": "供货方的名称",
+    "desc_en": "Name of the vendor."
+  },
+  {
+    "name": "xD",
+    "desc_zh": "曲线x轴分量值的描述",
+    "desc_en": "Description of the value of the x-axis of a curve."
+  },
+  {
+    "name": "xDU",
+    "desc_zh": "UNICODE表示的曲线x轴分量值的描述",
+    "desc_en": "Description of the value of the x-axis of a curve in UNICODE."
+  },
+  {
+    "name": "xUnits",
+    "desc_zh": "曲线x轴的单位",
+    "desc_en": "Unit of the x-axis of a curve."
+  },
+  {
+    "name": "yD",
+    "desc_zh": "曲线y轴分量值的描述",
+    "desc_en": "Description of the value of the y-axis of a curve."
+  },
+  {
+    "name": "yDU",
+    "desc_zh": "UNICODE表示的曲线y轴分量值的描述",
+    "desc_en": "Description of the value of the x-axis of a curve in UNICODE."
+  },
+  {
+    "name": "yUnits",
+    "desc_zh": "曲线x轴的单位",
+    "desc_en": "Unit of the y-axis of a curve."
+  },
+  {
+    "name": "zD",
+    "desc_zh": "曲线z轴分量值的描述",
+    "desc_en": "Description of the value of the z-axis of a curve."
+  },
+  {
+    "name": "zDU",
+    "desc_zh": "UNICODE表示的曲线z轴分量值的描述",
+    "desc_en": "Description of the value of the x-axis of a curve in UNICODE."
+  },
+  {
+    "name": "zeroDb",
+    "desc_zh": "用以计算零值附近范围的配置参数，使模拟量值强迫归零。该值应表示为max和min差值的百分比，单位是0.001%。",
+    "desc_en": "Configuration parameter used to calculate the range around zero, where the analogue value will be forced to zero."
+  },
+  {
+    "name": "zUnits",
+    "desc_zh": "曲线z轴的单位",
+    "desc_en": "Unit of the z-axis of a curve."
+  }
+]

@@ -1,0 +1,61 @@
+# ==============================================================================
+# Git Ignore Configuration for Industrial Protocol Simulation Suite
+# (IEC 104 Server & Client / Modbus Slave & Master / IEC 61850 Server & Client)
+# ==============================================================================
+
+# Operating System & Temporary Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.swp
+*.swo
+*~
+*.bak
+*.tmp
+*.log
+*.pid
+
+# IDE & Editor Configurations
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Flutter & Dart Build Output (Recursive for all subprojects)
+**/.dart_tool/
+**/build/
+**/.pub-cache/
+**/.pub/
+**/.packages
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/coverage/
+**/doc/api/
+**/.widget_preview/
+
+# Native Desktop Ephemeral & Generated Files
+**/linux/flutter/ephemeral/
+**/windows/flutter/ephemeral/
+**/macos/Flutter/ephemeral/
+**/ios/Flutter/ephemeral/
+
+# App Symbols & Maps
+*.symbols
+*.map.json
+
+# Local Runtime Workspace / User Data (e.g., local storage tests)
+**/.local/
+**/workspace.json
+**/workspace_storage/
+
+# Crash dumps & core dumps
+core
+core.*
+vgcore.*

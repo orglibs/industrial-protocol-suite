@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--SCL Schema Version 3.1 (2012/10/22)-->
+<SCL version="2007" revision="B" xmlns="http://www.iec.ch/61850/2003/SCL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.iec.ch/61850/2003/SCL SCL.xsd">
+	<Header id="" version="" revision="" toolID="Redisant SCL Parser Engine" nameStructure="IEDName" />
+	<Communication>
+		<SubNetwork name="NONE" type="8-MMS">
+			<ConnectedAP iedName="DEMO" apName="P1">
+				<Address>
+					<P type="IP" xsi:type="tP_IP">127.0.0.1</P>
+					<P type="OSI-TSEL" xsi:type="tP_OSI-TSEL">0001</P>
+					<P type="OSI-SSEL" xsi:type="tP_OSI-SSEL">0001</P>
+					<P type="OSI-PSEL" xsi:type="tP_OSI-PSEL">00000001</P>
+					<P type="OSI-AP-Title">1,1,1,999,1</P>
+					<P type="OSI-AP-Invoke" xsi:type="tP_OSI-AP-Invoke">0</P>
+					<P type="OSI-AE-Qualifier" xsi:type="tP_OSI-AE-Qualifier">12</P>
+					<P type="OSI-AE-Invoke" xsi:type="tP_OSI-AE-Invoke">0</P>
+					<P type="MMS-Port" xsi:type="tP_MMS-Port">102</P>
+				</Address>
+			</ConnectedAP>
+		</SubNetwork>
+	</Communication>
+	<IED name="DEMO">
+		<Services>
+			<DynAssociation />
+			<GetDirectory />
+			<GetDataObjectDefinition />
+			<DataObjectDirectory />
+			<GetDataSetValue />
+			<SetDataSetValue />
+			<DataSetDirectory />
+			<ConfDataSet max="0" modify="false" />
+			<DynDataSet max="42" />
+			<ReadWrite />
+			<SettingGroups>
+				<SGEdit />
+				<ConfSG />
+			</SettingGroups>
+			<TimerActivatedControl />
+			<ConfReportControl max="0" bufConf="false" />
+			<GetCBValues />
+			<ReportSettings rptID="Dyn" optFields="Dyn" bufTime="Dyn" trgOps="Dyn" intgPd="Dyn" />
+			<ConfLNs fixPrefix="true" fixLnInst="true" />
+			<GOOSE max="0" />
+			<GSSE max="0" />
+			<FileHandling />
+		</Services>
+		<AccessPoint name="P1">
+			<Server>
+				<Authentication none="true" />
+				<LDevice inst="PROT">
+					<LN0 lnType="DEMOPROT.LLN0" lnClass="LLN0" inst="">
+						<DOI name="Mod">
+							<DAI name="ctlModel">
+								<Val>status-only</Val>
+							</DAI>
+						</DOI>
+						<DOI name="NamPlt">
+							<DAI name="vendor">
+								<Val>MZ Automation</Val>
+							</DAI>
+							<DAI name="swRev">
+								<Val>1.0</Val>
+							</DAI>
+							<DAI name="d">
+								<Val>Setting group demo</Val>
+							</DAI>
+							<DAI name="configRev">
+								<Val>1</Val>
+							</DAI>
+							<DAI name="ldNs">
+								<Val>IEC 61850-7-4:2007</Val>
+							</DAI>
+						</DOI>
+						<SettingControl numOfSGs="5" actSG="1" />
+					</LN0>
+					<LN lnType="DEMOPROT.LPHD1" lnClass="LPHD" inst="1">
+						<DOI name="PhyNam">
+							<DAI name="vendor">
+								<Val>MZ Automation</Val>
+							</DAI>
+							<DAI name="hwRev">
+								<Val></Val>
+							</DAI>
+							<DAI name="swRev">
+								<Val></Val>
+							</DAI>
+							<DAI name="serNum">
+								<Val></Val>
+							</DAI>
+							<DAI name="model">
+								<Val></Val>
+							</DAI>
+							<DAI name="location">
+								<Val></Val>
+							</DAI>
+						</DOI>
+					</LN>
+					<LN lnType="DEMOPROT.PTOC1" lnClass="PTOC" inst="1">
+						<DOI name="Mod">
+							<DAI name="ctlModel">
+								<Val>status-only</Val>
+							</DAI>
+						</DOI>
+						<DOI name="StrVal">
+							<SDI name="setMag">
+								<DAI name="f" />
+							</SDI>
+						</DOI>
+						<DOI name="OpDlTmms">
+							<DAI name="setVal" />
+						</DOI>
+						<DOI name="RsDlTmms">
+							<DAI name="setVal" />
+						</DOI>
+						<DOI name="RstTms">
+							<DAI name="setVal" />
+						</DOI>
+					</LN>
+				</LDevice>
+			</Server>
+		</AccessPoint>
+	</IED>
+	<DataTypeTemplates>
+		<LNodeType id="DEMOPROT.LLN0" lnClass="LLN0">
+			<DO name="Mod" type="DEMOPROT.LLN0.Mod" />
+			<DO name="Beh" type="DEMOPROT.LLN0.Beh" />
+			<DO name="Health" type="DEMOPROT.LLN0.Health" />
+			<DO name="NamPlt" type="DEMOPROT.LLN0.NamPlt" />
+		</LNodeType>
+		<LNodeType id="DEMOPROT.LPHD1" lnClass="LPHD">
+			<DO name="PhyHealth" type="DEMOPROT.LLN0.Health" />
+			<DO name="Proxy" type="DEMOPROT.LPHD1.Proxy" />
+			<DO name="PhyNam" type="DEMOPROT.LPHD1.PhyNam" />
+		</LNodeType>
+		<LNodeType id="DEMOPROT.PTOC1" lnClass="PTOC">
+			<DO name="Beh" type="DEMOPROT.LLN0.Beh" />
+			<DO name="Mod" type="DEMOPROT.LLN0.Mod" />
+			<DO name="Str" type="DEMOPROT.PTOC1.Str" />
+			<DO name="Op" type="DEMOPROT.PTOC1.Op" />
+			<DO name="StrVal" type="DEMOPROT.PTOC1.StrVal" />
+			<DO name="OpDlTmms" type="DEMOPROT.PTOC1.OpDlTmms" />
+			<DO name="RsDlTmms" type="DEMOPROT.PTOC1.OpDlTmms" />
+			<DO name="RstTms" type="DEMOPROT.PTOC1.OpDlTmms" />
+		</LNodeType>
+		<DOType id="DEMOPROT.PTOC1.Str" cdc="ACD">
+			<DA name="general" fc="ST" bType="BOOLEAN" />
+			<DA name="dirGeneral" fc="ST" bType="Enum" type="FaultDirectionKind" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+		</DOType>
+		<DOType id="DEMOPROT.PTOC1.Op" cdc="ACT">
+			<DA name="general" fc="ST" bType="BOOLEAN" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+		</DOType>
+		<DOType id="DEMOPROT.PTOC1.StrVal" cdc="ASG">
+			<DA name="setMag" fc="SE" bType="Struct" type="DEMOPROT.PTOC1.StrVal.setMag" />
+		</DOType>
+		<DOType id="DEMOPROT.LPHD1.PhyNam" cdc="DPL">
+			<DA name="vendor" fc="DC" bType="VisString255" />
+			<DA name="hwRev" fc="DC" bType="VisString255" />
+			<DA name="swRev" fc="DC" bType="VisString255" />
+			<DA name="serNum" fc="DC" bType="VisString255" />
+			<DA name="model" fc="DC" bType="VisString255" />
+			<DA name="location" fc="DC" bType="VisString255" />
+		</DOType>
+		<DOType id="DEMOPROT.LLN0.Mod" cdc="ENC">
+			<DA name="stVal" fc="ST" bType="Enum" type="Mod" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+			<DA name="Oper" fc="CO" bType="Struct" type="DEMOPROT.LLN0.Mod.Oper" />
+			<DA name="ctlModel" fc="CF" bType="Enum" type="CtlModelKind" />
+		</DOType>
+		<DOType id="DEMOPROT.LLN0.Beh" cdc="ENS">
+			<DA name="stVal" fc="ST" bType="Enum" type="Beh" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+		</DOType>
+		<DOType id="DEMOPROT.LLN0.Health" cdc="ENS">
+			<DA name="stVal" fc="ST" bType="Enum" type="Health" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+		</DOType>
+		<DOType id="DEMOPROT.PTOC1.OpDlTmms" cdc="ING">
+			<DA name="setVal" fc="SE" bType="INT32" />
+		</DOType>
+		<DOType id="DEMOPROT.LLN0.NamPlt" cdc="LPL">
+			<DA name="vendor" fc="DC" bType="VisString255" />
+			<DA name="swRev" fc="DC" bType="VisString255" />
+			<DA name="d" fc="DC" bType="VisString255" />
+			<DA name="configRev" fc="DC" bType="VisString255" />
+			<DA name="ldNs" fc="EX" bType="VisString255" />
+		</DOType>
+		<DOType id="DEMOPROT.LPHD1.Proxy" cdc="SPS">
+			<DA name="stVal" fc="ST" bType="BOOLEAN" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+		</DOType>
+		<DAType id="DEMOPROT.LLN0.Mod.Oper.origin">
+			<BDA name="orCat" bType="Enum" type="OriginatorCategoryKind" />
+			<BDA name="orIdent" bType="Octet64" />
+		</DAType>
+		<DAType id="DEMOPROT.PTOC1.StrVal.setMag">
+			<BDA name="f" bType="FLOAT32" />
+		</DAType>
+		<DAType id="DEMOPROT.LLN0.Mod.Oper">
+			<BDA name="ctlVal" bType="Enum" type="Mod" />
+			<BDA name="operTm" bType="Timestamp" />
+			<BDA name="origin" bType="Struct" type="DEMOPROT.LLN0.Mod.Oper.origin" />
+			<BDA name="ctlNum" bType="INT8U" />
+			<BDA name="T" bType="Timestamp" />
+			<BDA name="Test" bType="BOOLEAN" />
+			<BDA name="Check" bType="Check" />
+		</DAType>
+		<EnumType id="FaultDirectionKind">
+			<!--Source: IEC 61850-7-3:2007A-->
+			<EnumVal ord="0">unknown</EnumVal>
+			<EnumVal ord="1">forward</EnumVal>
+			<EnumVal ord="2">backward</EnumVal>
+			<EnumVal ord="3">both</EnumVal>
+		</EnumType>
+		<EnumType id="CtlModelKind">
+			<!--Source: IEC 61850-7-3:2007A-->
+			<EnumVal ord="0">status-only</EnumVal>
+			<EnumVal ord="1">direct-with-normal-security</EnumVal>
+			<EnumVal ord="2">sbo-with-normal-security</EnumVal>
+			<EnumVal ord="3">direct-with-enhanced-security</EnumVal>
+			<EnumVal ord="4">sbo-with-enhanced-security</EnumVal>
+		</EnumType>
+		<EnumType id="OriginatorCategoryKind">
+			<!--Source: IEC 61850-7-3:2007A-->
+			<EnumVal ord="0">not-supported</EnumVal>
+			<EnumVal ord="1">bay-control</EnumVal>
+			<EnumVal ord="2">station-control</EnumVal>
+			<EnumVal ord="3">remote-control</EnumVal>
+			<EnumVal ord="4">automatic-bay</EnumVal>
+			<EnumVal ord="5">automatic-station</EnumVal>
+			<EnumVal ord="6">automatic-remote</EnumVal>
+			<EnumVal ord="7">maintenance</EnumVal>
+			<EnumVal ord="8">process</EnumVal>
+		</EnumType>
+		<EnumType id="Beh">
+			<!--Source: IEC 61850-7-4:2007A-->
+			<EnumVal ord="1">on</EnumVal>
+			<EnumVal ord="2">on-blocked</EnumVal>
+			<EnumVal ord="3">test</EnumVal>
+			<EnumVal ord="4">test/blocked</EnumVal>
+			<EnumVal ord="5">off</EnumVal>
+		</EnumType>
+		<EnumType id="Health">
+			<!--Source: IEC 61850-7-4:2007A-->
+			<EnumVal ord="1">Ok</EnumVal>
+			<EnumVal ord="2">Warning</EnumVal>
+			<EnumVal ord="3">Alarm</EnumVal>
+		</EnumType>
+		<EnumType id="Mod">
+			<!--Source: IEC 61850-7-4:2007A-->
+			<EnumVal ord="1">on</EnumVal>
+			<EnumVal ord="2">on-blocked</EnumVal>
+			<EnumVal ord="3">test</EnumVal>
+			<EnumVal ord="4">test/blocked</EnumVal>
+			<EnumVal ord="5">off</EnumVal>
+		</EnumType>
+	</DataTypeTemplates>
+</SCL>

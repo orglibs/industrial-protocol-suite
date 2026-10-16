@@ -1,0 +1,328 @@
+name: Build and Release Desktop Apps
+
+on:
+  push:
+    tags:
+      - 'v*'
+      - '[0-9]+.[0-9]+.[0-9]+*'
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release Tag (e.g. v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  # ============================================================================
+  # 1. Build Windows Desktop Apps (Inno Setup Installer .exe & Portable .zip)
+  # ============================================================================
+  build-windows:
+    name: Build Windows (x64)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Enable Windows Desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Determine Version
+        id: version
+        shell: bash
+        run: |
+          RAW_TAG="${{ github.event.inputs.release_tag || github.ref_name }}"
+          TAG="${RAW_TAG#v}"
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "raw_tag=${RAW_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Build All 6 Windows Desktop Applications
+        shell: pwsh
+        run: |
+          $projects = @('iec104_server', 'iec104_client', 'iec61850_server', 'iec61850_client', 'modbus_slave', 'modbus_master')
+          foreach ($p in $projects) {
+            Write-Host "================== Building Windows: $p =================="
+            Push-Location $p
+            flutter pub get
+            flutter build windows --release --no-tree-shake-icons
+            Pop-Location
+          }
+
+      - name: Package Windows Installers & Archives
+        shell: pwsh
+        run: |
+          .github/scripts/package-windows.ps1 -Version "${{ steps.version.outputs.tag }}" -OutputDir "dist-windows"
+
+      - name: Upload Windows Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-artifacts
+          path: dist-windows/*
+          if-no-files-found: error
+          retention-days: 1
+
+  # ============================================================================
+  # 2. Build macOS Desktop Apps (.dmg Drag-to-Install Images)
+  # ============================================================================
+  build-macos:
+    name: Build macOS (.dmg)
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Enable macOS Desktop
+        run: flutter config --enable-macos-desktop
+
+      - name: Determine Version
+        id: version
+        shell: bash
+        run: |
+          RAW_TAG="${{ github.event.inputs.release_tag || github.ref_name }}"
+          TAG="${RAW_TAG#v}"
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "raw_tag=${RAW_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Build All 6 macOS Desktop Applications
+        shell: bash
+        run: |
+          projects=("iec104_server" "iec104_client" "iec61850_server" "iec61850_client" "modbus_slave" "modbus_master")
+          for p in "${projects[@]}"; do
+            echo "================== Building macOS: $p =================="
+            (cd "$p" && flutter pub get && flutter build macos --release --no-tree-shake-icons)
+          done
+
+      - name: Package macOS DMGs
+        shell: bash
+        run: |
+          OUTPUT_DIR="dist-macos" .github/scripts/package-macos.sh "${{ steps.version.outputs.tag }}"
+
+      - name: Upload macOS Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-artifacts
+          path: dist-macos/*
+          if-no-files-found: error
+          retention-days: 1
+
+  # ============================================================================
+  # 3. Build Linux x64 Desktop Apps (.deb Installer & Portable .tar.gz)
+  # ============================================================================
+  build-linux-x64:
+    name: Build Linux (x64)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Linux Build Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Enable Linux Desktop
+        run: flutter config --enable-linux-desktop
+
+      - name: Determine Version
+        id: version
+        shell: bash
+        run: |
+          RAW_TAG="${{ github.event.inputs.release_tag || github.ref_name }}"
+          TAG="${RAW_TAG#v}"
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "raw_tag=${RAW_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Build All 6 Linux Desktop Applications
+        shell: bash
+        run: |
+          projects=("iec104_server" "iec104_client" "iec61850_server" "iec61850_client" "modbus_slave" "modbus_master")
+          for p in "${projects[@]}"; do
+            echo "================== Building Linux: $p =================="
+            (cd "$p" && flutter pub get && flutter build linux --release --no-tree-shake-icons)
+          done
+
+      - name: Package Linux .deb and .tar.gz
+        shell: bash
+        run: |
+          OUTPUT_DIR="dist-linux-x64" .github/scripts/package-linux.sh "${{ steps.version.outputs.tag }}"
+
+      - name: Upload Linux x64 Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-x64-artifacts
+          path: dist-linux-x64/*
+          if-no-files-found: error
+          retention-days: 1
+
+  # ============================================================================
+  # 4. Build Linux ARM64 Desktop Apps (Multi-Arch .deb & .tar.gz)
+  # ============================================================================
+  build-linux-arm64:
+    name: Build Linux (ARM64)
+    runs-on: ubuntu-24.04-arm
+    continue-on-error: true # Safe fallback if repository is private without larger ARM runners enabled
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Linux Build Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev git curl
+
+      - name: Setup Flutter via Git (Native ARM64 Bootstrap)
+        run: |
+          git clone https://github.com/flutter/flutter.git -b stable --depth 1 $HOME/flutter
+          echo "$HOME/flutter/bin" >> $GITHUB_PATH
+
+      - name: Enable Linux Desktop & Pre-cache
+        run: |
+          flutter config --enable-linux-desktop
+          flutter precache --linux
+
+      - name: Determine Version
+        id: version
+        shell: bash
+        run: |
+          RAW_TAG="${{ github.event.inputs.release_tag || github.ref_name }}"
+          TAG="${RAW_TAG#v}"
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "raw_tag=${RAW_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Build All 6 Linux ARM64 Applications
+        shell: bash
+        run: |
+          projects=("iec104_server" "iec104_client" "iec61850_server" "iec61850_client" "modbus_slave" "modbus_master")
+          for p in "${projects[@]}"; do
+            echo "================== Building Linux ARM64: $p =================="
+            (cd "$p" && flutter pub get && flutter build linux --release --no-tree-shake-icons)
+          done
+
+      - name: Package Linux ARM64 .deb and .tar.gz
+        shell: bash
+        run: |
+          OUTPUT_DIR="dist-linux-arm64" .github/scripts/package-linux.sh "${{ steps.version.outputs.tag }}"
+
+      - name: Upload Linux ARM64 Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-arm64-artifacts
+          path: dist-linux-arm64/*
+          if-no-files-found: error
+          retention-days: 1
+
+  # ============================================================================
+  # 5. Publish to GitHub Releases (Collect all artifacts & generate Release)
+  # ============================================================================
+  publish-release:
+    name: Create GitHub Release
+    needs: [build-windows, build-macos, build-linux-x64, build-linux-arm64]
+    runs-on: ubuntu-latest
+    if: always() && !cancelled() && (needs.build-windows.result == 'success' || needs.build-macos.result == 'success' || needs.build-linux-x64.result == 'success')
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Determine Release Tag
+        id: rel_info
+        shell: bash
+        run: |
+          RAW_TAG="${{ github.event.inputs.release_tag || github.ref_name }}"
+          TAG="${RAW_TAG#v}"
+          if [[ "$RAW_TAG" != v* ]]; then
+            RELEASE_TAG="v${TAG}"
+          else
+            RELEASE_TAG="${RAW_TAG}"
+          fi
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "release_tag=${RELEASE_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: '*-artifacts'
+          path: dist
+          merge-multiple: true
+
+      - name: Generate Checksums & Release Notes
+        shell: bash
+        run: |
+          cd dist
+          sha256sum * > SHA256SUMS.txt || true
+          ls -lh
+          cd ..
+
+          cat << 'EOF' > release_body.md
+          ## 📦 工业电力自动化协议仿真系统套件发布 (${{ steps.rel_info.outputs.release_tag }})
+
+          基于 Flutter & Dart 打造的跨平台现代化工业规约仿真桌面应用。包含 IEC 104、IEC 61850、Modbus 三大体系全功能服务端与客户端。
+
+          ### 🚀 下载与安装指南
+
+          #### 🪟 Windows (x64)
+          * **安装程序向导**：下载对应工程的 `*-setup.exe`，双击即可完成标准安装向导（自动创建桌面快捷方式、开始菜单及卸载项）。
+          * **免安装绿色版**：下载对应工程的 `*-windows-x64.zip` 解压直接运行。
+
+          #### 🍎 macOS (Apple Silicon & Intel)
+          * 下载对应工程的 `*-macos.dmg` 文件，双击打开并将应用程序拖入 `Applications` 目录即可完成安装。
+
+          #### 🐧 Linux (x64 / amd64 & ARM64 / aarch64)
+          * **Debian / Ubuntu / 统信UOS / 银河麒麟**：下载对应架构的 `*.deb` 安装包，双击通过应用商店安装，或在终端执行：
+            ```bash
+            sudo apt install ./<package_name>_<version>_linux_<arch>.deb
+            ```
+            安装完成后在系统应用程序菜单中直接启动。
+          * **通用 Linux 发行版**：下载对应架构的 `*.tar.gz` 绿色压缩包解压直接运行 `bundle/<app_name>`。
+
+          ---
+
+          ### 📋 产物对应表 (Artifacts)
+
+          | 子系统名称 | 规约角色 | Windows 安装向导 / 绿色包 | macOS 镜像 (.dmg) | Linux DEB 安装包 (x64 / ARM64) |
+          | :--- | :--- | :--- | :--- | :--- |
+          | **IEC 104 服务端** | 从站 / RTU | `iec104_server-*-setup.exe` / `.zip` | `iec104_server-*-macos.dmg` | `iec104_server_*_amd64.deb` / `arm64.deb` |
+          | **IEC 104 客户端** | 主站 / Master | `iec104_client-*-setup.exe` / `.zip` | `iec104_client-*-macos.dmg` | `iec104_client_*_amd64.deb` / `arm64.deb` |
+          | **IEC 61850 服务端** | MMS & GOOSE 从站 | `iec61850_server-*-setup.exe` / `.zip` | `iec61850_server-*-macos.dmg` | `iec61850_server_*_amd64.deb` / `arm64.deb` |
+          | **IEC 61850 客户端** | MMS & GOOSE 主站 | `iec61850_client-*-setup.exe` / `.zip` | `iec61850_client-*-macos.dmg` | `iec61850_client_*_amd64.deb` / `arm64.deb` |
+          | **Modbus 从站** | RTU / TCP / UDP 从站 | `modbus_slave-*-setup.exe` / `.zip` | `modbus_slave-*-macos.dmg` | `modbus_slave_*_amd64.deb` / `arm64.deb` |
+          | **Modbus 主站** | RTU / TCP / UDP 主站 | `modbus_master-*-setup.exe` / `.zip` | `modbus_master-*-macos.dmg` | `modbus_master_*_amd64.deb` / `arm64.deb` |
+
+          所有发布文件的 SHA-256 完整性校验值见附件 `SHA256SUMS.txt`。
+          EOF
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.rel_info.outputs.release_tag }}
+          name: "Release ${{ steps.rel_info.outputs.release_tag }}"
+          body_path: release_body.md
+          draft: false
+          prerelease: ${{ github.event.inputs.prerelease == 'true' }}
+          files: dist/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

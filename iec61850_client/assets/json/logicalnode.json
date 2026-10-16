@@ -1,0 +1,797 @@
+[
+  {
+    "name": "ANCR",
+    "desc_zh": "中性点电流调节",
+    "desc_en": "Neural current regulator"
+  },
+  {
+    "name": "ARCO",
+    "desc_zh": "无功控制",
+    "desc_en": "Reactive power control"
+  },
+  {
+    "name": "ARIS",
+    "desc_zh": "电阻控制",
+    "desc_en": "Resistor control"
+  },
+  {
+    "name": "ATCC",
+    "desc_zh": "自动调分接开关控制",
+    "desc_en": "Automatic tap changer controller"
+  },
+  {
+    "name": "AVCO",
+    "desc_zh": "电压控制",
+    "desc_en": "Voltage control"
+  },
+  {
+    "name": "CALH",
+    "desc_zh": "告警处理",
+    "desc_en": "Alarm handling"
+  },
+  {
+    "name": "CCGR",
+    "desc_zh": "冷却组控制",
+    "desc_en": "Colling group control"
+  },
+  {
+    "name": "CILO",
+    "desc_zh": "联锁",
+    "desc_en": "Interlocking"
+  },
+  {
+    "name": "CommonLN",
+    "desc_zh": "公共逻辑节点",
+    "desc_en": "Common Logic Node"
+  },
+  {
+    "name": "CPOW",
+    "desc_zh": "定点分合",
+    "desc_en": "Point-on-wave switching"
+  },
+  {
+    "name": "CSWI",
+    "desc_zh": "开关控制器",
+    "desc_en": "Switch controller"
+  },
+  {
+    "name": "CSYN",
+    "desc_zh": "同期控制器",
+    "desc_en": "Synchronizer controller"
+  },
+  {
+    "name": "FCNT",
+    "desc_zh": "计数器",
+    "desc_en": "Counter"
+  },
+  {
+    "name": "FCSD",
+    "desc_zh": "曲线形式描述",
+    "desc_en": "Curve shape description"
+  },
+  {
+    "name": "FFIL",
+    "desc_zh": "通用滤波",
+    "desc_en": "Generic filter"
+  },
+  {
+    "name": "FLIM",
+    "desc_zh": "控制功能输出限制",
+    "desc_en": "Control function output limitation"
+  },
+  {
+    "name": "FPID",
+    "desc_zh": "PID调节器",
+    "desc_en": "PID regulator"
+  },
+  {
+    "name": "FRMP",
+    "desc_zh": "爬坡功能",
+    "desc_en": "Ramp function"
+  },
+  {
+    "name": "FSPT",
+    "desc_zh": "设定点控制功能",
+    "desc_en": "Set-point control function"
+  },
+  {
+    "name": "FXOT",
+    "desc_zh": "越上限门槛动作",
+    "desc_en": "Action at over threshold"
+  },
+  {
+    "name": "FXUT",
+    "desc_zh": "越下限门槛动作",
+    "desc_en": "Action at under threshold"
+  },
+  {
+    "name": "GAPC",
+    "desc_zh": "通用自动过程控制",
+    "desc_en": "Generic automatic process control"
+  },
+  {
+    "name": "GGIO",
+    "desc_zh": "通用过程I/O",
+    "desc_en": "Generic process I/O"
+  },
+  {
+    "name": "GLOG",
+    "desc_zh": "通用日志",
+    "desc_en": "Generic log"
+  },
+  {
+    "name": "GSAL",
+    "desc_zh": "通用安全应用",
+    "desc_en": "Generic security application"
+  },
+  {
+    "name": "IARC",
+    "desc_zh": "存档",
+    "desc_en": "Archiving"
+  },
+  {
+    "name": "IHMI",
+    "desc_zh": "人机接口",
+    "desc_en": "Human machine interface"
+  },
+  {
+    "name": "ISAF",
+    "desc_zh": "安全告警功能",
+    "desc_en": "Safety alarm function"
+  },
+  {
+    "name": "ITCI",
+    "desc_zh": "远方控制接口",
+    "desc_en": "Telecontrol interface"
+  },
+  {
+    "name": "ITMI",
+    "desc_zh": "远方监视接口",
+    "desc_en": "Telemonitoring interface"
+  },
+  {
+    "name": "ITPC",
+    "desc_zh": "远方保护接口",
+    "desc_en": "Teleprotection communication interface"
+  },
+  {
+    "name": "KFAN",
+    "desc_zh": "风扇",
+    "desc_en": "Fan"
+  },
+  {
+    "name": "KFIL",
+    "desc_zh": "过滤器",
+    "desc_en": "Filter"
+  },
+  {
+    "name": "KPMP",
+    "desc_zh": "泵",
+    "desc_en": "Pump"
+  },
+  {
+    "name": "KTNK",
+    "desc_zh": "罐或桶状容器",
+    "desc_en": "Tank"
+  },
+  {
+    "name": "KVLV",
+    "desc_zh": "阀门控制",
+    "desc_en": "Valve control"
+  },
+  {
+    "name": "LCCH",
+    "desc_zh": "物理通道监视",
+    "desc_en": "Physical communication channel supervision"
+  },
+  {
+    "name": "LGOS",
+    "desc_zh": "GOOSE订阅",
+    "desc_en": "GOOSE subscription"
+  },
+  {
+    "name": "LLN0",
+    "desc_zh": "逻辑节点零",
+    "desc_en": "Logic node zero"
+  },
+  {
+    "name": "LPHD",
+    "desc_zh": "物理装置信息",
+    "desc_en": "Physical device information"
+  },
+  {
+    "name": "LSVS",
+    "desc_zh": "采样值订阅",
+    "desc_en": "Sampled value subscription"
+  },
+  {
+    "name": "LTIM",
+    "desc_zh": "时间管理",
+    "desc_en": "Time management"
+  },
+  {
+    "name": "LTMS",
+    "desc_zh": "主时钟管理",
+    "desc_en": "Time master supervision"
+  },
+  {
+    "name": "LTRK",
+    "desc_zh": "服务跟踪",
+    "desc_en": "Service tracking"
+  },
+  {
+    "name": "MENV",
+    "desc_zh": "环境信息",
+    "desc_en": "Environmental information"
+  },
+  {
+    "name": "MFLK",
+    "desc_zh": "闪变测量名",
+    "desc_en": "Flicker measurement name"
+  },
+  {
+    "name": "MHAI",
+    "desc_zh": "谐波和间谐波",
+    "desc_en": "Harmonics or interharmonics"
+  },
+  {
+    "name": "MHAN",
+    "desc_zh": "相别无关谐波和间谐波",
+    "desc_en": "Non-phase-related harmonics or interharmonics"
+  },
+  {
+    "name": "MHYD",
+    "desc_zh": "水文信息",
+    "desc_en": "Hydrological information"
+  },
+  {
+    "name": "MMDC",
+    "desc_zh": "直流流量",
+    "desc_en": "DC measurement"
+  },
+  {
+    "name": "MMET",
+    "desc_zh": "气象信息",
+    "desc_en": "Meteorological information"
+  },
+  {
+    "name": "MMTN",
+    "desc_zh": "单相计量",
+    "desc_en": "Metering"
+  },
+  {
+    "name": "MMTR",
+    "desc_zh": "计量",
+    "desc_en": "Metering"
+  },
+  {
+    "name": "MMXN",
+    "desc_zh": "相别无关值测量",
+    "desc_en": "Non-phase-related measurement"
+  },
+  {
+    "name": "MMXU",
+    "desc_zh": "测量",
+    "desc_en": "Measurement"
+  },
+  {
+    "name": "MSQI",
+    "desc_zh": "相序和不平衡",
+    "desc_en": "Sequence and imbalance"
+  },
+  {
+    "name": "MSTA",
+    "desc_zh": "计量统计",
+    "desc_en": "Metering statistics"
+  },
+  {
+    "name": "PDIF",
+    "desc_zh": "差动",
+    "desc_en": "Differential"
+  },
+  {
+    "name": "PDIR",
+    "desc_zh": "方向比较",
+    "desc_en": "Direction comparison"
+  },
+  {
+    "name": "PDIS",
+    "desc_zh": "距离保护",
+    "desc_en": "Distance"
+  },
+  {
+    "name": "PDOP",
+    "desc_zh": "过功率方向",
+    "desc_en": "Directional overpower"
+  },
+  {
+    "name": "PDUP",
+    "desc_zh": "欠功率方向",
+    "desc_en": "Directional underpower"
+  },
+  {
+    "name": "PFRC",
+    "desc_zh": "频率变化率",
+    "desc_en": "Rate of change of frequency"
+  },
+  {
+    "name": "PHAR",
+    "desc_zh": "谐波制动",
+    "desc_en": "Harmonic restraint"
+  },
+  {
+    "name": "PHIZ",
+    "desc_zh": "接地检测",
+    "desc_en": "Ground detector"
+  },
+  {
+    "name": "PIOC",
+    "desc_zh": "瞬时过流",
+    "desc_en": "Instantaneous overcurrent"
+  },
+  {
+    "name": "PMRI",
+    "desc_zh": "禁止电动机再启动",
+    "desc_en": "Motor restart inhibition"
+  },
+  {
+    "name": "PMSS",
+    "desc_zh": "电动机启动时间监视",
+    "desc_en": "Motor starting time supervision"
+  },
+  {
+    "name": "POPF",
+    "desc_zh": "过功率因数",
+    "desc_en": "Over power factor"
+  },
+  {
+    "name": "PPAM",
+    "desc_zh": "相角测量",
+    "desc_en": "Phase angle measuring"
+  },
+  {
+    "name": "PRTR",
+    "desc_zh": "转子保护",
+    "desc_en": "Rotor protection"
+  },
+  {
+    "name": "PSCH",
+    "desc_zh": "保护配置",
+    "desc_en": "Protection scheme"
+  },
+  {
+    "name": "PSDE",
+    "desc_zh": "灵敏方向接地故障",
+    "desc_en": "Sensitive directional earthfault"
+  },
+  {
+    "name": "PTEF",
+    "desc_zh": "瞬时接地故障",
+    "desc_en": "Transient earth fault"
+  },
+  {
+    "name": "PTHF",
+    "desc_zh": "晶闸管保护",
+    "desc_en": "Thyristor protection"
+  },
+  {
+    "name": "PTOC",
+    "desc_zh": "定时过电流",
+    "desc_en": "Time overcurrent"
+  },
+  {
+    "name": "PTOF",
+    "desc_zh": "高频",
+    "desc_en": "Overfrequency"
+  },
+  {
+    "name": "PTOV",
+    "desc_zh": "过电压",
+    "desc_en": "Overvoltage"
+  },
+  {
+    "name": "PTRC",
+    "desc_zh": "保护跳闸条件",
+    "desc_en": "Protection trip conditioning"
+  },
+  {
+    "name": "PTTR",
+    "desc_zh": "过热",
+    "desc_en": "Thermal overload"
+  },
+  {
+    "name": "PTUC",
+    "desc_zh": "欠电流",
+    "desc_en": "Undercurrent"
+  },
+  {
+    "name": "PTUF",
+    "desc_zh": "低频",
+    "desc_en": "Underfrequency"
+  },
+  {
+    "name": "PTUV",
+    "desc_zh": "低电压",
+    "desc_en": "Undervoltage"
+  },
+  {
+    "name": "PUPF",
+    "desc_zh": "低功率因数",
+    "desc_en": "Underpower factor"
+  },
+  {
+    "name": "PVOC",
+    "desc_zh": "电压闭锁延时过电流",
+    "desc_en": "Voltage controlled time overcurrent"
+  },
+  {
+    "name": "PVPH",
+    "desc_zh": "电压频率",
+    "desc_en": "Volts per Hz"
+  },
+  {
+    "name": "PZSU",
+    "desc_zh": "零速或欠速保护",
+    "desc_en": "Zero speed or underspeed"
+  },
+  {
+    "name": "QFVR",
+    "desc_zh": "频率变化",
+    "desc_en": "Frequency variation"
+  },
+  {
+    "name": "QITR",
+    "desc_zh": "电流瞬变",
+    "desc_en": "Current transient"
+  },
+  {
+    "name": "QIUB",
+    "desc_zh": "电流不平衡变化",
+    "desc_en": "Current unbalance variation"
+  },
+  {
+    "name": "QVTR",
+    "desc_zh": "电压瞬变",
+    "desc_en": "Voltage transient"
+  },
+  {
+    "name": "QVUB",
+    "desc_zh": "电压不平衡变化",
+    "desc_en": "Voltage unbalance variation"
+  },
+  {
+    "name": "QVVR",
+    "desc_zh": "电压变化",
+    "desc_en": "Voltage variation"
+  },
+  {
+    "name": "RADR",
+    "desc_zh": "扰动记录模拟通道",
+    "desc_en": "Disturbance recorder channel analogue"
+  },
+  {
+    "name": "RBDR",
+    "desc_zh": "扰动记录状态量通道",
+    "desc_en": "Disturbance recorder channel binary"
+  },
+  {
+    "name": "RBRF",
+    "desc_zh": "断路器失灵",
+    "desc_en": "Breaker failure"
+  },
+  {
+    "name": "RDIR",
+    "desc_zh": "方向元件",
+    "desc_en": "Directional element"
+  },
+  {
+    "name": "RDRE",
+    "desc_zh": "扰动记录功能",
+    "desc_en": "Disturbance recorder function"
+  },
+  {
+    "name": "RDRS",
+    "desc_zh": "扰动记录处理",
+    "desc_en": "Disturbance recorder handling"
+  },
+  {
+    "name": "RFLO",
+    "desc_zh": "故障定位",
+    "desc_en": "Fault locator"
+  },
+  {
+    "name": "RMXU",
+    "desc_zh": "差动测量",
+    "desc_en": "Differential measurements"
+  },
+  {
+    "name": "RPSB",
+    "desc_zh": "功率振荡检测/闭锁",
+    "desc_en": "Power swing detection/blocking"
+  },
+  {
+    "name": "RREC",
+    "desc_zh": "自动重合闸",
+    "desc_en": "Autoreclosing"
+  },
+  {
+    "name": "RSYN",
+    "desc_zh": "同期检查",
+    "desc_en": "Synchronism-check"
+  },
+  {
+    "name": "SARC",
+    "desc_zh": "电弧监视和诊断",
+    "desc_en": "Monitoring and diagnostics for arcs"
+  },
+  {
+    "name": "SCBR",
+    "desc_zh": "断路器监视",
+    "desc_en": "Circuit breaker supervision"
+  },
+  {
+    "name": "SIMG",
+    "desc_zh": "绝缘介质监视（气体）",
+    "desc_en": "Insulation medium supervision（gas）"
+  },
+  {
+    "name": "SIML",
+    "desc_zh": "绝缘介质监视（液体）",
+    "desc_en": "Insulation medium supervision（liquid）"
+  },
+  {
+    "name": "SLTC",
+    "desc_zh": "分接开关监视",
+    "desc_en": "Tap changer supervision"
+  },
+  {
+    "name": "SOPM",
+    "desc_zh": "操动机构监视",
+    "desc_en": "Supervision of operating mechanism"
+  },
+  {
+    "name": "SPDC",
+    "desc_zh": "局部放电监视和诊断",
+    "desc_en": "Monitoring and diagnostics for partial discharges"
+  },
+  {
+    "name": "SPTR",
+    "desc_zh": "变压器监视和诊断",
+    "desc_en": "Power transformer supervision"
+  },
+  {
+    "name": "SSWI",
+    "desc_zh": "隔离开关监视",
+    "desc_en": "Circuit switch supervision"
+  },
+  {
+    "name": "STMP",
+    "desc_zh": "温度监视",
+    "desc_en": "Temperature supervision"
+  },
+  {
+    "name": "SVBR",
+    "desc_zh": "振动监视",
+    "desc_en": "Vibration supervision"
+  },
+  {
+    "name": "TANG",
+    "desc_zh": "角度",
+    "desc_en": "Angle"
+  },
+  {
+    "name": "TAXD",
+    "desc_zh": "轴向位移",
+    "desc_en": "Axial displacement"
+  },
+  {
+    "name": "TCTR",
+    "desc_zh": "电流互感器",
+    "desc_en": "Current displacement"
+  },
+  {
+    "name": "TDST",
+    "desc_zh": "距离",
+    "desc_en": "Distance"
+  },
+  {
+    "name": "TFLW",
+    "desc_zh": "液体流",
+    "desc_en": "Liquid"
+  },
+  {
+    "name": "TFRQ",
+    "desc_zh": "频率",
+    "desc_en": "Frequency"
+  },
+  {
+    "name": "TGSN",
+    "desc_zh": "通用传感器",
+    "desc_en": "Generic sensor"
+  },
+  {
+    "name": "THUM",
+    "desc_zh": "湿度",
+    "desc_en": "Humidity"
+  },
+  {
+    "name": "TLVL",
+    "desc_zh": "介质液位",
+    "desc_en": "Media level"
+  },
+  {
+    "name": "TMGF",
+    "desc_zh": "磁场",
+    "desc_en": "Magnetic field"
+  },
+  {
+    "name": "TMVM",
+    "desc_zh": "移动传感器",
+    "desc_en": "Movement sensor"
+  },
+  {
+    "name": "TPOS",
+    "desc_zh": "位置指示",
+    "desc_en": "Position indicator"
+  },
+  {
+    "name": "TPRS",
+    "desc_zh": "压力传感器",
+    "desc_en": "Pressure sensor"
+  },
+  {
+    "name": "TRTN",
+    "desc_zh": "转速传感器",
+    "desc_en": "Rotation transmitter"
+  },
+  {
+    "name": "TSND",
+    "desc_zh": "声压传感器",
+    "desc_en": "Sound pressure sensor"
+  },
+  {
+    "name": "TTMP",
+    "desc_zh": "温度传感器",
+    "desc_en": "Temperature sensor"
+  },
+  {
+    "name": "TTNS",
+    "desc_zh": "机械张力/应力",
+    "desc_en": "Mechanical tension/stress"
+  },
+  {
+    "name": "TVBR",
+    "desc_zh": "振动传感器",
+    "desc_en": "Vibration sensor"
+  },
+  {
+    "name": "TVTR",
+    "desc_zh": "电压互感器",
+    "desc_en": "Voltage transformer"
+  },
+  {
+    "name": "TWPH",
+    "desc_zh": "水酸碱度",
+    "desc_en": "Water acidity"
+  },
+  {
+    "name": "XCBR",
+    "desc_zh": "断路器",
+    "desc_en": "Circuit breaker"
+  },
+  {
+    "name": "XSWI",
+    "desc_zh": "隔离开关",
+    "desc_en": "Circuit switch"
+  },
+  {
+    "name": "YEFN",
+    "desc_zh": "接地故障中性点补偿（消弧线圈）",
+    "desc_en": "Earth fault neutralizer"
+  },
+  {
+    "name": "YLTC",
+    "desc_zh": "分接开关",
+    "desc_en": "Tap changer"
+  },
+  {
+    "name": "YPSH",
+    "desc_zh": "功率分流",
+    "desc_en": "Power shunt"
+  },
+  {
+    "name": "YPTR",
+    "desc_zh": "电力变压器",
+    "desc_en": "Power transformer"
+  },
+  {
+    "name": "ZAXN",
+    "desc_zh": "辅助电源",
+    "desc_en": "Auxiliary network"
+  },
+  {
+    "name": "ZBAT",
+    "desc_zh": "电池",
+    "desc_en": "Battery"
+  },
+  {
+    "name": "ZBSH",
+    "desc_zh": "套管",
+    "desc_en": "Bushing"
+  },
+  {
+    "name": "ZCAB",
+    "desc_zh": "电力电缆",
+    "desc_en": "Power cable"
+  },
+  {
+    "name": "ZCAP",
+    "desc_zh": "电容器组",
+    "desc_en": "Capacitor bank"
+  },
+  {
+    "name": "ZCON",
+    "desc_zh": "变（转）换器",
+    "desc_en": "Converter"
+  },
+  {
+    "name": "ZGEN",
+    "desc_zh": "发电机",
+    "desc_en": "Generator"
+  },
+  {
+    "name": "ZGIL",
+    "desc_zh": "气体绝缘线路",
+    "desc_en": "Gas insulated line"
+  },
+  {
+    "name": "ZLIN",
+    "desc_zh": "电力架空线",
+    "desc_en": "Power overhead line"
+  },
+  {
+    "name": "ZMOT",
+    "desc_zh": "电动机",
+    "desc_en": "Motor"
+  },
+  {
+    "name": "ZREA",
+    "desc_zh": "电抗器",
+    "desc_en": "Reactor"
+  },
+  {
+    "name": "ZRES",
+    "desc_zh": "电阻",
+    "desc_en": "Resistor"
+  },
+  {
+    "name": "ZRRC",
+    "desc_zh": "旋转无功元件",
+    "desc_en": "Rotating reactive component"
+  },
+  {
+    "name": "ZSAR",
+    "desc_zh": "浪涌抑制器",
+    "desc_en": "Surge arrestor"
+  },
+  {
+    "name": "ZSCR",
+    "desc_zh": "半导体控制整流器",
+    "desc_en": "Semi-conductor controlled rectifier"
+  },
+  {
+    "name": "ZSMC",
+    "desc_zh": "同步电机",
+    "desc_en": "Synchronous machine"
+  },
+  {
+    "name": "ZTCF",
+    "desc_zh": "晶闸管控制频率转换器",
+    "desc_en": "Thyristor controlled frequency converter"
+  },
+  {
+    "name": "ZTCR",
+    "desc_zh": "受控晶闸管无功元件",
+    "desc_en": "Thyristor controlled reactive component"
+  }
+]

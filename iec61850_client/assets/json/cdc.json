@@ -1,0 +1,247 @@
+[
+  {
+    "name": "ACD",
+    "desc_zh": "方向保护激活信息",
+    "desc_en": "Directional Protection Activation Information"
+  },
+  {
+    "name": "ACT",
+    "desc_zh": "保护激活信息",
+    "desc_en": "Protection Activation Information"
+  },
+  {
+    "name": "APC",
+    "desc_zh": "可控模拟过程值",
+    "desc_en": "Controllable Analogue Process Value"
+  },
+  {
+    "name": "ASG",
+    "desc_zh": "模拟定值",
+    "desc_en": "Analogue Setting"
+  },
+  {
+    "name": "BAC",
+    "desc_zh": "可控的二进制模拟过程值",
+    "desc_en": "Binary Controlled Analog Process Value"
+  },
+  {
+    "name": "BCR",
+    "desc_zh": "二进制计数器读数",
+    "desc_en": "Binary Counter Reading"
+  },
+  {
+    "name": "BSC",
+    "desc_zh": "二进制受控步位置信息",
+    "desc_en": "Binary Controlled Step Position Information"
+  },
+  {
+    "name": "BTS",
+    "desc_zh": "缓存报告跟踪服务",
+    "desc_en": null
+  },
+  {
+    "name": "CMV",
+    "desc_zh": "复数测量值",
+    "desc_en": "Complex Measured Value"
+  },
+  {
+    "name": "CSD",
+    "desc_zh": "曲线形状描述",
+    "desc_en": "Curve Shape Description"
+  },
+  {
+    "name": "CSG",
+    "desc_zh": "曲线形状定值",
+    "desc_en": "Curve Shape Setting"
+  },
+  {
+    "name": "CTS",
+    "desc_zh": "公共跟踪服务",
+    "desc_en": null
+  },
+  {
+    "name": "CUG",
+    "desc_zh": "货币定值组",
+    "desc_en": "Currency Setting Group"
+  },
+  {
+    "name": "CURVE",
+    "desc_zh": "定值曲线",
+    "desc_en": "Setting Curve"
+  },
+  {
+    "name": "DEL",
+    "desc_zh": "三相系统中相对相相关测量值",
+    "desc_en": "Phase To Phase Related Measured Values Of a There-Phase System"
+  },
+  {
+    "name": "DPC",
+    "desc_zh": "可控的双点",
+    "desc_en": "Controllable Double Point"
+  },
+  {
+    "name": "DPL",
+    "desc_zh": "设备铭牌",
+    "desc_en": "Device Name Plate"
+  },
+  {
+    "name": "DPS",
+    "desc_zh": "双点状态信息",
+    "desc_en": "Double Point Status"
+  },
+  {
+    "name": "ENC",
+    "desc_zh": "可控的枚举状态",
+    "desc_en": "Controllable Enumerated Status"
+  },
+  {
+    "name": "ENG",
+    "desc_zh": "枚举状态定值",
+    "desc_en": "Enumerated Status Setting"
+  },
+  {
+    "name": "ENS",
+    "desc_zh": "枚举状态",
+    "desc_en": "Enumerated Status"
+  },
+  {
+    "name": "GTS",
+    "desc_zh": "GOOSE控制块跟踪服务",
+    "desc_en": null
+  },
+  {
+    "name": "HDEL",
+    "desc_zh": "DEL谐波值",
+    "desc_en": "Harmonic Value For DEL"
+  },
+  {
+    "name": "HMV",
+    "desc_zh": "谐波值",
+    "desc_en": "Harmonic Value"
+  },
+  {
+    "name": "HST",
+    "desc_zh": "直方图",
+    "desc_en": "Histogram"
+  },
+  {
+    "name": "HWYE",
+    "desc_zh": "WYE谐波值",
+    "desc_en": "Harmonic Value Of WYE"
+  },
+  {
+    "name": "INC",
+    "desc_zh": "可控的整数状态",
+    "desc_en": "Controllable Integer Status"
+  },
+  {
+    "name": "ING",
+    "desc_zh": "整数状态定值",
+    "desc_en": "Integer Status Setting"
+  },
+  {
+    "name": "INS",
+    "desc_zh": "整数状态",
+    "desc_en": "Integer Status"
+  },
+  {
+    "name": "ISC",
+    "desc_zh": "整数受控步位置信息",
+    "desc_en": "Integer Controlled Step Position Information"
+  },
+  {
+    "name": "LPL",
+    "desc_zh": "逻辑节点铭牌",
+    "desc_en": "Logic Node Name Plate"
+  },
+  {
+    "name": "LTS",
+    "desc_zh": "日志控制块跟踪服务",
+    "desc_en": null
+  },
+  {
+    "name": "MTS",
+    "desc_zh": "MSVCB跟踪服务",
+    "desc_en": null
+  },
+  {
+    "name": "MV",
+    "desc_zh": "测量值",
+    "desc_en": "Measured Value"
+  },
+  {
+    "name": "NTS",
+    "desc_zh": "USVCB跟踪服务",
+    "desc_en": null
+  },
+  {
+    "name": "ORG",
+    "desc_zh": "对象引用定值",
+    "desc_en": "Object Reference Setting"
+  },
+  {
+    "name": "OTS",
+    "desc_zh": "日志跟踪服务",
+    "desc_en": null
+  },
+  {
+    "name": "SAV",
+    "desc_zh": "采样值",
+    "desc_en": "Sample Value"
+  },
+  {
+    "name": "SEC",
+    "desc_zh": "安全违例计数",
+    "desc_en": "Security Violation Counting"
+  },
+  {
+    "name": "SEQ",
+    "desc_zh": "序分量",
+    "desc_en": "Sequence"
+  },
+  {
+    "name": "SPC",
+    "desc_zh": "可控的单点",
+    "desc_en": "Controllable Single Point"
+  },
+  {
+    "name": "SPG",
+    "desc_zh": "单点定值",
+    "desc_en": "Single Point Setting"
+  },
+  {
+    "name": "SPS",
+    "desc_zh": "单点状态信息",
+    "desc_en": "Single Point Status"
+  },
+  {
+    "name": "STS",
+    "desc_zh": "SGCB跟踪服务",
+    "desc_en": null
+  },
+  {
+    "name": "TSG",
+    "desc_zh": "时间定值组",
+    "desc_en": "Time Setting Group"
+  },
+  {
+    "name": "UTS",
+    "desc_zh": "非缓存报告跟踪服务",
+    "desc_en": null
+  },
+  {
+    "name": "VSG",
+    "desc_zh": "可见字符串定值组",
+    "desc_en": "Visible String Setting"
+  },
+  {
+    "name": "VSS",
+    "desc_zh": "可见字符串状态",
+    "desc_en": "Visible String Status"
+  },
+  {
+    "name": "WYE",
+    "desc_zh": "三相系统中相对地相关测量值",
+    "desc_en": "Phase To Ground/Neutral Related Measured Values Of a Three-Phase System"
+  }
+]

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--SCL Schema Version 3.1 (2012/10/22)-->
+<SCL version="2007" revision="B" xmlns="http://www.iec.ch/61850/2003/SCL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.iec.ch/61850/2003/SCL SCL.xsd">
+	<Header id="" version="" revision="" toolID="Redisant SCL Parser Engine" nameStructure="IEDName" />
+	<Communication>
+		<SubNetwork name="NONE" type="8-MMS">
+			<ConnectedAP iedName="IED1" apName="P1">
+				<Address>
+					<P type="IP" xsi:type="tP_IP">127.0.0.1</P>
+					<P type="OSI-TSEL" xsi:type="tP_OSI-TSEL">0001</P>
+					<P type="OSI-SSEL" xsi:type="tP_OSI-SSEL">0001</P>
+					<P type="OSI-PSEL" xsi:type="tP_OSI-PSEL">00000001</P>
+					<P type="OSI-AP-Title">1,1,1,999,1</P>
+					<P type="OSI-AP-Invoke" xsi:type="tP_OSI-AP-Invoke">0</P>
+					<P type="OSI-AE-Qualifier" xsi:type="tP_OSI-AE-Qualifier">12</P>
+					<P type="OSI-AE-Invoke" xsi:type="tP_OSI-AE-Invoke">0</P>
+					<P type="MMS-Port" xsi:type="tP_MMS-Port">102</P>
+				</Address>
+			</ConnectedAP>
+		</SubNetwork>
+	</Communication>
+	<IED name="IED1">
+		<Services>
+			<DynAssociation />
+			<GetDirectory />
+			<GetDataObjectDefinition />
+			<DataObjectDirectory />
+			<GetDataSetValue />
+			<SetDataSetValue />
+			<DataSetDirectory />
+			<ConfDataSet max="0" modify="false" />
+			<DynDataSet max="42" />
+			<ReadWrite />
+			<ConfReportControl max="2" bufConf="false" />
+			<GetCBValues />
+			<ReportSettings rptID="Dyn" optFields="Dyn" bufTime="Dyn" trgOps="Dyn" intgPd="Dyn" />
+			<ConfLNs fixPrefix="true" fixLnInst="true" />
+			<GOOSE max="0" />
+			<GSSE max="0" />
+			<FileHandling />
+		</Services>
+		<AccessPoint name="P1">
+			<Server>
+				<Authentication none="true" />
+				<LDevice inst="LD1">
+					<LN0 lnType="IED1LD1.LLN0" lnClass="LLN0" inst="">
+						<ReportControl name="urcb" rptID="13e08c78" buffered="false" bufTime="3000" intgPd="5000" confRev="1">
+							<TrgOps dchg="true" qchg="true" dupd="true" period="false" gi="true" />
+							<OptFields seqNum="true" timeStamp="true" dataSet="false" reasonCode="true" dataRef="true" entryID="true" configRef="true" />
+							<RptEnabled max="2" />
+						</ReportControl>
+					</LN0>
+					<LN lnType="IED1LD1.GGIO1" lnClass="GGIO" inst="1" />
+					<LN lnType="IED1LD1.LPHD1" lnClass="LPHD" inst="1">
+						<DOI name="PhyNam">
+							<DAI name="vendor">
+								<Val></Val>
+							</DAI>
+						</DOI>
+					</LN>
+					<LN lnType="IED1LD1.MMDC1" lnClass="MMDC" inst="1" />
+				</LDevice>
+			</Server>
+		</AccessPoint>
+	</IED>
+	<DataTypeTemplates>
+		<LNodeType id="IED1LD1.GGIO1" lnClass="GGIO">
+			<DO name="Beh" type="IED1LD1.LLN0.Beh" />
+			<DO name="Ind1" type="IED1LD1.GGIO1.Ind1" />
+			<DO name="AnIn1" type="IED1LD1.GGIO1.AnIn1" />
+		</LNodeType>
+		<LNodeType id="IED1LD1.LLN0" lnClass="LLN0">
+			<DO name="Beh" type="IED1LD1.LLN0.Beh" />
+		</LNodeType>
+		<LNodeType id="IED1LD1.LPHD1" lnClass="LPHD">
+			<DO name="PhyHealth" type="IED1LD1.LPHD1.PhyHealth" />
+			<DO name="Proxy" type="IED1LD1.GGIO1.Ind1" />
+			<DO name="PhyNam" type="IED1LD1.LPHD1.PhyNam" />
+		</LNodeType>
+		<LNodeType id="IED1LD1.MMDC1" lnClass="MMDC">
+			<DO name="Watt" type="IED1LD1.GGIO1.AnIn1" />
+			<DO name="Amp" type="IED1LD1.GGIO1.AnIn1" />
+			<DO name="Vol" type="IED1LD1.GGIO1.AnIn1" />
+			<DO name="Beh" type="IED1LD1.MMDC1.Beh" />
+		</LNodeType>
+		<DOType id="IED1LD1.LPHD1.PhyNam" cdc="DPL">
+			<DA name="vendor" fc="DC" bType="VisString255" />
+		</DOType>
+		<DOType id="IED1LD1.LLN0.Beh" cdc="INS">
+			<DA name="stVal" fc="ST" bType="Enum" type="Beh" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+		</DOType>
+		<DOType id="IED1LD1.LPHD1.PhyHealth" cdc="INS">
+			<DA name="stVal" fc="ST" bType="Enum" type="Health" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+		</DOType>
+		<DOType id="IED1LD1.GGIO1.AnIn1" cdc="MV">
+			<DA name="mag" fc="MX" bType="Struct" type="IED1LD1.GGIO1.AnIn1.mag" />
+			<DA name="q" fc="MX" bType="Quality" />
+			<DA name="t" fc="MX" bType="Timestamp" />
+			<DA name="subEna" fc="SV" bType="BOOLEAN" />
+			<DA name="subMag" fc="SV" bType="Struct" type="IED1LD1.GGIO1.AnIn1.subMag" />
+			<DA name="subQ" fc="SV" bType="Quality" />
+			<DA name="subID" fc="SV" bType="VisString64" />
+			<DA name="blkEna" fc="BL" bType="BOOLEAN" />
+		</DOType>
+		<DOType id="IED1LD1.GGIO1.Ind1" cdc="SPS">
+			<DA name="stVal" fc="ST" bType="BOOLEAN" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+			<DA name="subEna" fc="SV" bType="BOOLEAN" />
+			<DA name="subVal" fc="SV" bType="BOOLEAN" />
+			<DA name="subQ" fc="SV" bType="Quality" />
+			<DA name="subID" fc="SV" bType="VisString64" />
+			<DA name="blkEna" fc="BL" bType="BOOLEAN" />
+		</DOType>
+		<DOType id="IED1LD1.MMDC1.Beh" cdc="ENS">
+			<DA name="stVal" fc="ST" bType="Enum" type="Beh" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+		</DOType>
+		<DAType id="IED1LD1.GGIO1.AnIn1.mag">
+			<BDA name="f" bType="FLOAT32" />
+		</DAType>
+		<DAType id="IED1LD1.GGIO1.AnIn1.subMag">
+			<BDA name="f" bType="FLOAT32" />
+		</DAType>
+		<EnumType id="Beh">
+			<!--Source: IEC 61850-7-4:2003A-->
+			<EnumVal ord="1">on</EnumVal>
+			<EnumVal ord="2">blocked</EnumVal>
+			<EnumVal ord="3">test</EnumVal>
+			<EnumVal ord="4">test/blocked</EnumVal>
+			<EnumVal ord="5">off</EnumVal>
+		</EnumType>
+		<EnumType id="Health">
+			<!--Source: IEC 61850-7-4:2003A-->
+			<EnumVal ord="1">Ok</EnumVal>
+			<EnumVal ord="2">Warning</EnumVal>
+			<EnumVal ord="3">Alarm</EnumVal>
+		</EnumType>
+	</DataTypeTemplates>
+</SCL>

@@ -1,0 +1,23 @@
+name: iec104_server
+description: "A comprehensive IEC 60870-5-104 Server Simulator built with Flutter and Dart"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.0.0
+  flutter: ">=3.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  test: any
+  lints: ^3.0.0
+
+flutter:
+  uses-material-design: true

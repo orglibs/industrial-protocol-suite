@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--SCL Schema Version 3.1 (2012/10/22)-->
+<SCL version="2007" revision="B" xmlns="http://www.iec.ch/61850/2003/SCL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.iec.ch/61850/2003/SCL SCL.xsd">
+	<Header id="" version="" revision="" toolID="Redisant SCL Parser Engine" nameStructure="IEDName" />
+	<Communication>
+		<SubNetwork name="NONE" type="8-MMS">
+			<ConnectedAP iedName="IED1" apName="P1">
+				<Address>
+					<P type="IP" xsi:type="tP_IP">127.0.0.1</P>
+					<P type="OSI-TSEL" xsi:type="tP_OSI-TSEL">0001</P>
+					<P type="OSI-SSEL" xsi:type="tP_OSI-SSEL">0001</P>
+					<P type="OSI-PSEL" xsi:type="tP_OSI-PSEL">00000001</P>
+					<P type="OSI-AP-Title">1,1,1,999,1</P>
+					<P type="OSI-AP-Invoke" xsi:type="tP_OSI-AP-Invoke">0</P>
+					<P type="OSI-AE-Qualifier" xsi:type="tP_OSI-AE-Qualifier">12</P>
+					<P type="OSI-AE-Invoke" xsi:type="tP_OSI-AE-Invoke">0</P>
+					<P type="MMS-Port" xsi:type="tP_MMS-Port">102</P>
+				</Address>
+			</ConnectedAP>
+		</SubNetwork>
+	</Communication>
+	<IED name="IED1">
+		<Services>
+			<DynAssociation />
+			<GetDirectory />
+			<GetDataObjectDefinition />
+			<DataObjectDirectory />
+			<GetDataSetValue />
+			<SetDataSetValue />
+			<DataSetDirectory />
+			<ConfDataSet max="1" modify="false" />
+			<DynDataSet max="42" />
+			<ReadWrite />
+			<ConfReportControl max="4" bufConf="false" />
+			<GetCBValues />
+			<ReportSettings rptID="Dyn" optFields="Dyn" bufTime="Dyn" trgOps="Dyn" intgPd="Dyn" resvTms="true" />
+			<ConfLNs fixPrefix="true" fixLnInst="true" />
+			<GOOSE max="0" />
+			<GSSE max="0" />
+			<FileHandling />
+		</Services>
+		<AccessPoint name="P1">
+			<Server>
+				<Authentication none="true" />
+				<LDevice inst="LD1">
+					<LN0 lnType="IED1LD1.LLN0" lnClass="LLN0" inst="">
+						<DataSet name="AnalogEvents">
+							<FCDA ldInst="LD1" prefix="AnIn" lnClass="GGIO" lnInst="1" doName="AnIn1" fc="MX" />
+							<FCDA ldInst="LD1" prefix="AnIn" lnClass="GGIO" lnInst="1" doName="AnIn2" fc="MX" />
+							<FCDA ldInst="LD1" prefix="AnIn" lnClass="GGIO" lnInst="1" doName="AnIn3" fc="MX" />
+							<FCDA ldInst="LD1" prefix="AnIn" lnClass="GGIO" lnInst="1" doName="AnIn4" fc="MX" />
+						</DataSet>
+						<ReportControl name="URCB_Events01" rptID="IED1LD1/LLN0$RP$URCB_Events01" indexed="false" buffered="false" bufTime="0" datSet="AnalogEvents" intgPd="5000" confRev="1">
+							<TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true" />
+							<OptFields seqNum="true" timeStamp="true" dataSet="false" reasonCode="true" dataRef="true" entryID="false" configRef="true" />
+							<RptEnabled />
+						</ReportControl>
+						<ReportControl name="URCB_Events02" rptID="IED1LD1/LLN0$RP$URCB_Events02" indexed="false" buffered="false" bufTime="0" datSet="AnalogEvents" intgPd="5000" confRev="1">
+							<TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true" />
+							<OptFields seqNum="true" timeStamp="true" dataSet="false" reasonCode="true" dataRef="true" entryID="false" configRef="true" />
+							<RptEnabled />
+						</ReportControl>
+						<ReportControl name="BRCB_Events01" rptID="IED1LD1/LLN0$BR$BRCB_Events01" indexed="false" buffered="true" bufTime="0" datSet="AnalogEvents" intgPd="5000" confRev="1">
+							<TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true" />
+							<OptFields seqNum="true" timeStamp="true" dataSet="false" reasonCode="true" dataRef="true" entryID="true" configRef="true" />
+							<RptEnabled />
+						</ReportControl>
+						<ReportControl name="BRCB_Events02" rptID="IED1LD1/LLN0$BR$BRCB_Events02" indexed="false" buffered="true" bufTime="0" datSet="AnalogEvents" intgPd="5000" confRev="1">
+							<TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true" />
+							<OptFields seqNum="true" timeStamp="true" dataSet="false" reasonCode="true" dataRef="true" entryID="true" configRef="true" />
+							<RptEnabled />
+						</ReportControl>
+						<DOI name="Mod">
+							<DAI name="ctlModel">
+								<Val>status-only</Val>
+							</DAI>
+						</DOI>
+						<DOI name="NamPlt">
+							<DAI name="vendor">
+								<Val></Val>
+							</DAI>
+							<DAI name="swRev">
+								<Val></Val>
+							</DAI>
+							<DAI name="d">
+								<Val></Val>
+							</DAI>
+							<DAI name="configRev">
+								<Val></Val>
+							</DAI>
+						</DOI>
+					</LN0>
+					<LN lnType="IED1LD1.AnInGGIO1" prefix="AnIn" lnClass="GGIO" inst="1">
+						<DOI name="AnIn1">
+							<DAI name="db">
+								<Val>10000</Val>
+							</DAI>
+							<DAI name="zeroDb">
+								<Val>1000</Val>
+							</DAI>
+							<DAI name="dbRef">
+								<Val>10.0</Val>
+							</DAI>
+							<DAI name="zeroDbRef">
+								<Val>10.0</Val>
+							</DAI>
+						</DOI>
+						<DOI name="AnIn2">
+							<DAI name="db">
+								<Val>1000</Val>
+							</DAI>
+							<DAI name="zeroDb">
+								<Val>1000</Val>
+							</DAI>
+							<DAI name="dbRef">
+								<Val>10.0</Val>
+							</DAI>
+							<DAI name="zeroDbRef">
+								<Val>10.0</Val>
+							</DAI>
+						</DOI>
+						<DOI name="AnIn3">
+							<DAI name="db">
+								<Val>10000</Val>
+							</DAI>
+							<DAI name="zeroDb">
+								<Val>1000</Val>
+							</DAI>
+							<SDI name="rangeC">
+								<SDI name="min">
+									<DAI name="f">
+										<Val>-5.0</Val>
+									</DAI>
+								</SDI>
+								<SDI name="max">
+									<DAI name="f">
+										<Val>5.0</Val>
+									</DAI>
+								</SDI>
+							</SDI>
+						</DOI>
+						<DOI name="AnIn4">
+							<DAI name="db">
+								<Val>1000</Val>
+							</DAI>
+							<DAI name="zeroDb">
+								<Val>1000</Val>
+							</DAI>
+							<SDI name="rangeC">
+								<SDI name="min">
+									<DAI name="f">
+										<Val>-100.0</Val>
+									</DAI>
+								</SDI>
+								<SDI name="max">
+									<DAI name="f">
+										<Val>100.0</Val>
+									</DAI>
+								</SDI>
+							</SDI>
+						</DOI>
+					</LN>
+					<LN lnType="IED1LD1.LPHD1" lnClass="LPHD" inst="1">
+						<DOI name="PhyNam">
+							<DAI name="vendor">
+								<Val></Val>
+							</DAI>
+							<DAI name="hwRev">
+								<Val></Val>
+							</DAI>
+							<DAI name="swRev">
+								<Val></Val>
+							</DAI>
+							<DAI name="serNum">
+								<Val></Val>
+							</DAI>
+							<DAI name="model">
+								<Val></Val>
+							</DAI>
+							<DAI name="location">
+								<Val></Val>
+							</DAI>
+							<DAI name="name">
+								<Val></Val>
+							</DAI>
+							<DAI name="owner">
+								<Val></Val>
+							</DAI>
+						</DOI>
+						<DOI name="Proxy">
+							<DAI name="d">
+								<Val></Val>
+							</DAI>
+						</DOI>
+					</LN>
+				</LDevice>
+			</Server>
+		</AccessPoint>
+	</IED>
+	<DataTypeTemplates>
+		<LNodeType id="IED1LD1.AnInGGIO1" lnClass="GGIO">
+			<DO name="AnIn1" type="IED1LD1.AnInGGIO1.AnIn1" />
+			<DO name="AnIn2" type="IED1LD1.AnInGGIO1.AnIn1" />
+			<DO name="AnIn3" type="IED1LD1.AnInGGIO1.AnIn3" />
+			<DO name="AnIn4" type="IED1LD1.AnInGGIO1.AnIn3" />
+			<DO name="Beh" type="IED1LD1.LLN0.Beh" />
+		</LNodeType>
+		<LNodeType id="IED1LD1.LLN0" lnClass="LLN0">
+			<DO name="Mod" type="IED1LD1.LLN0.Mod" />
+			<DO name="Beh" type="IED1LD1.LLN0.Beh" />
+			<DO name="Health" type="IED1LD1.LLN0.Health" />
+			<DO name="NamPlt" type="IED1LD1.LLN0.NamPlt" />
+		</LNodeType>
+		<LNodeType id="IED1LD1.LPHD1" lnClass="LPHD">
+			<DO name="PhyHealth" type="IED1LD1.LLN0.Health" />
+			<DO name="PhyNam" type="IED1LD1.LPHD1.PhyNam" />
+			<DO name="Proxy" type="IED1LD1.LPHD1.Proxy" />
+		</LNodeType>
+		<DOType id="IED1LD1.LPHD1.PhyNam" cdc="DPL">
+			<DA name="vendor" fc="DC" bType="VisString255" />
+			<DA name="hwRev" fc="DC" bType="VisString255" />
+			<DA name="swRev" fc="DC" bType="VisString255" />
+			<DA name="serNum" fc="DC" bType="VisString255" />
+			<DA name="model" fc="DC" bType="VisString255" />
+			<DA name="location" fc="DC" bType="VisString255" />
+			<DA name="name" fc="DC" bType="VisString64" />
+			<DA name="owner" fc="DC" bType="VisString255" />
+		</DOType>
+		<DOType id="IED1LD1.LLN0.Mod" cdc="INC">
+			<DA name="stVal" fc="ST" bType="Enum" type="Mod" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+			<DA name="ctlModel" fc="CF" bType="Enum" type="ctlModel" />
+		</DOType>
+		<DOType id="IED1LD1.LLN0.Beh" cdc="INS">
+			<DA name="stVal" fc="ST" bType="Enum" type="Beh" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+		</DOType>
+		<DOType id="IED1LD1.LLN0.Health" cdc="INS">
+			<DA name="stVal" fc="ST" bType="Enum" type="Health" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+		</DOType>
+		<DOType id="IED1LD1.LLN0.NamPlt" cdc="LPL">
+			<DA name="vendor" fc="DC" bType="VisString255" />
+			<DA name="swRev" fc="DC" bType="VisString255" />
+			<DA name="d" fc="DC" bType="VisString255" />
+			<DA name="configRev" fc="DC" bType="VisString255" />
+		</DOType>
+		<DOType id="IED1LD1.AnInGGIO1.AnIn1" cdc="MV">
+			<DA name="instMag" fc="MX" bType="Struct" type="IED1LD1.AnInGGIO1.AnIn1.instMag" />
+			<DA name="mag" fc="MX" bType="Struct" type="IED1LD1.AnInGGIO1.AnIn1.instMag" />
+			<DA name="q" fc="MX" bType="Quality" />
+			<DA name="t" fc="MX" bType="Timestamp" />
+			<DA name="db" fc="CF" bType="INT32U" />
+			<DA name="zeroDb" fc="CF" bType="INT32U" />
+			<DA name="dbRef" fc="CF" bType="FLOAT32" />
+			<DA name="zeroDbRef" fc="CF" bType="FLOAT32" />
+		</DOType>
+		<DOType id="IED1LD1.AnInGGIO1.AnIn3" cdc="MV">
+			<DA name="instMag" fc="MX" bType="Struct" type="IED1LD1.AnInGGIO1.AnIn1.instMag" />
+			<DA name="mag" fc="MX" bType="Struct" type="IED1LD1.AnInGGIO1.AnIn1.instMag" />
+			<DA name="q" fc="MX" bType="Quality" />
+			<DA name="t" fc="MX" bType="Timestamp" />
+			<DA name="db" fc="CF" bType="INT32U" />
+			<DA name="zeroDb" fc="CF" bType="INT32U" />
+			<DA name="rangeC" fc="CF" bType="Struct" type="IED1LD1.AnInGGIO1.AnIn3.rangeC" />
+		</DOType>
+		<DOType id="IED1LD1.LPHD1.Proxy" cdc="SPS">
+			<DA name="stVal" fc="ST" bType="BOOLEAN" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+			<DA name="d" fc="DC" bType="VisString255" />
+		</DOType>
+		<DAType id="IED1LD1.AnInGGIO1.AnIn1.instMag">
+			<BDA name="f" bType="FLOAT32" />
+		</DAType>
+		<DAType id="IED1LD1.AnInGGIO1.AnIn3.rangeC.min">
+			<BDA name="f" bType="FLOAT32" />
+		</DAType>
+		<DAType id="IED1LD1.AnInGGIO1.AnIn3.rangeC">
+			<BDA name="min" bType="Struct" type="IED1LD1.AnInGGIO1.AnIn3.rangeC.min" />
+			<BDA name="max" bType="Struct" type="IED1LD1.AnInGGIO1.AnIn3.rangeC.min" />
+		</DAType>
+		<EnumType id="ctlModel">
+			<!--Source: IEC 61850-7-3:2003A-->
+			<EnumVal ord="0">status-only</EnumVal>
+			<EnumVal ord="1">direct-with-normal-security</EnumVal>
+			<EnumVal ord="2">sbo-with-normal-security</EnumVal>
+			<EnumVal ord="3">direct-with-enhanced-security</EnumVal>
+			<EnumVal ord="4">sbo-with-enhanced-security</EnumVal>
+		</EnumType>
+		<EnumType id="Beh">
+			<!--Source: IEC 61850-7-4:2003A-->
+			<EnumVal ord="1">on</EnumVal>
+			<EnumVal ord="2">blocked</EnumVal>
+			<EnumVal ord="3">test</EnumVal>
+			<EnumVal ord="4">test/blocked</EnumVal>
+			<EnumVal ord="5">off</EnumVal>
+		</EnumType>
+		<EnumType id="Health">
+			<!--Source: IEC 61850-7-4:2003A-->
+			<EnumVal ord="1">Ok</EnumVal>
+			<EnumVal ord="2">Warning</EnumVal>
+			<EnumVal ord="3">Alarm</EnumVal>
+		</EnumType>
+		<EnumType id="Mod">
+			<!--Source: IEC 61850-7-4:2003A-->
+			<EnumVal ord="1">on</EnumVal>
+			<EnumVal ord="2">blocked</EnumVal>
+			<EnumVal ord="3">test</EnumVal>
+			<EnumVal ord="4">test/blocked</EnumVal>
+			<EnumVal ord="5">off</EnumVal>
+		</EnumType>
+	</DataTypeTemplates>
+</SCL>

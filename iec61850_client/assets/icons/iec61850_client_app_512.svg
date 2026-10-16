@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background Gradient: Deep Electric Navy -->
+    <linearGradient id="bg61850Client" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#080F24" />
+      <stop offset="50%" stop-color="#101A38" />
+      <stop offset="100%" stop-color="#050814" />
+    </linearGradient>
+
+    <!-- Center Radial Glow -->
+    <radialGradient id="glowClientRadial" cx="50%" cy="44%" r="55%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.30" />
+      <stop offset="45%" stop-color="#818CF8" stop-opacity="0.16" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Outer Bezel (Cyan -> Indigo -> Violet) -->
+    <linearGradient id="bezelClientGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="45%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#A855F7" />
+    </linearGradient>
+
+    <!-- Workstation Console Body -->
+    <linearGradient id="clientDeskGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#182342" />
+      <stop offset="60%" stop-color="#10172D" />
+      <stop offset="100%" stop-color="#0A0E1C" />
+    </linearGradient>
+
+    <!-- Screen Glass Gradient -->
+    <linearGradient id="clientScreenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#070D1E" />
+      <stop offset="100%" stop-color="#03060F" />
+    </linearGradient>
+
+    <!-- Fiber Bus Ring Gradient -->
+    <linearGradient id="fiberRingGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="50%" stop-color="#818CF8" />
+      <stop offset="100%" stop-color="#C084FC" />
+    </linearGradient>
+
+    <!-- Filters -->
+    <filter id="shadowClient" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#38BDF8" flood-opacity="0.32" />
+    </filter>
+
+    <filter id="glowCyan" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <filter id="glowPurple" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="5" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Squircle Base Canvas -->
+  <rect width="512" height="512" rx="116" fill="url(#bg61850Client)" />
+
+  <!-- Substation Optical Fiber Grid Backdrop -->
+  <g stroke="#38BDF8" stroke-width="1" stroke-opacity="0.06">
+    <line x1="64" y1="0" x2="64" y2="512" />
+    <line x1="128" y1="0" x2="128" y2="512" />
+    <line x1="192" y1="0" x2="192" y2="512" />
+    <line x1="256" y1="0" x2="256" y2="512" stroke-opacity="0.14" stroke-dasharray="6 4" />
+    <line x1="320" y1="0" x2="320" y2="512" />
+    <line x1="384" y1="0" x2="384" y2="512" />
+    <line x1="448" y1="0" x2="448" y2="512" />
+    <line x1="0" y1="64" x2="512" y2="64" />
+    <line x1="0" y1="128" x2="512" y2="128" />
+    <line x1="0" y1="192" x2="512" y2="192" />
+    <line x1="0" y1="256" x2="512" y2="256" stroke-opacity="0.14" stroke-dasharray="6 4" />
+    <line x1="0" y1="320" x2="512" y2="320" />
+    <line x1="0" y1="384" x2="512" y2="384" />
+    <line x1="0" y1="448" x2="512" y2="448" />
+  </g>
+
+  <!-- Central Radial Ambience -->
+  <rect width="512" height="512" rx="116" fill="url(#glowClientRadial)" />
+
+  <!-- Premium Metallic Bezel Contour -->
+  <rect x="2" y="2" width="508" height="508" rx="114" fill="none" stroke="url(#bezelClientGrad)" stroke-width="3" stroke-opacity="0.48" />
+
+  <!-- Top Pill Badge: IEC 61850 MMS / GOOSE (Expanded width for perfect alignment) -->
+  <g transform="translate(256, 68)">
+    <rect x="-115" y="-14" width="230" height="28" rx="14" fill="#0C1B34" stroke="#38BDF8" stroke-width="1.5" />
+    <circle cx="-95" cy="0" r="4" fill="#38BDF8" filter="url(#glowCyan)" />
+    <text x="6" y="4.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#7DD3FC" letter-spacing="2" text-anchor="middle">IEC 61850 MMS / GOOSE</text>
+  </g>
+
+  <!-- Main Illustration: Station Bus Optical Network Ring & SCADA Master Workstation -->
+  <g filter="url(#shadowClient)" transform="translate(0, 4)">
+    
+    <!-- 1. Station Bus Dual Redundant Optical Ring (PRP / HSR Optical Network) -->
+    <!-- Outer Optical Ring A -->
+    <ellipse cx="256" cy="192" rx="148" ry="52" fill="none" stroke="url(#fiberRingGrad)" stroke-width="3" stroke-dasharray="10 6" opacity="0.8" />
+    <!-- Inner Optical Ring B -->
+    <ellipse cx="256" cy="192" rx="116" ry="38" fill="none" stroke="#38BDF8" stroke-width="2.5" opacity="0.6" />
+
+    <!-- Station Ring Interconnected Substation IED Nodes -->
+    <!-- Left IED Node (Bay 1) -->
+    <g transform="translate(112, 190)">
+      <circle cx="0" cy="0" r="11" fill="#0E1B38" stroke="#38BDF8" stroke-width="2.2" />
+      <circle cx="0" cy="0" r="4" fill="#38BDF8" filter="url(#glowCyan)" />
+      <!-- Vertical Drop Beam to Station Bus -->
+      <line x1="0" y1="12" x2="38" y2="88" stroke="#38BDF8" stroke-width="1.8" stroke-dasharray="3 3" opacity="0.6" />
+    </g>
+
+    <!-- Top Left Node (Bay 2) -->
+    <g transform="translate(178, 146)">
+      <circle cx="0" cy="0" r="8" fill="#0E1B38" stroke="#818CF8" stroke-width="1.8" />
+      <circle cx="0" cy="0" r="3" fill="#818CF8" />
+    </g>
+
+    <!-- Top Right Node (Bay 3) -->
+    <g transform="translate(334, 146)">
+      <circle cx="0" cy="0" r="8" fill="#0E1B38" stroke="#818CF8" stroke-width="1.8" />
+      <circle cx="0" cy="0" r="3" fill="#818CF8" />
+    </g>
+
+    <!-- Right IED Node (Bay 4) -->
+    <g transform="translate(400, 190)">
+      <circle cx="0" cy="0" r="11" fill="#0E1B38" stroke="#C084FC" stroke-width="2.2" />
+      <circle cx="0" cy="0" r="4" fill="#C084FC" filter="url(#glowPurple)" />
+      <!-- Vertical Drop Beam to Station Bus -->
+      <line x1="0" y1="12" x2="-38" y2="88" stroke="#C084FC" stroke-width="1.8" stroke-dasharray="3 3" opacity="0.6" />
+    </g>
+
+    <!-- Central SBO Optical Master Convergence Node -->
+    <g transform="translate(256, 192)">
+      <circle cx="0" cy="0" r="22" fill="#0E2248" stroke="#7DD3FC" stroke-width="3" filter="url(#glowCyan)" />
+      <circle cx="0" cy="0" r="13" fill="none" stroke="#C084FC" stroke-width="2" stroke-dasharray="4 3" />
+      <circle cx="0" cy="0" r="5" fill="#38BDF8" />
+      <!-- Fiber Optical Downlink to Screen -->
+      <line x1="0" y1="23" x2="0" y2="76" stroke="#38BDF8" stroke-width="4" stroke-linecap="round" />
+    </g>
+
+    <!-- 2. SCADA Station Level Master Console (Client Workstation Screen) -->
+    <g transform="translate(256, 332)">
+      <!-- Console Base Stand & Heavy Footing -->
+      <path d="M -48 64 L 48 64 L 36 48 L -36 48 Z" fill="#0A0F22" stroke="#38BDF8" stroke-width="1.5" />
+      <rect x="-14" y="32" width="28" height="20" rx="3" fill="#141E38" stroke="#38BDF8" stroke-width="1.8" />
+
+      <!-- Main Display Housing (Modern Wide Bezel) -->
+      <rect x="-146" y="-62" width="292" height="98" rx="14" fill="url(#clientDeskGrad)" stroke="#38BDF8" stroke-width="2.8" />
+      
+      <!-- Screen CRT Glass -->
+      <rect x="-136" y="-52" width="272" height="78" rx="8" fill="url(#clientScreenGrad)" stroke="#6366F1" stroke-width="1.8" />
+
+      <!-- Screen Partition Line (Object Tree on Left | Control & Wave on Right) -->
+      <line x1="-22" y1="-50" x2="-22" y2="24" stroke="#1E293B" stroke-width="1.5" stroke-dasharray="3 3" />
+
+      <!-- LEFT PANE: SCL Data Model Tree (IED -> LD -> LN -> DO) -->
+      <g transform="translate(-122, -38)">
+        <!-- Root Node: IED -->
+        <circle cx="4" cy="4" r="3.5" fill="#38BDF8" />
+        <text x="14" y="7" font-family="monospace" font-size="8.5" font-weight="700" fill="#7DD3FC">IED: Station_1</text>
+
+        <!-- Branch 1: LD0 -->
+        <path d="M 4 8 L 4 22 L 14 22" fill="none" stroke="#38BDF8" stroke-width="1.4" />
+        <circle cx="16" cy="22" r="3" fill="#818CF8" />
+        <text x="25" y="25" font-family="monospace" font-size="8.5" font-weight="700" fill="#A5B4FC">LD: PROT</text>
+
+        <!-- Branch 2: LN XCBR1 -->
+        <path d="M 16 26 L 16 40 L 26 40" fill="none" stroke="#818CF8" stroke-width="1.4" />
+        <circle cx="28" cy="40" r="2.8" fill="#C084FC" />
+        <text x="36" y="43" font-family="monospace" font-size="8.5" font-weight="700" fill="#E9D5FF">LN: XCBR1</text>
+      </g>
+
+      <!-- RIGHT PANE: SBO Command Operator & Real-time Telemetry Pulse -->
+      <g transform="translate(-8, -38)">
+        <!-- SBO Status Pill -->
+        <rect x="0" y="0" width="76" height="15" rx="4" fill="#0A2234" stroke="#38BDF8" stroke-width="1" />
+        <circle cx="7" cy="7.5" r="2.5" fill="#34D399" />
+        <text x="14" y="10.5" font-family="monospace" font-size="7.5" font-weight="700" fill="#38BDF8">SBO: SELECT</text>
+
+        <!-- Breaker Status Badge -->
+        <rect x="82" y="0" width="46" height="15" rx="4" fill="#2E102E" stroke="#C084FC" stroke-width="1" />
+        <text x="105" y="10.5" font-family="monospace" font-size="7.5" font-weight="700" fill="#F472B6" text-anchor="middle">CLOSE</text>
+
+        <!-- GOOSE Event Waveform Stream -->
+        <path d="M 0 34 L 18 34 L 28 20 L 38 46 L 50 24 L 62 38 L 74 34 L 126 34" fill="none" stroke="#38BDF8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" filter="url(#glowCyan)" />
+
+        <!-- Microsecond Marker -->
+        <circle cx="28" cy="20" r="3" fill="#FFFFFF" />
+        <circle cx="38" cy="46" r="3" fill="#C084FC" />
+      </g>
+
+      <!-- Bottom Chassis LEDs & Port Status -->
+      <g transform="translate(0, 40)">
+        <circle cx="-120" cy="0" r="3.2" fill="#10B981" />
+        <circle cx="-106" cy="0" r="3.2" fill="#38BDF8" />
+        <circle cx="-92" cy="0" r="3.2" fill="#818CF8" />
+        <text x="-76" y="3" font-family="monospace" font-size="7.5" font-weight="700" fill="#64748B">PORT 102: ONLINE</text>
+
+        <circle cx="92" cy="0" r="3.2" fill="#F59E0B" />
+        <circle cx="106" cy="0" r="3.2" fill="#38BDF8" />
+        <circle cx="120" cy="0" r="3.2" fill="#10B981" />
+      </g>
+    </g>
+  </g>
+
+  <!-- Typography & Subtitle Branding -->
+  <g transform="translate(256, 442)">
+    <text x="0" y="0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="34" font-weight="900" fill="#F8FAFC" letter-spacing="8" text-anchor="middle">IEC 61850</text>
+    <text x="0" y="24" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#38BDF8" letter-spacing="4" text-anchor="middle">CLIENT · MMS &amp; GOOSE</text>
+  </g>
+</svg>

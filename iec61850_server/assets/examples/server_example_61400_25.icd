@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--SCL Schema Version 3.1 (2012/10/22)-->
+<SCL version="2007" revision="B" xmlns="http://www.iec.ch/61850/2003/SCL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.iec.ch/61850/2003/SCL SCL.xsd">
+	<Header id="" version="" revision="" toolID="Redisant SCL Parser Engine" nameStructure="IEDName" />
+	<Communication>
+		<SubNetwork name="NONE" type="8-MMS">
+			<ConnectedAP iedName="WIN" apName="P1">
+				<Address>
+					<P type="IP" xsi:type="tP_IP">127.0.0.1</P>
+					<P type="OSI-TSEL" xsi:type="tP_OSI-TSEL">0001</P>
+					<P type="OSI-SSEL" xsi:type="tP_OSI-SSEL">0001</P>
+					<P type="OSI-PSEL" xsi:type="tP_OSI-PSEL">00000001</P>
+					<P type="OSI-AP-Title">1,1,1,999,1</P>
+					<P type="OSI-AP-Invoke" xsi:type="tP_OSI-AP-Invoke">0</P>
+					<P type="OSI-AE-Qualifier" xsi:type="tP_OSI-AE-Qualifier">12</P>
+					<P type="OSI-AE-Invoke" xsi:type="tP_OSI-AE-Invoke">0</P>
+					<P type="MMS-Port" xsi:type="tP_MMS-Port">102</P>
+				</Address>
+			</ConnectedAP>
+		</SubNetwork>
+	</Communication>
+	<IED name="WIN">
+		<Services>
+			<DynAssociation />
+			<GetDirectory />
+			<GetDataObjectDefinition />
+			<DataObjectDirectory />
+			<GetDataSetValue />
+			<SetDataSetValue />
+			<DataSetDirectory />
+			<ConfDataSet max="0" modify="false" />
+			<DynDataSet max="42" />
+			<ReadWrite />
+			<TimerActivatedControl />
+			<ConfReportControl max="0" bufConf="false" />
+			<GetCBValues />
+			<ReportSettings rptID="Dyn" optFields="Dyn" bufTime="Dyn" trgOps="Dyn" intgPd="Dyn" />
+			<ConfLNs fixPrefix="true" fixLnInst="true" />
+			<GOOSE max="0" />
+			<GSSE max="0" />
+			<FileHandling />
+		</Services>
+		<AccessPoint name="P1">
+			<Server>
+				<Authentication none="true" />
+				<LDevice inst="DWTG">
+					<LN0 lnType="WINDWTG.LLN0" lnClass="LLN0" inst="">
+						<DOI name="Mod">
+							<DAI name="ctlModel">
+								<Val>status-only</Val>
+							</DAI>
+						</DOI>
+						<DOI name="NamPlt">
+							<DAI name="vendor">
+								<Val></Val>
+							</DAI>
+							<DAI name="swRev">
+								<Val></Val>
+							</DAI>
+							<DAI name="configRev">
+								<Val></Val>
+							</DAI>
+						</DOI>
+					</LN0>
+					<LN lnType="WINDWTG.LPHD1" lnClass="LPHD" inst="1">
+						<DOI name="NamPlt">
+							<DAI name="vendor">
+								<Val></Val>
+							</DAI>
+							<DAI name="swRev">
+								<Val></Val>
+							</DAI>
+							<DAI name="configRev">
+								<Val></Val>
+							</DAI>
+						</DOI>
+						<DOI name="PhyNam">
+							<DAI name="vendor">
+								<Val></Val>
+							</DAI>
+							<DAI name="hwRev">
+								<Val></Val>
+							</DAI>
+							<DAI name="swRev">
+								<Val></Val>
+							</DAI>
+							<DAI name="serNum">
+								<Val></Val>
+							</DAI>
+							<DAI name="model">
+								<Val></Val>
+							</DAI>
+						</DOI>
+					</LN>
+					<LN lnType="WINDWTG.WTUR1" lnClass="WTUR" inst="1">
+						<DOI name="TotWh">
+							<SDI name="manRs">
+								<DAI name="ctlModel">
+									<Val>status-only</Val>
+								</DAI>
+								<DAI name="sboTimeout">
+									<Val>0</Val>
+								</DAI>
+								<DAI name="sboClass">
+									<Val>operate-once</Val>
+								</DAI>
+							</SDI>
+							<SDI name="hisRs">
+								<DAI name="ctlModel">
+									<Val>status-only</Val>
+								</DAI>
+							</SDI>
+							<DAI name="rsPer">
+								<Val>0</Val>
+							</DAI>
+						</DOI>
+						<DOI name="TurSt">
+							<SDI name="stTm">
+								<SDI name="manRs">
+									<DAI name="ctlModel">
+										<Val>status-only</Val>
+									</DAI>
+									<DAI name="sboTimeout">
+										<Val>0</Val>
+									</DAI>
+									<DAI name="sboClass">
+										<Val>operate-once</Val>
+									</DAI>
+								</SDI>
+								<SDI name="hisRs">
+									<DAI name="ctlModel">
+										<Val>status-only</Val>
+									</DAI>
+								</SDI>
+								<DAI name="rsPer">
+									<Val>0</Val>
+								</DAI>
+							</SDI>
+							<SDI name="stCt">
+								<SDI name="manRs">
+									<DAI name="ctlModel">
+										<Val>status-only</Val>
+									</DAI>
+									<DAI name="sboTimeout">
+										<Val>0</Val>
+									</DAI>
+									<DAI name="sboClass">
+										<Val>operate-once</Val>
+									</DAI>
+								</SDI>
+								<SDI name="hisRs">
+									<DAI name="ctlModel">
+										<Val>status-only</Val>
+									</DAI>
+								</SDI>
+								<DAI name="rsPer">
+									<Val>0</Val>
+								</DAI>
+							</SDI>
+							<DAI name="preTmms">
+								<Val>0</Val>
+							</DAI>
+							<DAI name="pstTmms">
+								<Val>0</Val>
+							</DAI>
+							<DAI name="smpTmms">
+								<Val>0</Val>
+							</DAI>
+							<DAI name="datSetMx">
+								<Val></Val>
+							</DAI>
+						</DOI>
+						<DOI name="SetTurOp">
+							<SDI name="actSt">
+								<DAI name="ctlModel">
+									<Val>direct-with-normal-security</Val>
+								</DAI>
+							</SDI>
+							<SDI name="cmTm">
+								<SDI name="manRs">
+									<DAI name="ctlModel">
+										<Val>status-only</Val>
+									</DAI>
+									<DAI name="sboTimeout">
+										<Val>0</Val>
+									</DAI>
+									<DAI name="sboClass">
+										<Val>operate-once</Val>
+									</DAI>
+								</SDI>
+								<SDI name="hisRs">
+									<DAI name="ctlModel">
+										<Val>status-only</Val>
+									</DAI>
+								</SDI>
+								<DAI name="rsPer">
+									<Val>0</Val>
+								</DAI>
+							</SDI>
+							<SDI name="cmCt">
+								<SDI name="manRs">
+									<DAI name="ctlModel">
+										<Val>status-only</Val>
+									</DAI>
+									<DAI name="sboTimeout">
+										<Val>0</Val>
+									</DAI>
+									<DAI name="sboClass">
+										<Val>operate-once</Val>
+									</DAI>
+								</SDI>
+								<SDI name="hisRs">
+									<DAI name="ctlModel">
+										<Val>status-only</Val>
+									</DAI>
+								</SDI>
+								<DAI name="rsPer">
+									<Val>0</Val>
+								</DAI>
+							</SDI>
+							<DAI name="cmAcs">
+								<Val>0</Val>
+							</DAI>
+						</DOI>
+						<DOI name="NamPlt">
+							<DAI name="vendor">
+								<Val></Val>
+							</DAI>
+							<DAI name="swRev">
+								<Val></Val>
+							</DAI>
+							<DAI name="configRev">
+								<Val></Val>
+							</DAI>
+						</DOI>
+					</LN>
+				</LDevice>
+			</Server>
+		</AccessPoint>
+	</IED>
+	<DataTypeTemplates>
+		<LNodeType id="WINDWTG.LLN0" lnClass="LLN0">
+			<DO name="Mod" type="WINDWTG.LLN0.Mod" />
+			<DO name="Beh" type="WINDWTG.LLN0.Beh" />
+			<DO name="Health" type="WINDWTG.LLN0.Health" />
+			<DO name="NamPlt" type="WINDWTG.LLN0.NamPlt" />
+		</LNodeType>
+		<LNodeType id="WINDWTG.LPHD1" lnClass="LPHD">
+			<DO name="PhyHealth" type="WINDWTG.LLN0.Health" />
+			<DO name="Proxy" type="WINDWTG.LPHD1.Proxy" />
+			<DO name="NamPlt" type="WINDWTG.LPHD1.NamPlt" />
+			<DO name="PhyNam" type="WINDWTG.LPHD1.PhyNam" />
+		</LNodeType>
+		<LNodeType id="WINDWTG.WTUR1" lnClass="WTUR">
+			<DO name="W" type="WINDWTG.WTUR1.W" />
+			<DO name="TotWh" type="WINDWTG.WTUR1.TotWh" />
+			<DO name="TurSt" type="WINDWTG.WTUR1.TurSt" />
+			<DO name="SetTurOp" type="WINDWTG.WTUR1.SetTurOp" />
+			<DO name="NamPlt" type="WINDWTG.LLN0.NamPlt" />
+		</LNodeType>
+		<DOType id="WINDWTG.LPHD1.PhyNam" cdc="DPL">
+			<DA name="vendor" fc="DC" bType="VisString255" />
+			<DA name="hwRev" fc="DC" bType="VisString255" />
+			<DA name="swRev" fc="DC" bType="VisString255" />
+			<DA name="serNum" fc="DC" bType="VisString255" />
+			<DA name="model" fc="DC" bType="VisString255" />
+		</DOType>
+		<DOType id="WINDWTG.LLN0.Mod" cdc="INC">
+			<DA name="stVal" fc="ST" bType="Enum" type="Mod" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+			<DA name="Oper" fc="CO" bType="Struct" type="WINDWTG.LLN0.Mod.Oper" />
+			<DA name="ctlModel" fc="CF" bType="Enum" type="ctlModel" />
+		</DOType>
+		<DOType id="WINDWTG.WTUR1.TotWh.hisRs" cdc="INC">
+			<DA name="stVal" fc="ST" bType="INT32" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+			<DA name="Oper" fc="CO" bType="Struct" type="WINDWTG.WTUR1.TotWh.hisRs.Oper" />
+			<DA name="ctlModel" fc="CF" bType="Enum" type="ctlModel" />
+		</DOType>
+		<DOType id="WINDWTG.LLN0.Beh" cdc="INS">
+			<DA name="stVal" fc="ST" bType="Enum" type="Beh" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+		</DOType>
+		<DOType id="WINDWTG.LLN0.Health" cdc="INS">
+			<DA name="stVal" fc="ST" bType="Enum" type="Health" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+		</DOType>
+		<DOType id="WINDWTG.WTUR1.TotWh.actCtVal" cdc="INS">
+			<DA name="stVal" fc="ST" bType="INT32" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+		</DOType>
+		<DOType id="WINDWTG.LLN0.NamPlt" cdc="LPL">
+			<DA name="vendor" fc="DC" bType="VisString255" />
+			<DA name="swRev" fc="DC" bType="VisString255" />
+			<DA name="configRev" fc="DC" bType="VisString255" />
+		</DOType>
+		<DOType id="WINDWTG.WTUR1.W" cdc="MV">
+			<DA name="instMag" fc="MX" bType="Struct" type="WINDWTG.WTUR1.W.instMag" />
+			<DA name="mag" fc="MX" bType="Struct" type="WINDWTG.WTUR1.W.instMag" />
+			<DA name="q" fc="MX" bType="Quality" />
+			<DA name="t" fc="MX" bType="Timestamp" />
+		</DOType>
+		<DOType id="WINDWTG.WTUR1.TotWh.manRs" cdc="SPC">
+			<DA name="stVal" fc="ST" bType="BOOLEAN" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+			<DA name="Oper" fc="CO" bType="Struct" type="WINDWTG.WTUR1.TotWh.manRs.Oper" />
+			<DA name="ctlModel" fc="CF" bType="Enum" type="ctlModel" />
+			<DA name="sboTimeout" fc="CF" bType="INT32U" />
+			<DA name="sboClass" fc="CF" bType="Enum" type="sboClass" />
+		</DOType>
+		<DOType id="WINDWTG.LPHD1.Proxy" cdc="SPS">
+			<DA name="stVal" fc="ST" bType="BOOLEAN" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+		</DOType>
+		<DOType id="WINDWTG.LPHD1.NamPlt" cdc="LPL">
+			<DA name="vendor" fc="DC" bType="VisString255" />
+			<DA name="swRev" fc="DC" bType="VisString255" />
+			<DA name="configRev" fc="DC" bType="VisString255" />
+		</DOType>
+		<DOType id="WINDWTG.WTUR1.TurSt.stTm" cdc="TMS">
+			<SDO name="manRs" type="WINDWTG.WTUR1.TotWh.manRs" />
+			<SDO name="hisRs" type="WINDWTG.WTUR1.TotWh.hisRs" />
+			<SDO name="actTmVal" type="WINDWTG.WTUR1.TotWh.actCtVal" />
+			<SDO name="oldTmVal" type="WINDWTG.WTUR1.TotWh.actCtVal" />
+			<DA name="tmTot" fc="ST" bType="INT32U" />
+			<DA name="dly" fc="ST" bType="INT32U" count="32" />
+			<DA name="mly" fc="ST" bType="INT32U" count="13" />
+			<DA name="yly" fc="ST" bType="INT32U" count="21" />
+			<DA name="tot" fc="ST" bType="INT32U" />
+			<DA name="rsPer" fc="CF" bType="INT8" />
+		</DOType>
+		<DOType id="WINDWTG.WTUR1.TotWh" cdc="CTE">
+			<SDO name="manRs" type="WINDWTG.WTUR1.TotWh.manRs" />
+			<SDO name="hisRs" type="WINDWTG.WTUR1.TotWh.hisRs" />
+			<SDO name="actCtVal" type="WINDWTG.WTUR1.TotWh.actCtVal" />
+			<SDO name="oldCtVal" type="WINDWTG.WTUR1.TotWh.actCtVal" />
+			<DA name="ctTot" fc="ST" bType="INT32U" />
+			<DA name="dly" fc="ST" bType="INT32U" count="32" />
+			<DA name="mly" fc="ST" bType="INT32U" count="13" />
+			<DA name="yly" fc="ST" bType="INT32U" count="21" />
+			<DA name="tot" fc="ST" bType="INT32U" />
+			<DA name="rsPer" fc="CF" bType="INT8" />
+		</DOType>
+		<DOType id="WINDWTG.WTUR1.SetTurOp" cdc="CMD">
+			<SDO name="actSt" type="WINDWTG.WTUR1.TotWh.hisRs" />
+			<SDO name="oldSt" type="WINDWTG.WTUR1.TotWh.actCtVal" />
+			<SDO name="cmTm" type="WINDWTG.WTUR1.TurSt.stTm" />
+			<SDO name="cmCt" type="WINDWTG.WTUR1.TotWh" />
+			<DA name="cmAcs" fc="CF" bType="INT8U" />
+		</DOType>
+		<DOType id="WINDWTG.WTUR1.TurSt" cdc="STV">
+			<SDO name="actSt" type="WINDWTG.WTUR1.TotWh.actCtVal" />
+			<SDO name="oldSt" type="WINDWTG.WTUR1.TotWh.actCtVal" />
+			<SDO name="stTm" type="WINDWTG.WTUR1.TurSt.stTm" />
+			<SDO name="stCt" type="WINDWTG.WTUR1.TotWh" />
+			<DA name="preTmms" fc="CF" bType="INT32U" />
+			<DA name="pstTmms" fc="CF" bType="INT32U" />
+			<DA name="smpTmms" fc="CF" bType="INT16U" />
+			<DA name="datSetMx" fc="CF" bType="ObjRef" />
+		</DOType>
+		<DAType id="WINDWTG.WTUR1.W.instMag">
+			<BDA name="i" bType="INT32" />
+			<BDA name="f" bType="FLOAT32" />
+		</DAType>
+		<DAType id="WINDWTG.LLN0.Mod.Oper.origin">
+			<BDA name="orCat" bType="Enum" type="orCategory" />
+			<BDA name="orIdent" bType="Octet64" />
+		</DAType>
+		<DAType id="WINDWTG.LLN0.Mod.Oper">
+			<BDA name="ctlVal" bType="Enum" type="Mod" />
+			<BDA name="operTm" bType="Timestamp" />
+			<BDA name="origin" bType="Struct" type="WINDWTG.LLN0.Mod.Oper.origin" />
+			<BDA name="ctlNum" bType="INT8U" />
+			<BDA name="T" bType="Timestamp" />
+			<BDA name="Test" bType="BOOLEAN" />
+			<BDA name="Check" bType="Check" />
+		</DAType>
+		<DAType id="WINDWTG.WTUR1.TotWh.manRs.Oper">
+			<BDA name="ctlVal" bType="BOOLEAN" />
+			<BDA name="operTm" bType="Timestamp" />
+			<BDA name="origin" bType="Struct" type="WINDWTG.LLN0.Mod.Oper.origin" />
+			<BDA name="ctlNum" bType="INT8U" />
+			<BDA name="T" bType="Timestamp" />
+			<BDA name="Test" bType="BOOLEAN" />
+			<BDA name="Check" bType="Check" />
+		</DAType>
+		<DAType id="WINDWTG.WTUR1.TotWh.hisRs.Oper">
+			<BDA name="ctlVal" bType="INT32" />
+			<BDA name="operTm" bType="Timestamp" />
+			<BDA name="origin" bType="Struct" type="WINDWTG.LLN0.Mod.Oper.origin" />
+			<BDA name="ctlNum" bType="INT8U" />
+			<BDA name="T" bType="Timestamp" />
+			<BDA name="Test" bType="BOOLEAN" />
+			<BDA name="Check" bType="Check" />
+		</DAType>
+		<EnumType id="ctlModel">
+			<!--Source: IEC 61850-7-3:2003A-->
+			<EnumVal ord="0">status-only</EnumVal>
+			<EnumVal ord="1">direct-with-normal-security</EnumVal>
+			<EnumVal ord="2">sbo-with-normal-security</EnumVal>
+			<EnumVal ord="3">direct-with-enhanced-security</EnumVal>
+			<EnumVal ord="4">sbo-with-enhanced-security</EnumVal>
+		</EnumType>
+		<EnumType id="sboClass">
+			<!--Source: IEC 61850-7-3:2003A-->
+			<EnumVal ord="0">operate-once</EnumVal>
+			<EnumVal ord="1">operate-many</EnumVal>
+		</EnumType>
+		<EnumType id="orCategory">
+			<!--Source: IEC 61850-7-3:2003A-->
+			<EnumVal ord="0">not-supported</EnumVal>
+			<EnumVal ord="1">bay-control</EnumVal>
+			<EnumVal ord="2">station-control</EnumVal>
+			<EnumVal ord="3">remote-control</EnumVal>
+			<EnumVal ord="4">automatic-bay</EnumVal>
+			<EnumVal ord="5">automatic-station</EnumVal>
+			<EnumVal ord="6">automatic-remote</EnumVal>
+			<EnumVal ord="7">maintenance</EnumVal>
+			<EnumVal ord="8">process</EnumVal>
+		</EnumType>
+		<EnumType id="Beh">
+			<!--Source: IEC 61850-7-4:2003A-->
+			<EnumVal ord="1">on</EnumVal>
+			<EnumVal ord="2">blocked</EnumVal>
+			<EnumVal ord="3">test</EnumVal>
+			<EnumVal ord="4">test/blocked</EnumVal>
+			<EnumVal ord="5">off</EnumVal>
+		</EnumType>
+		<EnumType id="Health">
+			<!--Source: IEC 61850-7-4:2003A-->
+			<EnumVal ord="1">Ok</EnumVal>
+			<EnumVal ord="2">Warning</EnumVal>
+			<EnumVal ord="3">Alarm</EnumVal>
+		</EnumType>
+		<EnumType id="Mod">
+			<!--Source: IEC 61850-7-4:2003A-->
+			<EnumVal ord="1">on</EnumVal>
+			<EnumVal ord="2">blocked</EnumVal>
+			<EnumVal ord="3">test</EnumVal>
+			<EnumVal ord="4">test/blocked</EnumVal>
+			<EnumVal ord="5">off</EnumVal>
+		</EnumType>
+	</DataTypeTemplates>
+</SCL>

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background Gradient (Deep Carbon Purple & Dark Teal Matrix) -->
+    <linearGradient id="bgModbusSlave" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#140D26" />
+      <stop offset="45%" stop-color="#121A2D" />
+      <stop offset="100%" stop-color="#070A12" />
+    </linearGradient>
+
+    <!-- Center Glow (Electric Teal & Violet Halo) -->
+    <radialGradient id="centerGlowModbusSlave" cx="50%" cy="44%" r="52%">
+      <stop offset="0%" stop-color="#10B981" stop-opacity="0.28" />
+      <stop offset="40%" stop-color="#8B5CF6" stop-opacity="0.18" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Teal-Emerald Accent Gradient -->
+    <linearGradient id="tealGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06B6D4" />
+      <stop offset="50%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#34D399" />
+    </linearGradient>
+
+    <!-- Violet-Teal Bezel Gradient -->
+    <linearGradient id="bezelSlaveGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A78BFA" />
+      <stop offset="50%" stop-color="#06B6D4" />
+      <stop offset="100%" stop-color="#10B981" />
+    </linearGradient>
+
+    <!-- Chassis Metal Gradient -->
+    <linearGradient id="slaveChassisGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1F1A3A" />
+      <stop offset="50%" stop-color="#151D2A" />
+      <stop offset="100%" stop-color="#0E131C" />
+    </linearGradient>
+
+    <!-- Oscilloscope CRT Screen Gradient -->
+    <linearGradient id="crtGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#041814" />
+      <stop offset="100%" stop-color="#020C0A" />
+    </linearGradient>
+
+    <!-- Brass Terminal Pin Gradient -->
+    <linearGradient id="pinBrass" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#34D399" />
+      <stop offset="50%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#064E3B" />
+    </linearGradient>
+
+    <!-- Drop Shadows and Glows -->
+    <filter id="shadowModbusSlave" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#10B981" flood-opacity="0.32" />
+    </filter>
+
+    <filter id="glowTeal" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="5.5" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <filter id="glowWave" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Base Squircle Container -->
+  <rect width="512" height="512" rx="116" fill="url(#bgModbusSlave)" />
+
+  <!-- Industrial Matrix Grid Lines -->
+  <g stroke="#10B981" stroke-width="1" stroke-opacity="0.06">
+    <line x1="64" y1="0" x2="64" y2="512" />
+    <line x1="128" y1="0" x2="128" y2="512" />
+    <line x1="192" y1="0" x2="192" y2="512" />
+    <line x1="256" y1="0" x2="256" y2="512" stroke-opacity="0.12" stroke-dasharray="6 4" />
+    <line x1="320" y1="0" x2="320" y2="512" />
+    <line x1="384" y1="0" x2="384" y2="512" />
+    <line x1="448" y1="0" x2="448" y2="512" />
+    <line x1="0" y1="64" x2="512" y2="64" />
+    <line x1="0" y1="128" x2="512" y2="128" />
+    <line x1="0" y1="192" x2="512" y2="192" />
+    <line x1="0" y1="256" x2="512" y2="256" stroke-opacity="0.12" stroke-dasharray="6 4" />
+    <line x1="0" y1="320" x2="512" y2="320" />
+    <line x1="0" y1="384" x2="512" y2="384" />
+    <line x1="0" y1="448" x2="512" y2="448" />
+  </g>
+
+  <!-- Ambient Light Sphere -->
+  <rect width="512" height="512" rx="116" fill="url(#centerGlowModbusSlave)" />
+
+  <!-- Outer Squircle Bezel Border -->
+  <rect x="2" y="2" width="508" height="508" rx="114" fill="none" stroke="url(#bezelSlaveGrad)" stroke-width="3" stroke-opacity="0.45" />
+
+  <!-- Protocol Header Badge -->
+  <g transform="translate(256, 68)">
+    <rect x="-92" y="-14" width="184" height="28" rx="14" fill="#0C1E1B" stroke="#10B981" stroke-width="1.5" />
+    <circle cx="-70" cy="0" r="4" fill="#34D399" />
+    <text x="8" y="4.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#6EE7B7" letter-spacing="2" text-anchor="middle">MODBUS TCP / RTU</text>
+  </g>
+
+  <!-- Main Illustration Group -->
+  <g filter="url(#shadowModbusSlave)" transform="translate(0, -6)">
+    <!-- Top Bus Header Bar (RS-485 / Serial Bus Infeed to Slave) -->
+    <g stroke-linecap="round">
+      <line x1="100" y1="140" x2="412" y2="140" stroke="#10B981" stroke-width="3" stroke-dasharray="8 6" opacity="0.6" />
+      <line x1="140" y1="140" x2="372" y2="140" stroke="#34D399" stroke-width="4" />
+      <!-- Downward Infeed Drops to this Slave Unit -->
+      <line x1="200" y1="140" x2="200" y2="165" stroke="#06B6D4" stroke-width="2.5" />
+      <circle cx="200" cy="168" r="4" fill="#38BDF8" />
+      <line x1="312" y1="140" x2="312" y2="165" stroke="#A78BFA" stroke-width="2.5" />
+      <circle cx="312" cy="168" r="4" fill="#C4B5FD" />
+    </g>
+
+    <!-- Slave Unit Enclosure -->
+    <g transform="translate(256, 274)">
+      <!-- Heavy Industrial Enclosure Body -->
+      <rect x="-124" y="-95" width="248" height="175" rx="18" fill="url(#slaveChassisGrad)" stroke="#10B981" stroke-width="3" />
+
+      <!-- Top Terminal Connector Block (RS-485 A/B/GND + Power) -->
+      <g transform="translate(0, -107)">
+        <rect x="-106" y="0" width="212" height="16" rx="4" fill="#0C1B17" stroke="#059669" stroke-width="1.5" />
+        <!-- 6 Screw Terminal Pins -->
+        <rect x="-90" y="-8" width="10" height="10" rx="2" fill="#10B981" />
+        <rect x="-60" y="-8" width="10" height="10" rx="2" fill="#10B981" />
+        <rect x="-15" y="-8" width="10" height="10" rx="2" fill="#06B6D4" />
+        <rect x="15" y="-8" width="10" height="10" rx="2" fill="#06B6D4" />
+        <rect x="60" y="-8" width="10" height="10" rx="2" fill="#8B5CF6" />
+        <rect x="85" y="-8" width="10" height="10" rx="2" fill="#8B5CF6" />
+      </g>
+
+      <!-- Panel Header: Status LEDs & Slave ID Badge -->
+      <line x1="-124" y1="-55" x2="124" y2="-55" stroke="#1E293B" stroke-width="2" />
+
+      <!-- Response / Listening LEDs -->
+      <circle cx="-100" cy="-74" r="5" fill="#10B981" />
+      <text x="-90" y="-70" font-family="monospace" font-size="10" font-weight="800" fill="#34D399">LISTEN</text>
+      <circle cx="-32" cy="-74" r="5" fill="#38BDF8" />
+      <text x="-22" y="-70" font-family="monospace" font-size="10" font-weight="800" fill="#7DD3FC">RESP</text>
+
+      <!-- Port 502 / Slave ID:1 Badge -->
+      <rect x="22" y="-84" width="90" height="20" rx="6" fill="#06221C" stroke="#10B981" stroke-width="1.2" />
+      <text x="67" y="-70.5" font-family="monospace" font-size="10.5" font-weight="700" fill="#34D399" letter-spacing="1" text-anchor="middle">SLAVE ID:1</text>
+
+      <!-- Central Display Area: Real-Time Dynamic Simulation Waveform Screen (Sine & Harmonics) -->
+      <rect x="-106" y="-42" width="212" height="108" rx="10" fill="url(#crtGrad)" stroke="#059669" stroke-width="2" />
+
+      <!-- Oscilloscope / Register Grid Lines -->
+      <line x1="-106" y1="-7" x2="106" y2="-7" stroke="#064E3B" stroke-width="1" stroke-dasharray="3 3" />
+      <line x1="-106" y1="28" x2="106" y2="28" stroke="#064E3B" stroke-width="1" stroke-dasharray="3 3" />
+      <line x1="0" y1="-42" x2="0" y2="66" stroke="#064E3B" stroke-width="1" stroke-dasharray="3 3" />
+
+      <!-- Register & Simulation Indicator Tags -->
+      <text x="-88" y="-27" font-family="monospace" font-size="9" font-weight="700" fill="#10B981" opacity="0.8">SIMULATION</text>
+      <text x="32" y="-27" font-family="monospace" font-size="9" font-weight="700" fill="#06B6D4" opacity="0.8">SINE · 50Hz</text>
+      <text x="-88" y="52" font-family="monospace" font-size="9" font-weight="700" fill="#10B981" opacity="0.8">HOLDING 4x</text>
+      <text x="32" y="52" font-family="monospace" font-size="9" font-weight="700" fill="#06B6D4" opacity="0.8">INPUT 3x</text>
+
+      <!-- Dynamic Smooth "S"-Curved Sine Wave (The Iconic Modbus "S" & Waveform Generator) -->
+      <!-- A harmonic double-wave that elegantly forms an 'S'-flow across the screen -->
+      <path d="M -80 18 C -64 36, -52 -32, -26 -16 C -6 0, 6 24, 26 12 C 52 -4, 64 -32, 80 18" fill="none" stroke="#34D399" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#glowTeal)" />
+
+      <!-- Secondary Harmonic Curve (Dashed subtle guide) -->
+      <path d="M -80 10 C -50 -15, -20 30, 10 5 C 40 -20, 60 25, 80 8" fill="none" stroke="#06B6D4" stroke-width="1.8" stroke-dasharray="4 3" opacity="0.6" />
+
+      <!-- Active Sampling Points on Wave -->
+      <circle cx="-50" cy="-6" r="3.5" fill="#FFFFFF" />
+      <circle cx="0" cy="12" r="4" fill="#FBBF24" />
+      <circle cx="48" cy="-8" r="3.5" fill="#FFFFFF" />
+
+      <!-- Bottom Chassis Screws -->
+      <circle cx="-110" cy="68" r="3.5" fill="#065F46" />
+      <circle cx="110" cy="68" r="3.5" fill="#065F46" />
+    </g>
+  </g>
+
+  <!-- Typography & Subtitle Branding -->
+  <g transform="translate(256, 436)">
+    <!-- Main Title -->
+    <text x="0" y="0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="34" font-weight="900" fill="#F8FAFC" letter-spacing="8" text-anchor="middle">MODBUS</text>
+    <!-- Subtitle Badge -->
+    <text x="0" y="24" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#34D399" letter-spacing="4" text-anchor="middle">SLAVE · SERVER EMULATOR</text>
+  </g>
+</svg>

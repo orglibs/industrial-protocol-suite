@@ -1,0 +1,31 @@
+name: CI Test Suite
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  test:
+    name: Run Unit & Protocol Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Run Tests Across All 6 Subprojects
+        run: |
+          projects=("iec104_server" "iec104_client" "iec61850_server" "iec61850_client" "modbus_slave" "modbus_master")
+          for p in "${projects[@]}"; do
+            echo "=========================================================="
+            echo ">>> Testing $p"
+            echo "=========================================================="
+            (cd "$p" && flutter pub get && flutter test)
+          done

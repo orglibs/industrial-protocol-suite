@@ -1,0 +1,3794 @@
+﻿[
+  {
+    "cdc": "ACD",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ACD",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ACD",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ACD",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ACD",
+    "name": "dirGeneral",
+    "type": "ENUMERATED",
+    "range": "unknown|forward|backward|both"
+  },
+  {
+    "cdc": "ACD",
+    "name": "dirNeut",
+    "type": "ENUMERATED",
+    "range": "unknown|forward|backward"
+  },
+  {
+    "cdc": "ACD",
+    "name": "dirPhsA",
+    "type": "ENUMERATED",
+    "range": "unknown|forward|backward"
+  },
+  {
+    "cdc": "ACD",
+    "name": "dirPhsB",
+    "type": "ENUMERATED",
+    "range": "unknown|forward|backward"
+  },
+  {
+    "cdc": "ACD",
+    "name": "dirPhsC",
+    "type": "ENUMERATED",
+    "range": "unknown|forward|backward"
+  },
+  {
+    "cdc": "ACD",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ACD",
+    "name": "general",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "ACD",
+    "name": "neut",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "ACD",
+    "name": "phsA",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "ACD",
+    "name": "phsB",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "ACD",
+    "name": "phsC",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "ACD",
+    "name": "q",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "ACD",
+    "name": "t",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "ACT",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ACT",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ACT",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ACT",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ACT",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ACT",
+    "name": "general",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "ACT",
+    "name": "neut",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "ACT",
+    "name": "operTmPhsA",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "ACT",
+    "name": "operTmPhsB",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "ACT",
+    "name": "operTmPhsC",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "ACT",
+    "name": "originSrc",
+    "type": "Originator",
+    "range": null
+  },
+  {
+    "cdc": "ACT",
+    "name": "phsA",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "ACT",
+    "name": "phsB",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "ACT",
+    "name": "phsC",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "ACT",
+    "name": "q",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "ACT",
+    "name": "t",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "blkEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "ctlModel",
+    "type": "CtlModels",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "ctlNum",
+    "type": "INT8U",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "ctlVal",
+    "type": "AnalogueValue",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "db",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "maxVal",
+    "type": "AnalogueValue",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "minVal",
+    "type": "AnalogueValue",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "mxWTr",
+    "type": "AnalogueValue",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "operTimeout",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "opOk",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "opRcvd",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "origin",
+    "type": "Originator",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "q",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "sboClass",
+    "type": "SboClasses",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "sboTimeout",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "stepSize",
+    "type": "AnalogueValue",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "stSeld",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "subEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "subID",
+    "type": "VISIBLE_STRING64",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "subQ",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "subVal",
+    "type": "AnalogueValue",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "sVC",
+    "type": "ScaledValueConfig",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "t",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "tOpOk",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "APC",
+    "name": "units",
+    "type": "Unit",
+    "range": null
+  },
+  {
+    "cdc": "ASG",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ASG",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ASG",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ASG",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ASG",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ASG",
+    "name": "maxVal",
+    "type": "AnalogueValue",
+    "range": null
+  },
+  {
+    "cdc": "ASG",
+    "name": "minVal",
+    "type": "AnalogueValue",
+    "range": null
+  },
+  {
+    "cdc": "ASG",
+    "name": "setMag",
+    "type": "AnalogueValue",
+    "range": null
+  },
+  {
+    "cdc": "ASG",
+    "name": "stepSize",
+    "type": "AnalogueValue",
+    "range": null
+  },
+  {
+    "cdc": "ASG",
+    "name": "sVC",
+    "type": "ScaledValueConfig",
+    "range": null
+  },
+  {
+    "cdc": "ASG",
+    "name": "units",
+    "type": "Unit",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "blkEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "ctlModel",
+    "type": "CtlModels",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "ctlNum",
+    "type": "INT8U",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "ctlVal",
+    "type": "CODED_ENUM",
+    "range": "stop|lower|higher|reserved"
+  },
+  {
+    "cdc": "BAC",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "dB",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "maxVal",
+    "type": "AnalogueValue",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "minVal",
+    "type": "AnalogueValue",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "mxVal",
+    "type": "AnalogueValue",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "operTimeout",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "opOk",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "opRcvd",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "origin",
+    "type": "Originator",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "persistent",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "q",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "sboClass",
+    "type": "SboClasses",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "sboTimeout",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "stepSize",
+    "type": "AnalogueValue",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "stSeld",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "subEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "subID",
+    "type": "VISIBLE_STRING64",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "subQ",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "subVal",
+    "type": "AnalogueValue",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "sVC",
+    "type": "ScaledValueConfig",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "t",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "tOpOk",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "BAC",
+    "name": "units",
+    "type": "Unit",
+    "range": null
+  },
+  {
+    "cdc": "BCR",
+    "name": "actVal",
+    "type": "INT128",
+    "range": null
+  },
+  {
+    "cdc": "BCR",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "BCR",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "BCR",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "BCR",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "BCR",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "BCR",
+    "name": "frEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "BCR",
+    "name": "frPd",
+    "type": "INT32",
+    "range": null
+  },
+  {
+    "cdc": "BCR",
+    "name": "frRs",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "BCR",
+    "name": "frTm",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "BCR",
+    "name": "frVal",
+    "type": "INT128",
+    "range": null
+  },
+  {
+    "cdc": "BCR",
+    "name": "pulsQty",
+    "type": "FLOAT32",
+    "range": null
+  },
+  {
+    "cdc": "BCR",
+    "name": "q",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "BCR",
+    "name": "strTm",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "BCR",
+    "name": "t",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "BCR",
+    "name": "units",
+    "type": "Unit",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "blkEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "ctlModel",
+    "type": "CtlModels",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "ctlNum",
+    "type": "INT8U",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "ctlVal",
+    "type": "CODED_ENUM",
+    "range": "stop|lower|higher|reserved"
+  },
+  {
+    "cdc": "BSC",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "maxVal",
+    "type": "INT8",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "minVal",
+    "type": "INT8",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "operTimeout",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "opOk",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "opRcvd",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "origin",
+    "type": "Originator",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "persistent",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "q",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "sboClass",
+    "type": "SboClasses",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "sboTimeout",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "stSeld",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "subEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "subID",
+    "type": "VISIBLE_STRING64",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "subQ",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "subVal",
+    "type": "ValWithTrans",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "t",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "tOpOk",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "BSC",
+    "name": "valWTr",
+    "type": "ValWithTrans",
+    "range": null
+  },
+  {
+    "cdc": "CMV",
+    "name": "angRef",
+    "type": "ENUMERATED",
+    "range": "Va|Vb|Vc|Aa|Ab|Ac|Vab|Vbc|Vca|Vother|Aother|Synchrophasor"
+  },
+  {
+    "cdc": "CMV",
+    "name": "angSVC",
+    "type": "ScaledValueConfig",
+    "range": null
+  },
+  {
+    "cdc": "CMV",
+    "name": "blkEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "CMV",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CMV",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CMV",
+    "name": "cVal",
+    "type": "Vector",
+    "range": null
+  },
+  {
+    "cdc": "CMV",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CMV",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CMV",
+    "name": "db",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "CMV",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CMV",
+    "name": "instCVal",
+    "type": "Vector",
+    "range": null
+  },
+  {
+    "cdc": "CMV",
+    "name": "magSVC",
+    "type": "ScaledValueConfig",
+    "range": null
+  },
+  {
+    "cdc": "CMV",
+    "name": "q",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "CMV",
+    "name": "range",
+    "type": "ENUMERATED",
+    "range": "normal|high|low|high-high|low-low|..."
+  },
+  {
+    "cdc": "CMV",
+    "name": "rangeAngC",
+    "type": "RangeConfig",
+    "range": null
+  },
+  {
+    "cdc": "CMV",
+    "name": "rangeC",
+    "type": "RangeConfig",
+    "range": null
+  },
+  {
+    "cdc": "CMV",
+    "name": "smpRate",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "CMV",
+    "name": "subCVal",
+    "type": "AnalogueValue",
+    "range": null
+  },
+  {
+    "cdc": "CMV",
+    "name": "subEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "CMV",
+    "name": "subID",
+    "type": "VISIBLE_STRING64",
+    "range": null
+  },
+  {
+    "cdc": "CMV",
+    "name": "subQ",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "CMV",
+    "name": "t",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "CMV",
+    "name": "units",
+    "type": "Unit",
+    "range": null
+  },
+  {
+    "cdc": "CMV",
+    "name": "zeroDb",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "CSD",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CSD",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CSD",
+    "name": "crvPts",
+    "type": "ARRAY",
+    "range": null
+  },
+  {
+    "cdc": "CSD",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CSD",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CSD",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CSD",
+    "name": "numPts",
+    "type": "INT16U",
+    "range": null
+  },
+  {
+    "cdc": "CSD",
+    "name": "xD",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CSD",
+    "name": "xDU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CSD",
+    "name": "xUnit",
+    "type": "Unit",
+    "range": null
+  },
+  {
+    "cdc": "CSD",
+    "name": "yD",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CSD",
+    "name": "yDU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CSD",
+    "name": "yUnit",
+    "type": "Unit",
+    "range": null
+  },
+  {
+    "cdc": "CSD",
+    "name": "zD",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CSD",
+    "name": "zDU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CSD",
+    "name": "zUnit",
+    "type": "Unit",
+    "range": null
+  },
+  {
+    "cdc": "CSG",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CSG",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CSG",
+    "name": "crvPts",
+    "type": "ARRAY",
+    "range": null
+  },
+  {
+    "cdc": "CSG",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CSG",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CSG",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CSG",
+    "name": "maxPts",
+    "type": "INT16U",
+    "range": null
+  },
+  {
+    "cdc": "CSG",
+    "name": "numPts",
+    "type": "INT16U",
+    "range": null
+  },
+  {
+    "cdc": "CSG",
+    "name": "pointZ",
+    "type": "FLOAT32",
+    "range": null
+  },
+  {
+    "cdc": "CSG",
+    "name": "xD",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CSG",
+    "name": "xDU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CSG",
+    "name": "xUnits",
+    "type": "Unit",
+    "range": null
+  },
+  {
+    "cdc": "CSG",
+    "name": "yD",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CSG",
+    "name": "yDU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CSG",
+    "name": "yUnits",
+    "type": "Unit",
+    "range": null
+  },
+  {
+    "cdc": "CSG",
+    "name": "zD",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CSG",
+    "name": "zDU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CSG",
+    "name": "zUnits",
+    "type": "Unit",
+    "range": null
+  },
+  {
+    "cdc": "CUG",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CUG",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CUG",
+    "name": "cur",
+    "type": "Currency",
+    "range": null
+  },
+  {
+    "cdc": "CUG",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CUG",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CUG",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CURVE",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CURVE",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CURVE",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CURVE",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CURVE",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "CURVE",
+    "name": "setCharact",
+    "type": "ENUMERATED",
+    "range": null
+  },
+  {
+    "cdc": "CURVE",
+    "name": "setParA",
+    "type": "FLOAT32",
+    "range": null
+  },
+  {
+    "cdc": "CURVE",
+    "name": "setParB",
+    "type": "FLOAT32",
+    "range": null
+  },
+  {
+    "cdc": "CURVE",
+    "name": "setParC",
+    "type": "FLOAT32",
+    "range": null
+  },
+  {
+    "cdc": "CURVE",
+    "name": "setParD",
+    "type": "FLOAT32",
+    "range": null
+  },
+  {
+    "cdc": "CURVE",
+    "name": "setParE",
+    "type": "FLOAT32",
+    "range": null
+  },
+  {
+    "cdc": "CURVE",
+    "name": "setParF",
+    "type": "FLOAT32",
+    "range": null
+  },
+  {
+    "cdc": "DEL",
+    "name": "angRef",
+    "type": "ENUMERATED",
+    "range": null
+  },
+  {
+    "cdc": "DEL",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DEL",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DEL",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DEL",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DEL",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DEL",
+    "name": "phsAB",
+    "type": "CMV",
+    "range": null
+  },
+  {
+    "cdc": "DEL",
+    "name": "phsBC",
+    "type": "CMV",
+    "range": null
+  },
+  {
+    "cdc": "DEL",
+    "name": "phsCA",
+    "type": "CMV",
+    "range": null
+  },
+  {
+    "cdc": "DPC",
+    "name": "blkEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "DPC",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPC",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPC",
+    "name": "ctlModel",
+    "type": "CtlModels",
+    "range": null
+  },
+  {
+    "cdc": "DPC",
+    "name": "ctlNum",
+    "type": "INT8U",
+    "range": null
+  },
+  {
+    "cdc": "DPC",
+    "name": "ctlVal",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "DPC",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPC",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPC",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPC",
+    "name": "operTimeout",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "DPC",
+    "name": "opOk",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "DPC",
+    "name": "opRcvd",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "DPC",
+    "name": "origin",
+    "type": "Originator",
+    "range": null
+  },
+  {
+    "cdc": "DPC",
+    "name": "pulseConfig",
+    "type": "PulseConfig",
+    "range": null
+  },
+  {
+    "cdc": "DPC",
+    "name": "q",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "DPC",
+    "name": "sboClass",
+    "type": "SboClasses",
+    "range": null
+  },
+  {
+    "cdc": "DPC",
+    "name": "sboTimeout",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "DPC",
+    "name": "stSeld",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "DPC",
+    "name": "stVal",
+    "type": "CODED_ENUM",
+    "range": "Intermediate-state|off|on|bad-state"
+  },
+  {
+    "cdc": "DPC",
+    "name": "subEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "DPC",
+    "name": "subID",
+    "type": "VISIBLE_STRING64",
+    "range": null
+  },
+  {
+    "cdc": "DPC",
+    "name": "subQ",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "DPC",
+    "name": "subVal",
+    "type": "CODED_ENUM",
+    "range": "Intermediate-state|off|on|bad-state"
+  },
+  {
+    "cdc": "DPC",
+    "name": "t",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "DPC",
+    "name": "tOpOk",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "DPL",
+    "name": "altitude",
+    "type": "FLOAT32",
+    "range": null
+  },
+  {
+    "cdc": "DPL",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPL",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPL",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPL",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPL",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPL",
+    "name": "ePSName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPL",
+    "name": "hwRev",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPL",
+    "name": "latitude",
+    "type": "FLOAT32",
+    "range": null
+  },
+  {
+    "cdc": "DPL",
+    "name": "location",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPL",
+    "name": "longitude",
+    "type": "FLOAT32",
+    "range": null
+  },
+  {
+    "cdc": "DPL",
+    "name": "model",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPL",
+    "name": "mRID",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPL",
+    "name": "name",
+    "type": "VISIBLE_STRING64",
+    "range": null
+  },
+  {
+    "cdc": "DPL",
+    "name": "owner",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPL",
+    "name": "primeOper",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPL",
+    "name": "secondOper",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPL",
+    "name": "serNum",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPL",
+    "name": "swRev",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPL",
+    "name": "vendor",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPS",
+    "name": "blkEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "DPS",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPS",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPS",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPS",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPS",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "DPS",
+    "name": "q",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "DPS",
+    "name": "stVal",
+    "type": "CODED_ENUM",
+    "range": "Intermediate-STate|ff|on|bad-STate"
+  },
+  {
+    "cdc": "DPS",
+    "name": "subEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "DPS",
+    "name": "subID",
+    "type": "VISIBLE_STRING64",
+    "range": null
+  },
+  {
+    "cdc": "DPS",
+    "name": "subQ",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "DPS",
+    "name": "subVal",
+    "type": "CODED_ENUM",
+    "range": "Intermediate-STate|ff|on|bad-STate"
+  },
+  {
+    "cdc": "DPS",
+    "name": "t",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "blkEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "ctlModel",
+    "type": "CtlModels",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "ctlNum",
+    "type": "INT8U",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "ctlVal",
+    "type": "ENUMERATED",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "operTimeout",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "opOk",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "opRcvd",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "origin",
+    "type": "Originator",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "q",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "sboClass",
+    "type": "SboClasses",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "sboTimeout",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "stSeld",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "stVal",
+    "type": "ENUMERATED",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "subEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "subID",
+    "type": "VISIBLE_STRING64",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "subQ",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "subVal",
+    "type": "INT32",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "t",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "ENC",
+    "name": "tOpOk",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "ENG",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ENG",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ENG",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ENG",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ENG",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ENG",
+    "name": "setVal",
+    "type": "ENUMERATED",
+    "range": null
+  },
+  {
+    "cdc": "ENS",
+    "name": "blkEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "ENS",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ENS",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ENS",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ENS",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ENS",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ENS",
+    "name": "q",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "ENS",
+    "name": "stVal",
+    "type": "ENUMERATED",
+    "range": null
+  },
+  {
+    "cdc": "ENS",
+    "name": "subEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "ENS",
+    "name": "subID",
+    "type": "VISIBLE_STRING64",
+    "range": null
+  },
+  {
+    "cdc": "ENS",
+    "name": "subQ",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "ENS",
+    "name": "subVal",
+    "type": "INT32",
+    "range": null
+  },
+  {
+    "cdc": "ENS",
+    "name": "t",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "HDEL",
+    "name": "angRef",
+    "type": "ENUMERATED",
+    "range": "Va|Vb|Vc|Aa|Ab|Ac|Vab|Vbc|Vca|Vother|Aother|Synchrophasor"
+  },
+  {
+    "cdc": "HDEL",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HDEL",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HDEL",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HDEL",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HDEL",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HDEL",
+    "name": "evalTm",
+    "type": "INT16U",
+    "range": null
+  },
+  {
+    "cdc": "HDEL",
+    "name": "frequency",
+    "type": "FLOAT32",
+    "range": null
+  },
+  {
+    "cdc": "HDEL",
+    "name": "hvRef",
+    "type": "ENUMERATED",
+    "range": "fundamental|rms|absolute"
+  },
+  {
+    "cdc": "HDEL",
+    "name": "numCycl",
+    "type": "INT16U",
+    "range": null
+  },
+  {
+    "cdc": "HDEL",
+    "name": "numHar",
+    "type": "INT16U",
+    "range": null
+  },
+  {
+    "cdc": "HDEL",
+    "name": "phsABHar",
+    "type": "ARRAY",
+    "range": null
+  },
+  {
+    "cdc": "HDEL",
+    "name": "phsBCHar",
+    "type": "ARRAY",
+    "range": null
+  },
+  {
+    "cdc": "HDEL",
+    "name": "phsCAHar",
+    "type": "ARRAY",
+    "range": null
+  },
+  {
+    "cdc": "HDEL",
+    "name": "rmscyc",
+    "type": "INT16U",
+    "range": null
+  },
+  {
+    "cdc": "HDEL",
+    "name": "smpRate",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "HMV",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HMV",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HMV",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HMV",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HMV",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HMV",
+    "name": "evalTm",
+    "type": "INT16U",
+    "range": null
+  },
+  {
+    "cdc": "HMV",
+    "name": "frequency",
+    "type": "FLOAT32",
+    "range": null
+  },
+  {
+    "cdc": "HMV",
+    "name": "har",
+    "type": "ARRAY",
+    "range": null
+  },
+  {
+    "cdc": "HMV",
+    "name": "hvRef",
+    "type": "ENUMERATED",
+    "range": "fundamental|rms|absolute"
+  },
+  {
+    "cdc": "HMV",
+    "name": "numCyc",
+    "type": "INT16U",
+    "range": null
+  },
+  {
+    "cdc": "HMV",
+    "name": "numHar",
+    "type": "INT16U",
+    "range": null
+  },
+  {
+    "cdc": "HMV",
+    "name": "rmsCyc",
+    "type": "INT16U",
+    "range": null
+  },
+  {
+    "cdc": "HMV",
+    "name": "smpRate",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "HST",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HST",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HST",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HST",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HST",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HST",
+    "name": "hstRangeC",
+    "type": "ARRAY",
+    "range": null
+  },
+  {
+    "cdc": "HST",
+    "name": "hstVal",
+    "type": "INT128",
+    "range": null
+  },
+  {
+    "cdc": "HST",
+    "name": "maxPts",
+    "type": "INT16U",
+    "range": null
+  },
+  {
+    "cdc": "HST",
+    "name": "numPts",
+    "type": "INT16U",
+    "range": null
+  },
+  {
+    "cdc": "HST",
+    "name": "q",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "HST",
+    "name": "t",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "HST",
+    "name": "units",
+    "type": "Unit",
+    "range": null
+  },
+  {
+    "cdc": "HST",
+    "name": "xD",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HST",
+    "name": "xDU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HST",
+    "name": "xUnits",
+    "type": "Unit",
+    "range": null
+  },
+  {
+    "cdc": "HST",
+    "name": "yD",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HST",
+    "name": "yDU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HST",
+    "name": "yUnits",
+    "type": "Unit",
+    "range": null
+  },
+  {
+    "cdc": "HWYE",
+    "name": "angRef",
+    "type": "ENUMERATED",
+    "range": "Va|Vb|Vc|Aa|Ab|Ac|Vab|Vbc|Vca|Vother|Aother|Synchrophasor"
+  },
+  {
+    "cdc": "HWYE",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HWYE",
+    "name": "cdeName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HWYE",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HWYE",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HWYE",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "HWYE",
+    "name": "evalTm",
+    "type": "INT16U",
+    "range": null
+  },
+  {
+    "cdc": "HWYE",
+    "name": "frequency",
+    "type": "FLOAT32",
+    "range": null
+  },
+  {
+    "cdc": "HWYE",
+    "name": "hvRef",
+    "type": "ENUMERATED",
+    "range": "fundamental|rms|absolute"
+  },
+  {
+    "cdc": "HWYE",
+    "name": "netHar",
+    "type": "ARRAY",
+    "range": null
+  },
+  {
+    "cdc": "HWYE",
+    "name": "neutHar",
+    "type": "ARRAY",
+    "range": null
+  },
+  {
+    "cdc": "HWYE",
+    "name": "numCyc",
+    "type": "INT16U",
+    "range": null
+  },
+  {
+    "cdc": "HWYE",
+    "name": "numHar",
+    "type": "INT16U",
+    "range": null
+  },
+  {
+    "cdc": "HWYE",
+    "name": "phsAHar",
+    "type": "ARRAY",
+    "range": null
+  },
+  {
+    "cdc": "HWYE",
+    "name": "phsBHar",
+    "type": "ARRAY",
+    "range": null
+  },
+  {
+    "cdc": "HWYE",
+    "name": "phsCHar",
+    "type": "ARRAY",
+    "range": null
+  },
+  {
+    "cdc": "HWYE",
+    "name": "resHar",
+    "type": "ARRAY",
+    "range": null
+  },
+  {
+    "cdc": "HWYE",
+    "name": "rmsCyc",
+    "type": "INT16U",
+    "range": null
+  },
+  {
+    "cdc": "HWYE",
+    "name": "smpRate",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "blkEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "ctlModel",
+    "type": "CtlModels",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "ctlNum",
+    "type": "INT8U",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "ctlVal",
+    "type": "INT32",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "maxVal",
+    "type": "INT32",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "minVal",
+    "type": "INT32",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "operTimeout",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "opOk",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "opRcvd",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "origin",
+    "type": "Originator",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "q",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "sboClass",
+    "type": "SboClasses",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "SboTimeout",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "stepSize",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "stSeld",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "stVal",
+    "type": "INT32",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "subEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "subID",
+    "type": "VISIBLE_STRING64",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "subQ",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "subVal",
+    "type": "INT32",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "t",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "tOpOk",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "INC",
+    "name": "units",
+    "type": "Unit",
+    "range": null
+  },
+  {
+    "cdc": "ING",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ING",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ING",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ING",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ING",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ING",
+    "name": "maxVal",
+    "type": "INT32",
+    "range": null
+  },
+  {
+    "cdc": "ING",
+    "name": "minVal",
+    "type": "INT32",
+    "range": null
+  },
+  {
+    "cdc": "ING",
+    "name": "setVal",
+    "type": "INT32",
+    "range": null
+  },
+  {
+    "cdc": "ING",
+    "name": "stepSize",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "ING",
+    "name": "units",
+    "type": "Unit",
+    "range": null
+  },
+  {
+    "cdc": "INS",
+    "name": "blkEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "INS",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "INS",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "INS",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "INS",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "INS",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "INS",
+    "name": "q",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "INS",
+    "name": "stVal",
+    "type": "INT32",
+    "range": null
+  },
+  {
+    "cdc": "INS",
+    "name": "subEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "INS",
+    "name": "subID",
+    "type": "VISIBLE_STRING64",
+    "range": null
+  },
+  {
+    "cdc": "INS",
+    "name": "subQ",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "INS",
+    "name": "subVal",
+    "type": "INT32",
+    "range": null
+  },
+  {
+    "cdc": "INS",
+    "name": "t",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "INS",
+    "name": "units",
+    "type": "Unit",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "blkEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "ctlModel",
+    "type": "CtlModels",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "ctlNum",
+    "type": "INT8U",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "ctlVal",
+    "type": "INT8",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "maxVal",
+    "type": "INT8",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "minVal",
+    "type": "INT8",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "operTimeout",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "opOk",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "opRcvd",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "origin",
+    "type": "Originator",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "q",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "sboClass",
+    "type": "SboClasses",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "sboTimeout",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "stSeld",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "subEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "subID",
+    "type": "VISIBLE_STRING64",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "subQ",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "subVal",
+    "type": "ValWithTrans",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "t",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "tOpOk",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "ISC",
+    "name": "valWTr",
+    "type": "ValWithTrans",
+    "range": null
+  },
+  {
+    "cdc": "LPL",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "LPL",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "LPL",
+    "name": "configRev",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "LPL",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "LPL",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "LPL",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "LPL",
+    "name": "ldNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "LPL",
+    "name": "lnNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "LPL",
+    "name": "paramRev",
+    "type": "INT32",
+    "range": null
+  },
+  {
+    "cdc": "LPL",
+    "name": "swRev",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "LPL",
+    "name": "valRev",
+    "type": "INT32",
+    "range": null
+  },
+  {
+    "cdc": "LPL",
+    "name": "vendor",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "MV",
+    "name": "blkEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "MV",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "MV",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "MV",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "MV",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "MV",
+    "name": "db",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "MV",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "MV",
+    "name": "instMag",
+    "type": "AnalogueValue",
+    "range": null
+  },
+  {
+    "cdc": "MV",
+    "name": "mag",
+    "type": "AnalogueValue",
+    "range": null
+  },
+  {
+    "cdc": "MV",
+    "name": "q",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "MV",
+    "name": "range",
+    "type": "ENUMERATED",
+    "range": "normal|high|low|high-high|low-low|..."
+  },
+  {
+    "cdc": "MV",
+    "name": "rangeC",
+    "type": "RangeConfig",
+    "range": null
+  },
+  {
+    "cdc": "MV",
+    "name": "smpRate",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "MV",
+    "name": "subEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "MV",
+    "name": "subID",
+    "type": "VISIBLE_STRING64",
+    "range": null
+  },
+  {
+    "cdc": "MV",
+    "name": "subMag",
+    "type": "AnalogueValue",
+    "range": null
+  },
+  {
+    "cdc": "MV",
+    "name": "subQ",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "MV",
+    "name": "sVC",
+    "type": "ScaledValueConfig",
+    "range": null
+  },
+  {
+    "cdc": "MV",
+    "name": "t",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "MV",
+    "name": "units",
+    "type": "Unit",
+    "range": null
+  },
+  {
+    "cdc": "MV",
+    "name": "zeroDb",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "ORG",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ORG",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ORG",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ORG",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ORG",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ORG",
+    "name": "intAddr",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ORG",
+    "name": "purpose",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "ORG",
+    "name": "setSrcCB",
+    "type": "ObjectReference",
+    "range": null
+  },
+  {
+    "cdc": "ORG",
+    "name": "setSrcRef",
+    "type": "ObjectReference",
+    "range": null
+  },
+  {
+    "cdc": "ORG",
+    "name": "setTstCB",
+    "type": "ObjectReference",
+    "range": null
+  },
+  {
+    "cdc": "ORG",
+    "name": "setTstRef",
+    "type": "ObjectReference",
+    "range": null
+  },
+  {
+    "cdc": "ORG",
+    "name": "tstEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "SAV",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SAV",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SAV",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SAV",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SAV",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SAV",
+    "name": "instMag",
+    "type": "AnalogueValue",
+    "range": null
+  },
+  {
+    "cdc": "SAV",
+    "name": "max",
+    "type": "AnalogueValue",
+    "range": null
+  },
+  {
+    "cdc": "SAV",
+    "name": "min",
+    "type": "AnalogueValue",
+    "range": null
+  },
+  {
+    "cdc": "SAV",
+    "name": "q",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "SAV",
+    "name": "sVC",
+    "type": "ScaledValueConfig",
+    "range": null
+  },
+  {
+    "cdc": "SAV",
+    "name": "t",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "SAV",
+    "name": "units",
+    "type": "Unit",
+    "range": null
+  },
+  {
+    "cdc": "SEC",
+    "name": "addInfo",
+    "type": "VISIBLE_STRING64",
+    "range": null
+  },
+  {
+    "cdc": "SEC",
+    "name": "addr",
+    "type": "OCTET_STRING64",
+    "range": null
+  },
+  {
+    "cdc": "SEC",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SEC",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SEC",
+    "name": "cnt",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "SEC",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SEC",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SEC",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SEC",
+    "name": "sev",
+    "type": "ENUMERATED",
+    "range": "unknown|critical|major|minor|warning"
+  },
+  {
+    "cdc": "SEC",
+    "name": "t",
+    "type": "TimeSTamp",
+    "range": null
+  },
+  {
+    "cdc": "SEQ",
+    "name": "c1",
+    "type": "CMV",
+    "range": null
+  },
+  {
+    "cdc": "SEQ",
+    "name": "c2",
+    "type": "CMV",
+    "range": null
+  },
+  {
+    "cdc": "SEQ",
+    "name": "c3",
+    "type": "CMV",
+    "range": null
+  },
+  {
+    "cdc": "SEQ",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SEQ",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SEQ",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SEQ",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SEQ",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SEQ",
+    "name": "phsRef",
+    "type": "ENUMERATED",
+    "range": "A|B|C|..."
+  },
+  {
+    "cdc": "SEQ",
+    "name": "seqT",
+    "type": "ENUMERATED",
+    "range": "pos-neg-zero|dir-quad-zero"
+  },
+  {
+    "cdc": "SPC",
+    "name": "blkEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "SPC",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SPC",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SPC",
+    "name": "ctlModel",
+    "type": "CtlModels",
+    "range": "status-only|direct-with-normal-security|sbo-with-normal-security|direct-with-enhanced-security|sbo-with-enhanced-security"
+  },
+  {
+    "cdc": "SPC",
+    "name": "ctlNum",
+    "type": "INT8U",
+    "range": null
+  },
+  {
+    "cdc": "SPC",
+    "name": "ctlVal",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "SPC",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SPC",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SPC",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SPC",
+    "name": "operTimeout",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "SPC",
+    "name": "opOk",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "SPC",
+    "name": "opRcvd",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "SPC",
+    "name": "origin",
+    "type": "Originator",
+    "range": null
+  },
+  {
+    "cdc": "SPC",
+    "name": "pulseConfig",
+    "type": "PulseConfig",
+    "range": null
+  },
+  {
+    "cdc": "SPC",
+    "name": "q",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "SPC",
+    "name": "sboClass",
+    "type": "SboClasses",
+    "range": "operate-once|operate-many"
+  },
+  {
+    "cdc": "SPC",
+    "name": "sboTimeout",
+    "type": "INT32U",
+    "range": null
+  },
+  {
+    "cdc": "SPC",
+    "name": "stSeld",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "SPC",
+    "name": "stVal",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "SPC",
+    "name": "subEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "SPC",
+    "name": "subID",
+    "type": "VISIBLE_STRING64",
+    "range": null
+  },
+  {
+    "cdc": "SPC",
+    "name": "subQ",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "SPC",
+    "name": "subVal",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "SPC",
+    "name": "t",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "SPC",
+    "name": "tOpOk",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "SPG",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SPG",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SPG",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SPG",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SPG",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SPG",
+    "name": "setVal",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "SPS",
+    "name": "blkEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "SPS",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SPS",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SPS",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SPS",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SPS",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "SPS",
+    "name": "q",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "SPS",
+    "name": "stVal",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "SPS",
+    "name": "subEna",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "SPS",
+    "name": "subID",
+    "type": "VISIBLE_STRING64",
+    "range": null
+  },
+  {
+    "cdc": "SPS",
+    "name": "subQ",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "SPS",
+    "name": "subVal",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "SPS",
+    "name": "t",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "TSG",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "TSG",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "TSG",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "TSG",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "TSG",
+    "name": "setCal",
+    "type": "CalendarTime",
+    "range": null
+  },
+  {
+    "cdc": "TSG",
+    "name": "setTm",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "VSG",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "VSG",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "VSG",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "VSG",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "VSG",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "VSG",
+    "name": "setVal",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "VSS",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "VSS",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "VSS",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "VSS",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "VSS",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "VSS",
+    "name": "q",
+    "type": "Quality",
+    "range": null
+  },
+  {
+    "cdc": "VSS",
+    "name": "stVal",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "VSS",
+    "name": "t",
+    "type": "TimeStamp",
+    "range": null
+  },
+  {
+    "cdc": "WYE",
+    "name": "angRef",
+    "type": "ENUMERATED",
+    "range": null
+  },
+  {
+    "cdc": "WYE",
+    "name": "cdcName",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "WYE",
+    "name": "cdcNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "WYE",
+    "name": "d",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "WYE",
+    "name": "dataNs",
+    "type": "VISIBLE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "WYE",
+    "name": "dU",
+    "type": "UNICODE_STRING255",
+    "range": null
+  },
+  {
+    "cdc": "WYE",
+    "name": "net",
+    "type": "CMV",
+    "range": null
+  },
+  {
+    "cdc": "WYE",
+    "name": "neut",
+    "type": "CMV",
+    "range": null
+  },
+  {
+    "cdc": "WYE",
+    "name": "phsA",
+    "type": "CMV",
+    "range": null
+  },
+  {
+    "cdc": "WYE",
+    "name": "phsB",
+    "type": "CMV",
+    "range": null
+  },
+  {
+    "cdc": "WYE",
+    "name": "phsC",
+    "type": "CMV",
+    "range": null
+  },
+  {
+    "cdc": "WYE",
+    "name": "phsToNeut",
+    "type": "BOOLEAN",
+    "range": null
+  },
+  {
+    "cdc": "WYE",
+    "name": "res",
+    "type": "CMV",
+    "range": null
+  }
+]

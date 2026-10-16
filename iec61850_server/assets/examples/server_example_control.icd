@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--SCL Schema Version 3.1 (2012/10/22)-->
+<SCL version="2007" revision="B" xmlns="http://www.iec.ch/61850/2003/SCL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.iec.ch/61850/2003/SCL SCL.xsd">
+	<Header id="" version="" revision="" toolID="Redisant SCL Parser Engine" nameStructure="IEDName" />
+	<Communication>
+		<SubNetwork name="NONE" type="8-MMS">
+			<ConnectedAP iedName="simpleIO" apName="P1">
+				<Address>
+					<P type="IP" xsi:type="tP_IP">127.0.0.1</P>
+					<P type="OSI-TSEL" xsi:type="tP_OSI-TSEL">0001</P>
+					<P type="OSI-SSEL" xsi:type="tP_OSI-SSEL">0001</P>
+					<P type="OSI-PSEL" xsi:type="tP_OSI-PSEL">00000001</P>
+					<P type="OSI-AP-Title">1,1,1,999,1</P>
+					<P type="OSI-AP-Invoke" xsi:type="tP_OSI-AP-Invoke">0</P>
+					<P type="OSI-AE-Qualifier" xsi:type="tP_OSI-AE-Qualifier">12</P>
+					<P type="OSI-AE-Invoke" xsi:type="tP_OSI-AE-Invoke">0</P>
+					<P type="MMS-Port" xsi:type="tP_MMS-Port">102</P>
+				</Address>
+			</ConnectedAP>
+		</SubNetwork>
+	</Communication>
+	<IED name="simpleIO">
+		<Services>
+			<DynAssociation />
+			<GetDirectory />
+			<GetDataObjectDefinition />
+			<DataObjectDirectory />
+			<GetDataSetValue />
+			<SetDataSetValue />
+			<DataSetDirectory />
+			<ConfDataSet max="1" modify="false" />
+			<DynDataSet max="42" />
+			<ReadWrite />
+			<TimerActivatedControl />
+			<ConfReportControl max="2" bufConf="false" />
+			<GetCBValues />
+			<ReportSettings rptID="Dyn" optFields="Dyn" bufTime="Dyn" trgOps="Dyn" intgPd="Dyn" />
+			<ConfLNs fixPrefix="true" fixLnInst="true" />
+			<GOOSE max="0" />
+			<GSSE max="0" />
+			<FileHandling />
+		</Services>
+		<AccessPoint name="P1">
+			<Server>
+				<Authentication none="true" />
+				<LDevice inst="GenericIO">
+					<LN0 lnType="simpleIOGenericIO.LLN0" lnClass="LLN0" inst="">
+						<DataSet name="ControlEvents">
+							<FCDA ldInst="GenericIO" prefix="" lnClass="GGIO" lnInst="1" doName="SPCSO1" daName="stVal" fc="ST" />
+							<FCDA ldInst="GenericIO" prefix="" lnClass="GGIO" lnInst="1" doName="SPCSO2" daName="stVal" fc="ST" />
+							<FCDA ldInst="GenericIO" prefix="" lnClass="GGIO" lnInst="1" doName="SPCSO3" daName="stVal" fc="ST" />
+							<FCDA ldInst="GenericIO" prefix="" lnClass="GGIO" lnInst="1" doName="SPCSO4" daName="stVal" fc="ST" />
+							<FCDA ldInst="GenericIO" prefix="" lnClass="GGIO" lnInst="1" doName="SPCSO5" daName="stVal" fc="ST" />
+							<FCDA ldInst="GenericIO" prefix="" lnClass="GGIO" lnInst="1" doName="SPCSO6" daName="stVal" fc="ST" />
+							<FCDA ldInst="GenericIO" prefix="" lnClass="GGIO" lnInst="1" doName="SPCSO7" daName="stVal" fc="ST" />
+							<FCDA ldInst="GenericIO" prefix="" lnClass="GGIO" lnInst="1" doName="SPCSO8" daName="stVal" fc="ST" />
+							<FCDA ldInst="GenericIO" prefix="" lnClass="GGIO" lnInst="1" doName="SPCSO9" daName="stVal" fc="ST" />
+							<FCDA ldInst="GenericIO" prefix="" lnClass="GGIO" lnInst="1" doName="SPCSO2" daName="stSeld" fc="ST" />
+							<FCDA ldInst="GenericIO" prefix="" lnClass="GGIO" lnInst="1" doName="SPCSO2" daName="opRcvd" fc="OR" />
+							<FCDA ldInst="GenericIO" prefix="" lnClass="GGIO" lnInst="1" doName="SPCSO2" daName="opOk" fc="OR" />
+						</DataSet>
+						<ReportControl name="ControlEventsRCB" rptID="ControlEvents" buffered="false" bufTime="0" datSet="ControlEvents" intgPd="1000" confRev="1">
+							<TrgOps dchg="true" qchg="false" dupd="false" period="false" gi="true" />
+							<OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="false" entryID="true" configRef="true" />
+							<RptEnabled max="2" />
+						</ReportControl>
+						<DOI name="Mod">
+							<DAI name="ctlModel">
+								<Val>status-only</Val>
+							</DAI>
+						</DOI>
+						<DOI name="NamPlt">
+							<DAI name="vendor">
+								<Val></Val>
+							</DAI>
+							<DAI name="swRev">
+								<Val></Val>
+							</DAI>
+							<DAI name="d">
+								<Val></Val>
+							</DAI>
+							<DAI name="configRev">
+								<Val></Val>
+							</DAI>
+							<DAI name="ldNs">
+								<Val></Val>
+							</DAI>
+						</DOI>
+					</LN0>
+					<LN lnType="simpleIOGenericIO.GGIO1" lnClass="GGIO" inst="1">
+						<DOI name="Mod">
+							<DAI name="ctlModel">
+								<Val>status-only</Val>
+							</DAI>
+						</DOI>
+						<DOI name="SPCSO1">
+							<DAI name="ctlModel">
+								<Val>direct-with-normal-security</Val>
+							</DAI>
+						</DOI>
+						<DOI name="SPCSO2">
+							<DAI name="ctlModel">
+								<Val>sbo-with-normal-security</Val>
+							</DAI>
+							<DAI name="sboTimeout">
+								<Val>2000</Val>
+							</DAI>
+							<DAI name="sboClass">
+								<Val>operate-once</Val>
+							</DAI>
+						</DOI>
+						<DOI name="SPCSO3">
+							<DAI name="ctlModel">
+								<Val>direct-with-enhanced-security</Val>
+							</DAI>
+						</DOI>
+						<DOI name="SPCSO4">
+							<DAI name="ctlModel">
+								<Val>sbo-with-enhanced-security</Val>
+							</DAI>
+						</DOI>
+						<DOI name="SPCSO5">
+							<DAI name="ctlModel">
+								<Val>direct-with-normal-security</Val>
+							</DAI>
+						</DOI>
+						<DOI name="SPCSO6">
+							<DAI name="ctlModel">
+								<Val>sbo-with-normal-security</Val>
+							</DAI>
+						</DOI>
+						<DOI name="SPCSO7">
+							<DAI name="ctlModel">
+								<Val>direct-with-enhanced-security</Val>
+							</DAI>
+						</DOI>
+						<DOI name="SPCSO8">
+							<DAI name="ctlModel">
+								<Val>sbo-with-enhanced-security</Val>
+							</DAI>
+						</DOI>
+						<DOI name="SPCSO9">
+							<DAI name="ctlModel">
+								<Val>direct-with-enhanced-security</Val>
+							</DAI>
+						</DOI>
+						<DOI name="NamPlt">
+							<DAI name="vendor">
+								<Val></Val>
+							</DAI>
+							<DAI name="swRev">
+								<Val></Val>
+							</DAI>
+							<DAI name="d">
+								<Val></Val>
+							</DAI>
+						</DOI>
+					</LN>
+					<LN lnType="simpleIOGenericIO.LPHD1" lnClass="LPHD" inst="1">
+						<DOI name="PhyNam">
+							<DAI name="vendor">
+								<Val></Val>
+							</DAI>
+						</DOI>
+					</LN>
+				</LDevice>
+			</Server>
+		</AccessPoint>
+	</IED>
+	<DataTypeTemplates>
+		<LNodeType id="simpleIOGenericIO.GGIO1" lnClass="GGIO">
+			<DO name="AnIn1" type="simpleIOGenericIO.GGIO1.AnIn1" />
+			<DO name="AnIn2" type="simpleIOGenericIO.GGIO1.AnIn1" />
+			<DO name="AnIn3" type="simpleIOGenericIO.GGIO1.AnIn1" />
+			<DO name="AnIn4" type="simpleIOGenericIO.GGIO1.AnIn1" />
+			<DO name="Mod" type="simpleIOGenericIO.LLN0.Mod" />
+			<DO name="Beh" type="simpleIOGenericIO.LLN0.Beh" />
+			<DO name="Health" type="simpleIOGenericIO.LLN0.Health" />
+			<DO name="SPCSO1" type="simpleIOGenericIO.GGIO1.SPCSO1" />
+			<DO name="SPCSO2" type="simpleIOGenericIO.GGIO1.SPCSO2" />
+			<DO name="SPCSO3" type="simpleIOGenericIO.GGIO1.SPCSO3" />
+			<DO name="SPCSO4" type="simpleIOGenericIO.GGIO1.SPCSO4" />
+			<DO name="SPCSO5" type="simpleIOGenericIO.GGIO1.SPCSO5" />
+			<DO name="SPCSO6" type="simpleIOGenericIO.GGIO1.SPCSO6" />
+			<DO name="SPCSO7" type="simpleIOGenericIO.GGIO1.SPCSO7" />
+			<DO name="SPCSO8" type="simpleIOGenericIO.GGIO1.SPCSO8" />
+			<DO name="SPCSO9" type="simpleIOGenericIO.GGIO1.SPCSO3" />
+			<DO name="Ind1" type="simpleIOGenericIO.GGIO1.Ind1" />
+			<DO name="Ind2" type="simpleIOGenericIO.GGIO1.Ind1" />
+			<DO name="Ind3" type="simpleIOGenericIO.GGIO1.Ind1" />
+			<DO name="Ind4" type="simpleIOGenericIO.GGIO1.Ind1" />
+			<DO name="NamPlt" type="simpleIOGenericIO.GGIO1.NamPlt" />
+		</LNodeType>
+		<LNodeType id="simpleIOGenericIO.LLN0" lnClass="LLN0">
+			<DO name="Mod" type="simpleIOGenericIO.LLN0.Mod" />
+			<DO name="Beh" type="simpleIOGenericIO.LLN0.Beh" />
+			<DO name="Health" type="simpleIOGenericIO.LLN0.Health" />
+			<DO name="NamPlt" type="simpleIOGenericIO.LLN0.NamPlt" />
+		</LNodeType>
+		<LNodeType id="simpleIOGenericIO.LPHD1" lnClass="LPHD">
+			<DO name="PhyHealth" type="simpleIOGenericIO.LLN0.Health" />
+			<DO name="Proxy" type="simpleIOGenericIO.GGIO1.Ind1" />
+			<DO name="PhyNam" type="simpleIOGenericIO.LPHD1.PhyNam" />
+		</LNodeType>
+		<DOType id="simpleIOGenericIO.LPHD1.PhyNam" cdc="DPL">
+			<DA name="vendor" fc="DC" bType="VisString255" />
+		</DOType>
+		<DOType id="simpleIOGenericIO.LLN0.Mod" cdc="INC">
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+			<DA name="ctlModel" fc="CF" bType="Enum" type="ctlModel" />
+		</DOType>
+		<DOType id="simpleIOGenericIO.LLN0.Beh" cdc="INS">
+			<DA name="stVal" fc="ST" bType="Enum" type="Beh" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+		</DOType>
+		<DOType id="simpleIOGenericIO.LLN0.Health" cdc="INS">
+			<DA name="stVal" fc="ST" bType="Enum" type="Health" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+		</DOType>
+		<DOType id="simpleIOGenericIO.LLN0.NamPlt" cdc="LPL">
+			<DA name="vendor" fc="DC" bType="VisString255" />
+			<DA name="swRev" fc="DC" bType="VisString255" />
+			<DA name="d" fc="DC" bType="VisString255" />
+			<DA name="configRev" fc="DC" bType="VisString255" />
+			<DA name="ldNs" fc="EX" bType="VisString255" />
+		</DOType>
+		<DOType id="simpleIOGenericIO.GGIO1.NamPlt" cdc="LPL">
+			<DA name="vendor" fc="DC" bType="VisString255" />
+			<DA name="swRev" fc="DC" bType="VisString255" />
+			<DA name="d" fc="DC" bType="VisString255" />
+		</DOType>
+		<DOType id="simpleIOGenericIO.GGIO1.AnIn1" cdc="MV">
+			<DA name="mag" fc="MX" bType="Struct" type="simpleIOGenericIO.GGIO1.AnIn1.mag" />
+			<DA name="q" fc="MX" bType="Quality" />
+			<DA name="t" fc="MX" bType="Timestamp" />
+		</DOType>
+		<DOType id="simpleIOGenericIO.GGIO1.SPCSO1" cdc="SPC">
+			<DA name="stVal" fc="ST" bType="BOOLEAN" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+			<DA name="Oper" fc="CO" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO1.Oper" />
+			<DA name="ctlModel" fc="CF" bType="Enum" type="ctlModel" />
+		</DOType>
+		<DOType id="simpleIOGenericIO.GGIO1.SPCSO2" cdc="SPC">
+			<DA name="stVal" fc="ST" bType="BOOLEAN" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+			<DA name="stSeld" fc="ST" bType="BOOLEAN" />
+			<DA name="SBO" fc="CO" bType="VisString64" />
+			<DA name="Oper" fc="CO" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO1.Oper" />
+			<DA name="Cancel" fc="CO" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO2.Cancel" />
+			<DA name="ctlModel" fc="CF" bType="Enum" type="ctlModel" />
+			<DA name="sboTimeout" fc="CF" bType="INT32U" />
+			<DA name="sboClass" fc="CF" bType="Enum" type="sboClass" />
+			<DA name="opRcvd" fc="OR" bType="BOOLEAN" />
+			<DA name="opOk" fc="OR" bType="BOOLEAN" />
+			<DA name="tOpOk" fc="OR" bType="Timestamp" />
+		</DOType>
+		<DOType id="simpleIOGenericIO.GGIO1.SPCSO3" cdc="SPC">
+			<DA name="stVal" fc="ST" bType="BOOLEAN" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+			<DA name="Oper" fc="CO" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO1.Oper" />
+			<DA name="Cancel" fc="CO" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO2.Cancel" />
+			<DA name="ctlModel" fc="CF" bType="Enum" type="ctlModel" />
+		</DOType>
+		<DOType id="simpleIOGenericIO.GGIO1.SPCSO4" cdc="SPC">
+			<DA name="stVal" fc="ST" bType="BOOLEAN" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+			<DA name="SBOw" fc="CO" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO4.SBOw" />
+			<DA name="Oper" fc="CO" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO1.Oper" />
+			<DA name="Cancel" fc="CO" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO2.Cancel" />
+			<DA name="ctlModel" fc="CF" bType="Enum" type="ctlModel" />
+		</DOType>
+		<DOType id="simpleIOGenericIO.GGIO1.SPCSO5" cdc="SPC">
+			<DA name="stVal" fc="ST" bType="BOOLEAN" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+			<DA name="Oper" fc="CO" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO5.Oper" />
+			<DA name="Cancel" fc="CO" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO2.Cancel" />
+			<DA name="ctlModel" fc="CF" bType="Enum" type="ctlModel" />
+		</DOType>
+		<DOType id="simpleIOGenericIO.GGIO1.SPCSO6" cdc="SPC">
+			<DA name="stVal" fc="ST" bType="BOOLEAN" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+			<DA name="SBO" fc="CO" bType="VisString64" />
+			<DA name="Oper" fc="CO" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO5.Oper" />
+			<DA name="Cancel" fc="CO" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO6.Cancel" />
+			<DA name="ctlModel" fc="CF" bType="Enum" type="ctlModel" />
+		</DOType>
+		<DOType id="simpleIOGenericIO.GGIO1.SPCSO7" cdc="SPC">
+			<DA name="stVal" fc="ST" bType="BOOLEAN" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+			<DA name="Oper" fc="CO" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO5.Oper" />
+			<DA name="Cancel" fc="CO" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO6.Cancel" />
+			<DA name="ctlModel" fc="CF" bType="Enum" type="ctlModel" />
+		</DOType>
+		<DOType id="simpleIOGenericIO.GGIO1.SPCSO8" cdc="SPC">
+			<DA name="origin" fc="ST" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO8.origin" />
+			<DA name="ctlNum" fc="ST" bType="INT8U" />
+			<DA name="stVal" fc="ST" bType="BOOLEAN" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+			<DA name="SBOw" fc="CO" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO8.SBOw" />
+			<DA name="Oper" fc="CO" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO5.Oper" />
+			<DA name="Cancel" fc="CO" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO6.Cancel" />
+			<DA name="ctlModel" fc="CF" bType="Enum" type="ctlModel" />
+		</DOType>
+		<DOType id="simpleIOGenericIO.GGIO1.Ind1" cdc="SPS">
+			<DA name="stVal" fc="ST" bType="BOOLEAN" />
+			<DA name="q" fc="ST" bType="Quality" />
+			<DA name="t" fc="ST" bType="Timestamp" />
+		</DOType>
+		<DAType id="simpleIOGenericIO.GGIO1.AnIn1.mag">
+			<BDA name="f" bType="FLOAT32" />
+		</DAType>
+		<DAType id="simpleIOGenericIO.GGIO1.SPCSO1.Oper.origin">
+			<BDA name="orCat" bType="Enum" type="orCategory" />
+			<BDA name="orIdent" bType="Octet64" />
+		</DAType>
+		<DAType id="simpleIOGenericIO.GGIO1.SPCSO8.origin">
+			<BDA name="orCat" bType="Enum" type="orCategory" />
+			<BDA name="orIdent" bType="Octet64" />
+		</DAType>
+		<DAType id="simpleIOGenericIO.GGIO1.SPCSO4.SBOw">
+			<BDA name="ctlVal" bType="BOOLEAN" />
+			<BDA name="origin" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO1.Oper.origin" />
+			<BDA name="ctlNum" bType="INT8U" />
+			<BDA name="T" bType="Timestamp" />
+			<BDA name="Test" bType="BOOLEAN" />
+			<BDA name="Check" bType="Check" />
+		</DAType>
+		<DAType id="simpleIOGenericIO.GGIO1.SPCSO8.SBOw">
+			<BDA name="ctlVal" bType="BOOLEAN" />
+			<BDA name="operTm" bType="Timestamp" />
+			<BDA name="origin" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO1.Oper.origin" />
+			<BDA name="ctlNum" bType="INT8U" />
+			<BDA name="T" bType="Timestamp" />
+			<BDA name="Test" bType="BOOLEAN" />
+			<BDA name="Check" bType="Check" />
+		</DAType>
+		<DAType id="simpleIOGenericIO.GGIO1.SPCSO1.Oper">
+			<BDA name="ctlVal" bType="BOOLEAN" />
+			<BDA name="origin" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO1.Oper.origin" />
+			<BDA name="ctlNum" bType="INT8U" />
+			<BDA name="T" bType="Timestamp" />
+			<BDA name="Test" bType="BOOLEAN" />
+			<BDA name="Check" bType="Check" />
+		</DAType>
+		<DAType id="simpleIOGenericIO.GGIO1.SPCSO5.Oper">
+			<BDA name="ctlVal" bType="BOOLEAN" />
+			<BDA name="operTm" bType="Timestamp" />
+			<BDA name="origin" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO1.Oper.origin" />
+			<BDA name="ctlNum" bType="INT8U" />
+			<BDA name="T" bType="Timestamp" />
+			<BDA name="Test" bType="BOOLEAN" />
+			<BDA name="Check" bType="Check" />
+		</DAType>
+		<DAType id="simpleIOGenericIO.GGIO1.SPCSO2.Cancel">
+			<BDA name="ctlVal" bType="BOOLEAN" />
+			<BDA name="origin" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO1.Oper.origin" />
+			<BDA name="ctlNum" bType="INT8U" />
+			<BDA name="T" bType="Timestamp" />
+			<BDA name="Test" bType="BOOLEAN" />
+		</DAType>
+		<DAType id="simpleIOGenericIO.GGIO1.SPCSO6.Cancel">
+			<BDA name="ctlVal" bType="BOOLEAN" />
+			<BDA name="operTm" bType="Timestamp" />
+			<BDA name="origin" bType="Struct" type="simpleIOGenericIO.GGIO1.SPCSO1.Oper.origin" />
+			<BDA name="ctlNum" bType="INT8U" />
+			<BDA name="T" bType="Timestamp" />
+			<BDA name="Test" bType="BOOLEAN" />
+		</DAType>
+		<EnumType id="ctlModel">
+			<!--Source: IEC 61850-7-3:2003A-->
+			<EnumVal ord="0">status-only</EnumVal>
+			<EnumVal ord="1">direct-with-normal-security</EnumVal>
+			<EnumVal ord="2">sbo-with-normal-security</EnumVal>
+			<EnumVal ord="3">direct-with-enhanced-security</EnumVal>
+			<EnumVal ord="4">sbo-with-enhanced-security</EnumVal>
+		</EnumType>
+		<EnumType id="sboClass">
+			<!--Source: IEC 61850-7-3:2003A-->
+			<EnumVal ord="0">operate-once</EnumVal>
+			<EnumVal ord="1">operate-many</EnumVal>
+		</EnumType>
+		<EnumType id="orCategory">
+			<!--Source: IEC 61850-7-3:2003A-->
+			<EnumVal ord="0">not-supported</EnumVal>
+			<EnumVal ord="1">bay-control</EnumVal>
+			<EnumVal ord="2">station-control</EnumVal>
+			<EnumVal ord="3">remote-control</EnumVal>
+			<EnumVal ord="4">automatic-bay</EnumVal>
+			<EnumVal ord="5">automatic-station</EnumVal>
+			<EnumVal ord="6">automatic-remote</EnumVal>
+			<EnumVal ord="7">maintenance</EnumVal>
+			<EnumVal ord="8">process</EnumVal>
+		</EnumType>
+		<EnumType id="Beh">
+			<!--Source: IEC 61850-7-4:2003A-->
+			<EnumVal ord="1">on</EnumVal>
+			<EnumVal ord="2">blocked</EnumVal>
+			<EnumVal ord="3">test</EnumVal>
+			<EnumVal ord="4">test/blocked</EnumVal>
+			<EnumVal ord="5">off</EnumVal>
+		</EnumType>
+		<EnumType id="Health">
+			<!--Source: IEC 61850-7-4:2003A-->
+			<EnumVal ord="1">Ok</EnumVal>
+			<EnumVal ord="2">Warning</EnumVal>
+			<EnumVal ord="3">Alarm</EnumVal>
+		</EnumType>
+	</DataTypeTemplates>
+</SCL>
