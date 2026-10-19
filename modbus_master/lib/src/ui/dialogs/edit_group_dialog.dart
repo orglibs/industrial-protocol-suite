@@ -29,7 +29,7 @@ class _EditGroupDialogState extends State<EditGroupDialog> {
   void initState() {
     super.initState();
     final g = widget.group;
-    _nameCtrl = TextEditingController(text: g?.groupName ?? 'Group ${DateTime.now().millisecondsSinceEpoch % 100}');
+    _nameCtrl = TextEditingController(text: g?.displayGroupName ?? 'Group ${DateTime.now().millisecondsSinceEpoch % 100}');
     _startAddrCtrl = TextEditingController(text: (g?.startAddress ?? 0).toString());
     _qtyCtrl = TextEditingController(text: (g?.quantity ?? 10).toString());
     _type = g?.registerType ?? ModbusRegisterType.holdingRegisters;
@@ -51,19 +51,22 @@ class _EditGroupDialogState extends State<EditGroupDialog> {
 
     if (startAddr < 0 || startAddr > 65535) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Start Address: 0-65535')),
+        SnackBar(content: Text('${AppI18n.instance.t('startAddr')}: 0-65535')),
       );
       return;
     }
 
     if (qty < 1 || qty > 125) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Quantity: 1-125')),
+        SnackBar(content: Text('${AppI18n.instance.t('regQty')}: 1-125')),
       );
       return;
     }
 
     if (widget.group != null) {
+      if (widget.group!.groupNameKey != null && name != AppI18n.instance.t(widget.group!.groupNameKey!)) {
+        widget.group!.groupNameKey = null;
+      }
       widget.group!.groupName = name;
       widget.group!.registerType = _type;
       widget.group!.startAddress = startAddr;
@@ -96,19 +99,19 @@ class _EditGroupDialogState extends State<EditGroupDialog> {
             children: [
               TextField(
                 controller: _nameCtrl,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: AppI18n.instance.t('groupName'),
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.folder_special),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.folder_special),
                 ),
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<ModbusRegisterType>(
                 initialValue: _type,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: AppI18n.instance.t('regType'),
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.category),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.category),
                 ),
                 items: ModbusRegisterType.values.map((t) {
                   return DropdownMenuItem(value: t, child: Text(t.label));
@@ -118,20 +121,20 @@ class _EditGroupDialogState extends State<EditGroupDialog> {
               const SizedBox(height: 12),
               TextField(
                 controller: _startAddrCtrl,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: AppI18n.instance.t('startAddr'),
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.pin),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.pin),
                 ),
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: _qtyCtrl,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: AppI18n.instance.t('regQty'),
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.format_list_numbered),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.format_list_numbered),
                 ),
                 keyboardType: TextInputType.number,
               ),

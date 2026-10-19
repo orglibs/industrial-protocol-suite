@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'src/client/iec104_client.dart';
+import 'src/client/workspace_storage.dart';
 import 'src/i18n/app_i18n.dart';
+import 'src/models/connection_config.dart';
 import 'src/ui/home_screen.dart';
 import 'src/ui/widgets/window_title_bar.dart';
 
@@ -8,16 +10,16 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await WindowManagerHelper.initialize();
 
-  final client = Iec104Client();
-  await client.loadWorkspace();
+  final connections = await WorkspaceStorage.loadConnections();
 
-  runApp(Iec104ClientApp(client: client));
+  runApp(Iec104ClientApp(connections: connections));
 }
 
 class Iec104ClientApp extends StatefulWidget {
-  final Iec104Client client;
+  final List<Iec104ClientConnectionConfig>? connections;
+  final Iec104Client? client;
 
-  const Iec104ClientApp({super.key, required this.client});
+  const Iec104ClientApp({super.key, this.connections, this.client});
 
   @override
   State<Iec104ClientApp> createState() => _Iec104ClientAppState();
@@ -73,6 +75,7 @@ class _Iec104ClientAppState extends State<Iec104ClientApp> {
       home: Directionality(
         textDirection: i18n.currentLanguage.isRtl ? TextDirection.rtl : TextDirection.ltr,
         child: HomeScreen(
+          initialConnections: widget.connections,
           client: widget.client,
           onToggleTheme: _toggleTheme,
           isDarkMode: _themeMode == ThemeMode.dark,

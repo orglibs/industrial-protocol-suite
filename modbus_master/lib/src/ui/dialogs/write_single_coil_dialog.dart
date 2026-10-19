@@ -91,7 +91,7 @@ class _WriteSingleCoilDialogState extends State<WriteSingleCoilDialog> {
         children: [
           Icon(Icons.toggle_on, color: theme.colorScheme.primary),
           const SizedBox(width: 8),
-          Text('FC 05: Write Single Coil', style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(AppI18n.instance.t('writeSingleCoil'), style: const TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
       content: SizedBox(
@@ -100,7 +100,7 @@ class _WriteSingleCoilDialogState extends State<WriteSingleCoilDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Unit ID: $_slaveId  |  ${AppI18n.instance.t('colAddr')}: $_address'),
+            Text('${AppI18n.instance.t('slaveId')}: $_slaveId  |  ${AppI18n.instance.t('colAddr')}: $_address'),
             const SizedBox(height: 16),
             Text('${AppI18n.instance.t('currValue')}:'),
             const SizedBox(height: 8),
@@ -114,7 +114,7 @@ class _WriteSingleCoilDialogState extends State<WriteSingleCoilDialog> {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                     icon: const Icon(Icons.check_circle),
-                    label: const Text('ON (0xFF00)'),
+                    label: Text('${AppI18n.instance.t('on')} (0xFF00)'),
                     onPressed: () => setState(() => _value = true),
                   ),
                 ),
@@ -127,7 +127,7 @@ class _WriteSingleCoilDialogState extends State<WriteSingleCoilDialog> {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                     icon: const Icon(Icons.cancel),
-                    label: const Text('OFF (0x0000)'),
+                    label: Text('${AppI18n.instance.t('off')} (0x0000)'),
                     onPressed: () => setState(() => _value = false),
                   ),
                 ),

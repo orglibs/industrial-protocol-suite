@@ -160,9 +160,9 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
                     children: [
                       const Icon(Icons.folder_shared, size: 20, color: Colors.blueAccent),
                       const SizedBox(width: 8),
-                      const Text(
+                      Text(
                         i18n.t('remoteFilesService'),
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                       ),
                       const Spacer(),
                       FilledButton.icon(
@@ -203,11 +203,11 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(color: isDark ? Colors.grey[850]! : Colors.grey[300]!),
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Text(
                           i18n.t('emptyRemoteFiles'),
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.grey, fontSize: 12),
+                          style: const TextStyle(color: Colors.grey, fontSize: 12),
                         ),
                       ),
                     )
@@ -270,9 +270,9 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
                     children: [
                       const Icon(Icons.tune, size: 20, color: Colors.purpleAccent),
                       const SizedBox(width: 8),
-                      const Text(
+                      Text(
                         i18n.t('sgcbTitle'),
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                       ),
                       const Spacer(),
                       if (_isSwitchingSg)
@@ -325,10 +325,10 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
                         color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF8F8F8),
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Text(
                           i18n.t('noSgVarsConfigured'),
-                          style: TextStyle(color: Colors.grey, fontSize: 12),
+                          style: const TextStyle(color: Colors.grey, fontSize: 12),
                         ),
                       ),
                     )
@@ -349,9 +349,9 @@ class _FilesAndSettingsTabState extends State<FilesAndSettingsTab> {
                           decoration: BoxDecoration(
                             color: isDark ? const Color(0xFF252526) : const Color(0xFFEBEBEB),
                           ),
-                          children: const [
+                          children: [
                             Padding(padding: const EdgeInsets.all(8), child: Text(i18n.t('colSgRef'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-                            Padding(padding: EdgeInsets.all(8), child: Text('FC', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                            const Padding(padding: EdgeInsets.all(8), child: Text('FC', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
                             Padding(padding: const EdgeInsets.all(8), child: Text(i18n.t('colType'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
                             Padding(padding: const EdgeInsets.all(8), child: Text(i18n.t('colVal'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
                           ],

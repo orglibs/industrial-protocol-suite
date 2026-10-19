@@ -78,68 +78,83 @@ class _TopologyTabState extends State<TopologyTab> {
               color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
               border: Border(bottom: BorderSide(color: theme.dividerColor)),
             ),
-            child: Row(
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              alignment: WrapAlignment.spaceBetween,
               children: [
-                FilledButton.icon(
-                  icon: const Icon(Icons.play_arrow, size: 18),
-                  label: Text(AppI18n.instance.t('openAll')),
-                  style: FilledButton.styleFrom(backgroundColor: Colors.green),
-                  onPressed: () async {
-                    await ModbusServerManager.instance.startAll(widget.connections);
-                    setState(() {});
-                    widget.onDataChanged();
-                  },
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    FilledButton.icon(
+                      icon: const Icon(Icons.play_arrow, size: 18),
+                      label: Text(AppI18n.instance.t('openAll')),
+                      style: FilledButton.styleFrom(backgroundColor: Colors.green),
+                      onPressed: () async {
+                        await ModbusServerManager.instance.startAll(widget.connections);
+                        setState(() {});
+                        widget.onDataChanged();
+                      },
+                    ),
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.stop, size: 18),
+                      label: Text(AppI18n.instance.t('closeAll')),
+                      style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+                      onPressed: () async {
+                        await ModbusServerManager.instance.stopAll(widget.connections);
+                        setState(() {});
+                        widget.onDataChanged();
+                      },
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.stop, size: 18),
-                  label: Text(AppI18n.instance.t('closeAll')),
-                  style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
-                  onPressed: () async {
-                    await ModbusServerManager.instance.stopAll(widget.connections);
-                    setState(() {});
-                    widget.onDataChanged();
-                  },
-                ),
-                const Spacer(),
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.file_upload_outlined, size: 18),
-                  label: Text(AppI18n.instance.t('importWorkspace')),
-                  onPressed: () async {
-                    final path = WorkspaceStorage.defaultFilePath;
-                    try {
-                      final imported = await WorkspaceStorage.importFromFile(path);
-                      setState(() {
-                        widget.connections.clear();
-                        widget.connections.addAll(imported);
-                      });
-                      widget.onDataChanged();
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('${AppI18n.instance.t('importWorkspace')}: $path')),
-                        );
-                      }
-                    } catch (e) {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('${AppI18n.instance.t('parseError')}: $e')),
-                        );
-                      }
-                    }
-                  },
-                ),
-                const SizedBox(width: 8),
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.file_download_outlined, size: 18),
-                  label: Text(AppI18n.instance.t('saveWorkspace')),
-                  onPressed: () async {
-                    await WorkspaceStorage.saveConnections(widget.connections);
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('${AppI18n.instance.t('saveWorkspace')} -> ${WorkspaceStorage.defaultFilePath}')),
-                      );
-                    }
-                  },
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.file_upload_outlined, size: 18),
+                      label: Text(AppI18n.instance.t('importWorkspace')),
+                      onPressed: () async {
+                        final path = WorkspaceStorage.defaultFilePath;
+                        try {
+                          final imported = await WorkspaceStorage.importFromFile(path);
+                          setState(() {
+                            widget.connections.clear();
+                            widget.connections.addAll(imported);
+                          });
+                          widget.onDataChanged();
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('${AppI18n.instance.t('importWorkspace')}: $path')),
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('${AppI18n.instance.t('parseError')}: $e')),
+                            );
+                          }
+                        }
+                      },
+                    ),
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.file_download_outlined, size: 18),
+                      label: Text(AppI18n.instance.t('saveWorkspace')),
+                      onPressed: () async {
+                        await WorkspaceStorage.saveConnections(widget.connections);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('${AppI18n.instance.t('saveWorkspace')} -> ${WorkspaceStorage.defaultFilePath}')),
+                          );
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -175,7 +190,13 @@ class _TopologyTabState extends State<TopologyTab> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('${AppI18n.instance.t('connServers')} (${widget.connections.length})', style: theme.textTheme.titleMedium),
+              Expanded(
+                child: Text(
+                  '${AppI18n.instance.t('connServers')} (${widget.connections.length})',
+                  style: theme.textTheme.titleMedium,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
               IconButton(
                 icon: const Icon(Icons.add_circle, color: Colors.blue),
                 tooltip: AppI18n.instance.t('newConn'),
@@ -215,12 +236,15 @@ class _TopologyTabState extends State<TopologyTab> {
                           conn.mode == ModbusTransportMode.serialRtu ? Icons.usb : Icons.router,
                           color: isRunning ? Colors.green : Colors.grey,
                         ),
-                        title: Text(conn.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Text(
-                          conn.mode == ModbusTransportMode.serialRtu
-                              ? '${conn.serialPortName} (${conn.baudRate} bps)'
-                              : '${conn.ip}:${conn.port} (${conn.mode.name.toUpperCase()})',
-                          style: const TextStyle(fontSize: 12),
+                        title: Text(conn.displayName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: Text(
+                            conn.mode == ModbusTransportMode.serialRtu
+                                ? '${conn.serialPortName} (${conn.baudRate} bps)'
+                                : '${conn.ip}:${conn.port} (${conn.mode.label})',
+                            style: const TextStyle(fontSize: 12),
+                          ),
                         ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -306,7 +330,13 @@ class _TopologyTabState extends State<TopologyTab> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('${AppI18n.instance.t('slavesList')} (${slaves.length})', style: theme.textTheme.titleMedium),
+              Expanded(
+                child: Text(
+                  '${AppI18n.instance.t('slavesList')} (${slaves.length})',
+                  style: theme.textTheme.titleMedium,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
               IconButton(
                 icon: const Icon(Icons.add_circle, color: Colors.blue),
                 tooltip: AppI18n.instance.t('newSlave'),
@@ -351,9 +381,9 @@ class _TopologyTabState extends State<TopologyTab> {
                             leading: CircleAvatar(
                               child: Text(s.slaveId.toString()),
                             ),
-                            title: Text(s.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                            title: Text(s.displayName, style: const TextStyle(fontWeight: FontWeight.bold)),
                             subtitle: Text(
-                              '${AppI18n.instance.t('regGroups')}: ${s.groups.length} | ${AppI18n.instance.t('respDelay')}: ${s.responseDelay}ms | ${s.byteOrder.name.toUpperCase()}',
+                              '${AppI18n.instance.t('regGroups')}: ${s.groups.length} | ${AppI18n.instance.t('respDelay')}: ${s.responseDelay}ms | ${s.byteOrder.label}',
                               style: const TextStyle(fontSize: 12),
                             ),
                             trailing: PopupMenuButton<String>(
@@ -371,7 +401,8 @@ class _TopologyTabState extends State<TopologyTab> {
                                   // Replicates MSE Copy Slave
                                   final nextId = (slaves.map((e) => e.slaveId).fold(0, (a, b) => a > b ? a : b)) + 1;
                                   final clone = s.copyWith(
-                                    name: '${s.name} (${AppI18n.instance.t('copy')})',
+                                    name: '${s.displayName} (${AppI18n.instance.t('copy')})',
+                                    nameKey: null,
                                     slaveId: nextId.clamp(1, 247),
                                   );
                                   setState(() {
@@ -420,7 +451,13 @@ class _TopologyTabState extends State<TopologyTab> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('${AppI18n.instance.t('regGroups')} (${groups.length})', style: theme.textTheme.titleMedium),
+              Expanded(
+                child: Text(
+                  '${AppI18n.instance.t('regGroups')} (${groups.length})',
+                  style: theme.textTheme.titleMedium,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
               IconButton(
                 icon: const Icon(Icons.add_circle, color: Colors.blue),
                 tooltip: AppI18n.instance.t('addGroup'),
@@ -470,7 +507,7 @@ class _TopologyTabState extends State<TopologyTab> {
                                 style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
                               ),
                             ),
-                            title: Text(g.groupName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                            title: Text(g.displayGroupName, style: const TextStyle(fontWeight: FontWeight.bold)),
                             subtitle: Text(
                               '${AppI18n.instance.t('regType')}: ${g.registerType.label} | ${AppI18n.instance.t('startAddr')}: ${g.startAddress} | ${AppI18n.instance.t('pointsCount')}: ${g.quantity}',
                               style: const TextStyle(fontSize: 12),
@@ -498,7 +535,7 @@ class _TopologyTabState extends State<TopologyTab> {
                                     context: context,
                                     builder: (_) => SimulationConfigDialog(
                                       initialConfig: g.registers.first.simulation,
-                                      title: '${AppI18n.instance.t('batchWave')} (${g.groupName})',
+                                      title: '${AppI18n.instance.t('batchWave')} (${g.displayGroupName})',
                                     ),
                                   );
                                   if (simCfg != null) {

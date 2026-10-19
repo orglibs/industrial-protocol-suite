@@ -1,20 +1,68 @@
 import 'dart:math';
+import '../i18n/app_i18n.dart';
 
 /// Easing and Waveform types replicating MSE EaseFunctionConfig
 enum EaseWaveType {
-  none('无 (None)'),
-  sine('正弦波 (Sine Wave)'),
-  triangle('三角波 (Triangle Wave)'),
-  square('方波 (Square Wave)'),
-  sawtooth('锯齿波 (Sawtooth Wave)'),
-  increment('线性累加 (Linear Counter)'),
-  random('随机波动 (Random Walk)'),
-  easeInQuint('五次方加速 (EaseInQuint)'),
-  easeOutQuint('五次方减速 (EaseOutQuint)'),
-  easeInOutQuint('平滑五次方缓动 (EaseInOutQuint)');
+  none,
+  sine,
+  triangle,
+  square,
+  sawtooth,
+  increment,
+  random,
+  easeInQuint,
+  easeOutQuint,
+  easeInOutQuint;
 
-  final String label;
-  const EaseWaveType(this.label);
+  String get label {
+    switch (this) {
+      case EaseWaveType.none:
+        return AppI18n.instance.t('waveNone');
+      case EaseWaveType.sine:
+        return AppI18n.instance.t('waveSine');
+      case EaseWaveType.triangle:
+        return AppI18n.instance.t('waveTriangle');
+      case EaseWaveType.square:
+        return AppI18n.instance.t('waveSquare');
+      case EaseWaveType.sawtooth:
+        return AppI18n.instance.t('waveSawtooth');
+      case EaseWaveType.increment:
+        return AppI18n.instance.t('waveIncrement');
+      case EaseWaveType.random:
+        return AppI18n.instance.t('waveRandom');
+      case EaseWaveType.easeInQuint:
+        return AppI18n.instance.t('waveEaseIn');
+      case EaseWaveType.easeOutQuint:
+        return AppI18n.instance.t('waveEaseOut');
+      case EaseWaveType.easeInOutQuint:
+        return AppI18n.instance.t('waveEaseInOut');
+    }
+  }
+
+  String get shortLabel {
+    switch (this) {
+      case EaseWaveType.none:
+        return '-';
+      case EaseWaveType.sine:
+        return AppI18n.instance.t('shortSine');
+      case EaseWaveType.triangle:
+        return AppI18n.instance.t('shortTriangle');
+      case EaseWaveType.square:
+        return AppI18n.instance.t('shortSquare');
+      case EaseWaveType.sawtooth:
+        return AppI18n.instance.t('shortSawtooth');
+      case EaseWaveType.increment:
+        return AppI18n.instance.t('shortIncrement');
+      case EaseWaveType.random:
+        return AppI18n.instance.t('shortRandom');
+      case EaseWaveType.easeInQuint:
+        return 'EaseIn';
+      case EaseWaveType.easeOutQuint:
+        return 'EaseOut';
+      case EaseWaveType.easeInOutQuint:
+        return 'EaseInOut';
+    }
+  }
 
   static EaseWaveType fromIndex(int index) {
     if (index >= 0 && index < EaseWaveType.values.length) {

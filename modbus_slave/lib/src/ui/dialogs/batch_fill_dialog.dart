@@ -3,14 +3,26 @@ import 'package:flutter/material.dart';
 import '../../models/register_group.dart';
 
 enum BatchFillMode {
-  zero('All 0'),
-  ones('All 1 / Max'),
-  constant('Constant'),
-  increment('Linear Increment'),
-  random('Random Range');
+  zero,
+  ones,
+  constant,
+  increment,
+  random;
 
-  final String label;
-  const BatchFillMode(this.label);
+  String get label {
+    switch (this) {
+      case BatchFillMode.zero:
+        return AppI18n.instance.t('fillZero');
+      case BatchFillMode.ones:
+        return AppI18n.instance.t('fillOnes');
+      case BatchFillMode.constant:
+        return AppI18n.instance.t('fillConst');
+      case BatchFillMode.increment:
+        return AppI18n.instance.t('fillLinear');
+      case BatchFillMode.random:
+        return AppI18n.instance.t('fillRandom');
+    }
+  }
 }
 
 class BatchFillDialog extends StatefulWidget {
@@ -50,7 +62,12 @@ class _BatchFillDialogState extends State<BatchFillDialog> {
         children: [
           Icon(Icons.auto_fix_high, color: theme.colorScheme.primary),
           const SizedBox(width: 8),
-          Text('${AppI18n.instance.t('batchFillTitle')} (${widget.group.groupName})'),
+          Expanded(
+            child: Text(
+              '${AppI18n.instance.t('batchFillTitle')} (${widget.group.displayGroupName})',
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
       content: SizedBox(
@@ -67,10 +84,10 @@ class _BatchFillDialogState extends State<BatchFillDialog> {
               const SizedBox(height: 16),
               DropdownButtonFormField<BatchFillMode>(
                 value: _mode,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: AppI18n.instance.t('fillMode'),
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.tune),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.tune),
                 ),
                 items: BatchFillMode.values.map((m) {
                   return DropdownMenuItem(value: m, child: Text(m.label));
@@ -95,9 +112,9 @@ class _BatchFillDialogState extends State<BatchFillDialog> {
                       child: TextField(
                         controller: _startController,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: AppI18n.instance.t('startAddr'),
-                          border: OutlineInputBorder(),
+                          border: const OutlineInputBorder(),
                         ),
                       ),
                     ),
@@ -106,9 +123,9 @@ class _BatchFillDialogState extends State<BatchFillDialog> {
                       child: TextField(
                         controller: _stepController,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: AppI18n.instance.t('waveStep'),
-                          border: OutlineInputBorder(),
+                          border: const OutlineInputBorder(),
                         ),
                       ),
                     ),
@@ -121,9 +138,9 @@ class _BatchFillDialogState extends State<BatchFillDialog> {
                       child: TextField(
                         controller: _minController,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: AppI18n.instance.t('waveMin'),
-                          border: OutlineInputBorder(),
+                          border: const OutlineInputBorder(),
                         ),
                       ),
                     ),
@@ -132,9 +149,9 @@ class _BatchFillDialogState extends State<BatchFillDialog> {
                       child: TextField(
                         controller: _maxController,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: AppI18n.instance.t('waveMax'),
-                          border: OutlineInputBorder(),
+                          border: const OutlineInputBorder(),
                         ),
                       ),
                     ),

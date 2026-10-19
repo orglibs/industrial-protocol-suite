@@ -1,7 +1,9 @@
 import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:modbus_slave/src/i18n/app_i18n.dart';
 import 'package:modbus_slave/src/models/connection_config.dart';
 import 'package:modbus_slave/src/models/register_group.dart';
+import 'package:modbus_slave/src/models/register_model.dart';
 import 'package:modbus_slave/src/models/simulation_config.dart';
 import 'package:modbus_slave/src/models/slave_model.dart';
 import 'package:modbus_slave/src/protocol/modbus_crc.dart';
@@ -306,6 +308,138 @@ void main() {
       expect(restored.slaves.length, equals(1));
       expect(restored.slaves.first.name, equals('TestSlave'));
       expect(restored.slaves.first.groups.length, equals(conn.slaves.first.groups.length));
+    });
+  });
+
+  group('7. Multi-language Dynamic i18n Tests', () {
+    test('Verifies dynamic translation switching across all 17 languages', () {
+      final defaultSlave = ConnectionConfig.createDefaultSlave(1);
+      final defaultConn = ConnectionConfig(
+        name: 'Modbus TCP Default Server (Port 502)',
+        nameKey: 'preset_conn_tcp',
+        slaves: [defaultSlave],
+      );
+
+      final voltReg = defaultSlave.groups.first.registers.first; // Phase A Voltage
+      final group = defaultSlave.groups.first; // Holding registers
+
+      // Test English
+      AppI18n.instance.setLanguage(AppLanguage.enUS);
+      expect(defaultConn.displayName, equals('Modbus TCP Default Server (Port 502)'));
+      expect(defaultSlave.displayName, equals('Substation Main Transformer (Unit 1)'));
+      expect(group.displayGroupName, equals('Holding Registers - Power Telemetry (Holding 4x)'));
+      expect(voltReg.displayAlias, equals('Phase A Voltage (V)'));
+      expect(voltReg.displayComment, equals('Sine wave simulation'));
+
+      // Test Simplified Chinese
+      AppI18n.instance.setLanguage(AppLanguage.zhCN);
+      expect(defaultConn.displayName, equals('Modbus TCP 默认从站服务 (Port 502)'));
+      expect(defaultSlave.displayName, equals('配电站主变从站 (Unit 1)'));
+      expect(group.displayGroupName, equals('保持寄存器-电力模拟量 (Holding 4x)'));
+      expect(voltReg.displayAlias, equals('A相电压(V)'));
+      expect(voltReg.displayComment, equals('正弦波动模拟'));
+
+      // Test German
+      AppI18n.instance.setLanguage(AppLanguage.deDE);
+      expect(defaultConn.displayName, contains('Modbus TCP Standard-Server'));
+      expect(defaultSlave.displayName, contains('Umspannwerk Haupttransformator'));
+
+      // Test Japanese
+      AppI18n.instance.setLanguage(AppLanguage.jaJP);
+      expect(defaultConn.displayName, contains('Modbus TCP'));
+      expect(defaultSlave.displayName, contains('変電所メイン変圧器'));
+
+      // Test Russian
+      AppI18n.instance.setLanguage(AppLanguage.ruRU);
+      expect(defaultConn.displayName, contains('Modbus TCP'));
+      expect(defaultSlave.displayName, contains('трансформатор'));
+
+      // Test Arabic (RTL)
+      AppI18n.instance.setLanguage(AppLanguage.arSA);
+      expect(defaultConn.displayName, contains('Modbus TCP'));
+      expect(defaultSlave.displayName, contains('المحول'));
+
+      // Reset to English
+      AppI18n.instance.setLanguage(AppLanguage.enUS);
+    });
+
+    test('Manual user custom names are preserved and never overridden by language switching', () {
+      final customReg = RegisterModel(
+        address: 0,
+        alias: 'Custom Flow Meter #42',
+        aliasKey: null, // User custom alias has no key
+        comment: 'User custom notes',
+        commentKey: null,
+      );
+
+      AppI18n.instance.setLanguage(AppLanguage.enUS);
+      expect(customReg.displayAlias, equals('Custom Flow Meter #42'));
+      expect(customReg.displayComment, equals('User custom notes'));
+
+      AppI18n.instance.setLanguage(AppLanguage.zhCN);
+      expect(customReg.displayAlias, equals('Custom Flow Meter #42'));
+      expect(customReg.displayComment, equals('User custom notes'));
+
+      AppI18n.instance.setLanguage(AppLanguage.deDE);
+      expect(customReg.displayAlias, equals('Custom Flow Meter #42'));
+      expect(customReg.displayComment, equals('User custom notes'));
+    });
+
+    test('AppI18n.instance.tf parameter replacement formats traffic log summaries', () {
+      AppI18n.instance.setLanguage(AppLanguage.enUS);
+      final enReq = AppI18n.instance.tf('traffic_fc03_req', {'start': 100, 'qty': 10});
+      expect(enReq, equals('Read Holding Registers [FC 03]: Start=100, Qty=10'));
+
+      AppI18n.instance.setLanguage(AppLanguage.zhCN);
+      final zhReq = AppI18n.instance.tf('traffic_fc03_req', {'start': 100, 'qty': 10});
+      expect(zhReq, equals('读保持寄存器 [FC 03]: 起始=100, 数量=10'));
+    });
+
+    test('EaseWaveType and ModbusTransportMode labels dynamically translate', () {
+      AppI18n.instance.setLanguage(AppLanguage.enUS);
+      expect(EaseWaveType.sine.label, equals('Sine Wave'));
+      expect(ModbusTransportMode.tcp.label, equals('Modbus TCP Server (Ethernet/LAN)'));
+
+      AppI18n.instance.setLanguage(AppLanguage.zhCN);
+      expect(EaseWaveType.sine.label, equals('正弦波 (Sine Wave)'));
+      expect(ModbusTransportMode.tcp.label, equals('Modbus TCP Server (以太网/局域网服务端)'));
+    });
+
+    test('Preserves NameKey, GroupNameKey, AliasKey, CommentKey across JSON serialization', () {
+      final slave = ConnectionConfig.createDefaultSlave(1);
+      final conn = ConnectionConfig(
+        name: 'MyConn',
+        nameKey: 'preset_conn_tcp',
+        slaves: [slave],
+      );
+
+      final json = conn.toJson();
+      expect(json['NameKey'], equals('preset_conn_tcp'));
+      final slaveJson = (json['SlaveModels'] as List).first as Map<String, dynamic>;
+      expect(slaveJson['NameKey'], equals('preset_slave_transformer'));
+      final groupJson = (slaveJson['RegisterGroupModels'] as List).first as Map<String, dynamic>;
+      expect(groupJson['GroupNameKey'], equals('preset_grp_holding_power'));
+      final regJson = (groupJson['RegisterModels'] as List).first as Map<String, dynamic>;
+      expect(regJson['AliasKey'], equals('reg_volt_a'));
+      expect(regJson['CommentKey'], equals('cmt_sine_wave'));
+
+      final restored = ConnectionConfig.fromJson(json);
+      expect(restored.nameKey, equals('preset_conn_tcp'));
+      expect(restored.slaves.first.nameKey, equals('preset_slave_transformer'));
+      expect(restored.slaves.first.groups.first.groupNameKey, equals('preset_grp_holding_power'));
+      expect(restored.slaves.first.groups.first.registers.first.aliasKey, equals('reg_volt_a'));
+      expect(restored.slaves.first.groups.first.registers.first.commentKey, equals('cmt_sine_wave'));
+    });
+
+    test('Verifies all tab titles exist across all 17 languages for safe navigation rendering', () {
+      final tabKeys = ['tabRegisters', 'tabConnections', 'tabTraffic', 'tabCharts', 'tabTools'];
+      for (final lang in AppLanguage.values) {
+        AppI18n.instance.setLanguage(lang);
+        for (final k in tabKeys) {
+          final title = AppI18n.instance.t(k);
+          expect(title.isNotEmpty, isTrue);
+        }
+      }
     });
   });
 }

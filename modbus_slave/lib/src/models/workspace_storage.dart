@@ -50,14 +50,16 @@ class WorkspaceStorage {
 
     return [
       ConnectionConfig(
-        name: 'Modbus TCP 默认从站服务 (Port 502)',
+        name: 'Modbus TCP Default Server (Port 502)',
+        nameKey: 'preset_conn_tcp',
         mode: ModbusTransportMode.tcp,
         ip: '0.0.0.0',
         port: 502,
-        slaves: [ConnectionConfig.createDefaultSlave(1, '配电站主变从站 (Unit 1)')],
+        slaves: [ConnectionConfig.createDefaultSlave(1, 'Substation Main Transformer (Unit 1)', 'preset_slave_transformer')],
       ),
       ConnectionConfig(
-        name: 'Modbus RTU 串口从站服务 (/dev/ttyUSB0)',
+        name: 'Modbus RTU Serial Server (/dev/ttyUSB0)',
+        nameKey: 'preset_conn_rtu',
         mode: ModbusTransportMode.serialRtu,
         serialPortName: '/dev/ttyUSB0',
         baudRate: 9600,
@@ -65,15 +67,16 @@ class WorkspaceStorage {
         parity: 0,
         stopBits: 1,
         messageFrameFormat: 1,
-        slaves: [ConnectionConfig.createDefaultSlave(2, '串口采集从站 (Unit 2)')],
+        slaves: [ConnectionConfig.createDefaultSlave(2, 'Serial Acquisition Slave (Unit 2)', 'preset_slave_serial')],
       ),
       ConnectionConfig(
         name: 'Modbus RTU over TCP (Port 5020)',
+        nameKey: 'preset_conn_rtu_over_tcp',
         mode: ModbusTransportMode.rtuOverTcp,
         ip: '0.0.0.0',
         port: 5020,
         messageFrameFormat: 1,
-        slaves: [ConnectionConfig.createDefaultSlave(3, '网关从站 (Unit 3)')],
+        slaves: [ConnectionConfig.createDefaultSlave(3, 'Gateway Slave (Unit 3)', 'preset_slave_gateway')],
       ),
     ];
   }
@@ -98,13 +101,13 @@ class WorkspaceStorage {
   /// Import from custom file path
   static Future<List<ConnectionConfig>> importFromFile(String path) async {
     final file = File(path);
-    if (!await file.exists()) throw Exception('文件不存在: $path');
+    if (!await file.exists()) throw Exception('File not found: $path');
     final content = await file.readAsString();
     final list = jsonDecode(content);
     if (list is List) {
       return list.map((e) => ConnectionConfig.fromJson(Map<String, dynamic>.from(e))).toList();
     }
-    throw Exception('文件格式错误: 顶层必须为数组');
+    throw Exception('Invalid file format: root must be an array');
   }
 
   /// Export to custom file path

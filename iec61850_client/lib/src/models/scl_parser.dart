@@ -322,6 +322,13 @@ class SclParser {
       }
     }
 
+    final inferredKey = ClientVariableModel.inferNameKey(
+      lnName: lnName,
+      doName: doName,
+      daName: daName,
+      reference: ref,
+    );
+
     final v = ClientVariableModel(
       reference: ref,
       iedName: iedName,
@@ -333,6 +340,7 @@ class SclParser {
       type: type,
       cdc: cdc,
       initialValue: parsedVal,
+      nameKey: inferredKey,
     );
 
     variables.add(v);

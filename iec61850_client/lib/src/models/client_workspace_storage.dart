@@ -38,6 +38,9 @@ class ClientWorkspaceStorage {
               conns.add(ConnectionConfig.fromJson(Map<String, dynamic>.from(c)));
             }
           }
+          if (conns.isEmpty) {
+            conns.addAll(ConnectionConfig.createDefaultConnections());
+          }
           final vars = <ClientVariableModel>[];
           if (json['MonitoredVariables'] != null) {
             for (var v in (json['MonitoredVariables'] as List)) {
@@ -49,15 +52,11 @@ class ClientWorkspaceStorage {
       }
     } catch (_) {}
 
-    // Default connection
-    final defaultConn = ConnectionConfig(
-      id: 'conn_default',
-      name: '本地测试服务端 (Local 127.0.0.1:102)',
-      ip: '127.0.0.1',
-      port: 102,
-      boundSclPath: 'assets/examples/server_example_basic_io.icd',
+    // Default connections
+    return ClientWorkspaceData(
+      connections: ConnectionConfig.createDefaultConnections(),
+      monitoredVariables: [],
     );
-    return ClientWorkspaceData(connections: [defaultConn], monitoredVariables: []);
   }
 
   /// Saves workspace configuration

@@ -121,11 +121,11 @@ class _WriteMultipleRegistersDialogState extends State<WriteMultipleRegistersDia
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.playlist_add_check, color: Colors.deepPurple),
-          SizedBox(width: 8),
-          Text('FC 16: Write Multiple Registers', style: const TextStyle(fontWeight: FontWeight.bold)),
+          const Icon(Icons.playlist_add_check, color: Colors.deepPurple),
+          const SizedBox(width: 8),
+          Text(AppI18n.instance.t('writeMultipleRegisters'), style: const TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
       content: SizedBox(
@@ -134,14 +134,14 @@ class _WriteMultipleRegistersDialogState extends State<WriteMultipleRegistersDia
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Unit ID: ${widget.slaveId}'),
+            Text('${AppI18n.instance.t('slaveId')}: ${widget.slaveId}'),
             const SizedBox(height: 12),
             TextField(
               controller: _addrCtrl,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: AppI18n.instance.t('startAddr'),
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.pin),
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.pin),
               ),
               keyboardType: TextInputType.number,
             ),
@@ -149,10 +149,10 @@ class _WriteMultipleRegistersDialogState extends State<WriteMultipleRegistersDia
             TextField(
               controller: _valuesCtrl,
               maxLines: 4,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: AppI18n.instance.t('currValue'),
                 hintText: '100, 200, 0x1A2B, 450',
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
                 alignLabelWithHint: true,
               ),
             ),

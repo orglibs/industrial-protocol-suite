@@ -1,6 +1,7 @@
 import '../../i18n/app_i18n.dart';
 import 'package:flutter/material.dart';
 import '../../models/dictionary_service.dart';
+import '../../models/scl_models.dart';
 import '../../models/server_variable_model.dart';
 import '../../protocol/iec61850_server_manager.dart';
 import '../dialogs/simulation_dialog.dart';
@@ -28,6 +29,9 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
   @override
   void initState() {
     super.initState();
+    DictionaryService.instance.load().then((_) {
+      if (mounted) setState(() {});
+    });
     _searchCtrl.addListener(() {
       setState(() {
         _filterText = _searchCtrl.text.trim().toLowerCase();
@@ -45,16 +49,26 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
   Widget build(BuildContext context) {
     final i18n = AppI18n.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final dict = DictionaryService.instance;
     final scl = widget.manager.engine.scl;
     final allVars = widget.manager.engine.allVariables;
 
     final filteredVars = _filterText.isEmpty
         ? allVars
-        : allVars.where((v) =>
-            v.reference.toLowerCase().contains(_filterText) ||
-            v.shortRef.toLowerCase().contains(_filterText) ||
-            v.lnName.toLowerCase().contains(_filterText) ||
-            v.doName.toLowerCase().contains(_filterText)).toList();
+        : allVars.where((v) {
+            final t = _filterText;
+            final lnDesc = dict.getLogicalNode(v.lnName)?.display.toLowerCase() ?? '';
+            final doDesc = dict.getDataObject(v.doName)?.display.toLowerCase() ?? '';
+            return v.reference.toLowerCase().contains(t) ||
+                v.shortRef.toLowerCase().contains(t) ||
+                v.displayName.toLowerCase().contains(t) ||
+                v.lnName.toLowerCase().contains(t) ||
+                v.doName.toLowerCase().contains(t) ||
+                v.daName.toLowerCase().contains(t) ||
+                (v.cdc != null && v.cdc!.toLowerCase().contains(t)) ||
+                lnDesc.contains(t) ||
+                doDesc.contains(t);
+          }).toList();
 
     return Row(
       children: [
@@ -91,11 +105,14 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                     children: [
                       Icon(Icons.device_hub, size: 16, color: Theme.of(context).colorScheme.primary),
                       const SizedBox(width: 8),
-                      Text(
-                        'IED: ${scl?.iedName ?? i18n.t("unloaded")} | ${i18n.t("allVarsCount")}: ${allVars.length}',
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                      Expanded(
+                        child: Text(
+                          'IED: ${scl?.ied.displayName ?? scl?.iedName ?? i18n.t("unloaded")} | ${i18n.t("allVarsCount")}: ${allVars.length}',
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                      const Spacer(),
+                      const SizedBox(width: 6),
                       Text('${i18n.t("matchedVars")}: ${filteredVars.length}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
                     ],
                   ),
@@ -114,6 +131,8 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                           itemBuilder: (context, index) {
                             final v = filteredVars[index];
                             final isSelected = _selectedVariable?.reference == v.reference;
+                            final lnDesc = dict.getLogicalNode(v.lnName);
+                            final lnText = lnDesc != null ? '  |  ${lnDesc.display}' : '';
 
                             return ListTile(
                               dense: true,
@@ -125,7 +144,9 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                                   const SizedBox(width: 6),
                                   Expanded(
                                     child: Text(
-                                      '${v.ldInst}/${v.lnName}.${v.doName}.${v.daName}',
+                                      v.displayName != v.shortRef
+                                          ? '${v.displayName} (${v.shortRef})'
+                                          : '${v.ldInst}/${v.lnName}.${v.doName}.${v.daName}',
                                       style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -134,11 +155,14 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                               ),
                               subtitle: Row(
                                 children: [
-                                  Text(
-                                    '${v.type.name}  |  ${i18n.t("valLabel")} ${v.displayValue}',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                  Expanded(
+                                    child: Text(
+                                      '${v.type.name}$lnText  |  ${i18n.t("valLabel")} ${v.displayValue}',
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                      ),
                                     ),
                                   ),
                                   if (v.simulation.enabled) ...[
@@ -190,24 +214,68 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
     final i18n = AppI18n.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final dict = DictionaryService.instance;
-    final lnDesc = dict.getLogicalNode(v.lnName.replaceAll(RegExp(r'\d+'), ''));
+    final scl = widget.manager.engine.scl;
+    final lnDesc = dict.getLogicalNode(v.lnName);
     final doDesc = dict.getDataObject(v.doName);
     final daDesc = dict.getDataAttribute(v.daName);
+    final cdcCode = v.cdc ?? doDesc?.cdc;
+    final cdcDesc = cdcCode != null ? dict.getCdc(cdcCode) : null;
+
+    final ld = scl?.ied.findLDevice(v.ldInst);
+    final ln = ld?.findLN(v.lnName);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
+          // Header: Localized Name, Short Reference, MMS Reference
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _fcBadge(v.fcCode),
-              const SizedBox(width: 8),
+              const SizedBox(width: 10),
               Expanded(
-                child: Text(
-                  v.shortRef,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Tooltip(
+                      message: v.displayName,
+                      waitDuration: const Duration(milliseconds: 200),
+                      child: Text(
+                        v.displayName,
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Tooltip(
+                      message: v.shortRef,
+                      waitDuration: const Duration(milliseconds: 200),
+                      child: Text(
+                        v.shortRef,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontFamily: 'monospace',
+                          color: isDark ? Colors.grey[400] : Colors.grey[600],
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Tooltip(
+                      message: 'MMS Reference: ${v.reference}',
+                      waitDuration: const Duration(milliseconds: 200),
+                      child: Text(
+                        'MMS Reference: ${v.reference}',
+                        style: TextStyle(fontSize: 11, color: isDark ? Colors.grey[500] : Colors.grey[500]),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               IconButton(
@@ -223,10 +291,6 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
               ),
             ],
           ),
-          Text(
-            'MMS Reference: ${v.reference}',
-            style: TextStyle(fontSize: 11, color: isDark ? Colors.grey[400] : Colors.grey[600]),
-          ),
           const SizedBox(height: 16),
 
           // Live Value & Quick Edit Card
@@ -238,28 +302,64 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                 children: [
                   Text(i18n.t('liveDataCard'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                   const SizedBox(height: 12),
-                  Row(
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 8,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    alignment: WrapAlignment.spaceBetween,
                     children: [
-                      Text(i18n.t('currentValLabel'), style: const TextStyle(fontWeight: FontWeight.w600)),
-                      Text(
-                        v.displayValue,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(i18n.t('currentValLabel'), style: const TextStyle(fontWeight: FontWeight.w600)),
+                          const SizedBox(width: 8),
+                          SizedBox(
+                            width: 150,
+                            child: Tooltip(
+                              message: v.displayValue,
+                              waitDuration: const Duration(milliseconds: 200),
+                              child: InkWell(
+                                onTap: () => _openWriteDialog(v),
+                                borderRadius: BorderRadius.circular(4),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: isDark ? Colors.grey[800] : Colors.grey[200],
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    v.displayValue,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontFamily: 'monospace',
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context).colorScheme.primary,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      const Spacer(),
-                      FilledButton.tonalIcon(
-                        icon: const Icon(Icons.edit, size: 16),
-                        label: Text(i18n.t('writeVal')),
-                        onPressed: () => _openWriteDialog(v),
-                      ),
-                      const SizedBox(width: 8),
-                      FilledButton.tonalIcon(
-                        icon: const Icon(Icons.waves, size: 16),
-                        label: Text(i18n.t('simWave')),
-                        onPressed: () => _openSimDialog(v),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          FilledButton.tonalIcon(
+                            icon: const Icon(Icons.edit, size: 16),
+                            label: Text(i18n.t('writeVal')),
+                            onPressed: () => _openWriteDialog(v),
+                          ),
+                          const SizedBox(width: 8),
+                          FilledButton.tonalIcon(
+                            icon: const Icon(Icons.waves, size: 16),
+                            label: Text(i18n.t('simWave')),
+                            onPressed: () => _openSimDialog(v),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -297,6 +397,16 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                           ],
                         ),
                       ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('FC', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                            const SizedBox(height: 2),
+                            Text(v.fc.label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -312,17 +422,47 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.library_books, size: 18),
-                      SizedBox(width: 8),
+                      const Icon(Icons.library_books, size: 18),
+                      const SizedBox(width: 8),
                       Text(i18n.t('standardDictTitle'), style: const TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
                   const SizedBox(height: 12),
+                  if (cdcCode != null)
+                    _dictRow(i18n.t('dictCdc'), cdcCode, cdcDesc?.display),
                   _dictRow(i18n.t('dictLn'), v.lnName, lnDesc?.display),
                   _dictRow(i18n.t('dictDo'), v.doName, doDesc?.display),
                   _dictRow(i18n.t('dictDa'), v.daName, daDesc?.display),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // SCL Hierarchy Card
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.account_tree_outlined, size: 18),
+                      const SizedBox(width: 8),
+                      Text(i18n.t('sclHierarchyTitle'), style: const TextStyle(fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  _dictRow(i18n.t('sclHierarchyIed'), scl?.iedName ?? '-', scl?.ied.displayName),
+                  _dictRow(i18n.t('sclHierarchyLd'), v.ldInst, ld?.displayName),
+                  _dictRow(i18n.t('sclHierarchyLn'), v.lnName, ln?.displayName ?? lnDesc?.display),
+                  _dictRow(i18n.t('sclHierarchyDo'), v.doName, doDesc?.display),
+                  if (cdcCode != null)
+                    _dictRow(i18n.t('sclHierarchyCdc'), cdcCode, cdcDesc?.display),
+                  _dictRow(i18n.t('sclHierarchyDa'), v.daName, daDesc?.display),
                 ],
               ),
             ),
@@ -370,15 +510,18 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
     if (fc == 'SP') bg = Colors.indigo[700]!;
     if (fc == 'CF') bg = Colors.purple[700]!;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        fc,
-        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+    return Tooltip(
+      message: FunctionalConstraint.fromCode(fc).label,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Text(
+          fc,
+          style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }

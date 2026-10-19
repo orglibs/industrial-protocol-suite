@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import '../i18n/app_i18n.dart';
 
 /// Quality Descriptor (QDS / SIQ / DIQ quality flags)
 class QualityDescriptor {
@@ -40,12 +41,13 @@ class QualityDescriptor {
 
   String get summary {
     final flags = <String>[];
-    if (invalid) flags.add('IV(无效)');
-    if (nonTopical) flags.add('NT(非当前值)');
-    if (substituted) flags.add('SB(人工置入)');
-    if (blocked) flags.add('BL(闭锁)');
-    if (overflow) flags.add('OV(溢出)');
-    return flags.isEmpty ? 'OK(有效)' : flags.join(',');
+    final i18n = AppI18n.instance;
+    if (invalid) flags.add('IV(${i18n.t("qualityInvalid")})');
+    if (nonTopical) flags.add('NT(${i18n.t("qualityNonTopical")})');
+    if (substituted) flags.add('SB(${i18n.t("qualitySubstituted")})');
+    if (blocked) flags.add('BL(${i18n.t("qualityBlocked")})');
+    if (overflow) flags.add('OV(${i18n.t("qualityOverflow")})');
+    return flags.isEmpty ? i18n.t('qualityGood') : flags.join(',');
   }
 
   @override
@@ -163,11 +165,11 @@ class SinglePointObject extends InformationObject {
   });
 
   @override
-  String get displayValue => value ? '1 (合/ON)' : '0 (分/OFF)';
+  String get displayValue => value ? AppI18n.instance.t('spStateOn') : AppI18n.instance.t('spStateOff');
 }
 
 /// M_DP_NA_1 (Type 3) / M_DP_TB_1 (Type 31): Double Point Information
-/// 00: Indeterminate, 01: OFF (分), 10: ON (合), 11: Indeterminate
+/// 00: Indeterminate, 01: OFF, 10: ON, 11: Fault
 class DoublePointObject extends InformationObject {
   int value; // 1 = OFF, 2 = ON, 0 = Indeterminate, 3 = Bad
   QualityDescriptor quality;
@@ -182,11 +184,12 @@ class DoublePointObject extends InformationObject {
 
   @override
   String get displayValue {
+    final i18n = AppI18n.instance;
     switch (value) {
-      case 1: return '01 (分/OFF)';
-      case 2: return '10 (合/ON)';
-      case 0: return '00 (不确定)';
-      case 3: return '11 (故障/中间态)';
+      case 1: return i18n.t('dpStateOff');
+      case 2: return i18n.t('dpStateOn');
+      case 0: return i18n.t('dpStateIndeterminate');
+      case 3: return i18n.t('dpStateFault');
       default: return '$value';
     }
   }
@@ -208,7 +211,7 @@ class StepPositionObject extends InformationObject {
   });
 
   @override
-  String get displayValue => '分接头: $value${isTransient ? " (瞬变)" : ""}';
+  String get displayValue => 'Tap: $value${isTransient ? " (Transient)" : ""}';
 }
 
 /// M_BO_NA_1 (Type 7) / M_BO_TB_1 (Type 33): Bitstring of 32 bits
@@ -318,10 +321,10 @@ class SingleCommandObject extends InformationObject {
   });
 
   @override
-  String get displayValue => '${state ? "合(ON)" : "分(OFF)"} [${isSelect ? "选择" : "执行"}]';
+  String get displayValue => '${state ? "ON" : "OFF"} [${isSelect ? "Select" : "Execute"}]';
 }
 
-/// C_DC_NA_1 (Type 46) / C_DC_TA_1 (Type 59): Double Command (遥控双命令)
+/// C_DC_NA_1 (Type 46) / C_DC_TA_1 (Type 59): Double Command
 class DoubleCommandObject extends InformationObject {
   final int state;        // 1 = OFF, 2 = ON
   final bool isSelect;
@@ -337,10 +340,10 @@ class DoubleCommandObject extends InformationObject {
   });
 
   @override
-  String get displayValue => '${state == 2 ? "合(ON)" : "分(OFF)"} [${isSelect ? "选择" : "执行"}]';
+  String get displayValue => '${state == 2 ? "ON" : "OFF"} [${isSelect ? "Select" : "Execute"}]';
 }
 
-/// C_RC_NA_1 (Type 47) / C_RC_TA_1 (Type 60): Regulating Step Command (步调节命令)
+/// C_RC_NA_1 (Type 47) / C_RC_TA_1 (Type 60): Regulating Step Command
 class RegulatingStepCommandObject extends InformationObject {
   final int step; // 1 = Lower, 2 = Higher
   final bool isSelect;
@@ -356,7 +359,7 @@ class RegulatingStepCommandObject extends InformationObject {
   });
 
   @override
-  String get displayValue => '${step == 2 ? "升" : "降"} [${isSelect ? "选择" : "执行"}]';
+  String get displayValue => '${step == 2 ? "Higher" : "Lower"} [${isSelect ? "Select" : "Execute"}]';
 }
 
 /// C_SE_NA_1 (Type 48) / C_SE_TA_1 (Type 61): Setpoint Command, Normalized Value
@@ -375,7 +378,7 @@ class SetpointNormalizedObject extends InformationObject {
   });
 
   @override
-  String get displayValue => '${value.toStringAsFixed(4)} [${isSelect ? "选择" : "执行"}]';
+  String get displayValue => '${value.toStringAsFixed(4)} [${isSelect ? "Select" : "Execute"}]';
 }
 
 /// C_SE_NB_1 (Type 49) / C_SE_TB_1 (Type 62): Setpoint Command, Scaled Value
@@ -394,7 +397,7 @@ class SetpointScaledObject extends InformationObject {
   });
 
   @override
-  String get displayValue => '$value [${isSelect ? "选择" : "执行"}]';
+  String get displayValue => '$value [${isSelect ? "Select" : "Execute"}]';
 }
 
 /// C_SE_NC_1 (Type 50) / C_SE_TC_1 (Type 63): Setpoint Command, Short Float
@@ -413,7 +416,7 @@ class SetpointShortFloatObject extends InformationObject {
   });
 
   @override
-  String get displayValue => '${value.toStringAsFixed(3)} [${isSelect ? "选择" : "执行"}]';
+  String get displayValue => '${value.toStringAsFixed(3)} [${isSelect ? "Select" : "Execute"}]';
 }
 
 /// C_BO_NA_1 (Type 51) / C_BO_TA_1 (Type 64): Bitstring 32 Command
@@ -431,7 +434,7 @@ class Bitstring32CommandObject extends InformationObject {
   String get displayValue => '0x${value.toRadixString(16).padLeft(8, '0').toUpperCase()}';
 }
 
-/// C_IC_NA_1 (Type 100): Interrogation Command (总召唤命令)
+/// C_IC_NA_1 (Type 100): Interrogation Command
 class InterrogationCommandObject extends InformationObject {
   final int qoi; // 0x14 = Station interrogation
 
@@ -441,10 +444,10 @@ class InterrogationCommandObject extends InformationObject {
   });
 
   @override
-  String get displayValue => 'QOI: 0x${qoi.toRadixString(16)} (总召唤)';
+  String get displayValue => 'QOI: 0x${qoi.toRadixString(16)} (GI)';
 }
 
-/// C_CI_NA_1 (Type 101): Counter Interrogation Command (电能量召唤)
+/// C_CI_NA_1 (Type 101): Counter Interrogation Command
 class CounterInterrogationCommandObject extends InformationObject {
   final int qcc; // Qualifier of counter interrogation
 
@@ -454,18 +457,18 @@ class CounterInterrogationCommandObject extends InformationObject {
   });
 
   @override
-  String get displayValue => 'QCC: 0x${qcc.toRadixString(16)} (电能量召唤)';
+  String get displayValue => 'QCC: 0x${qcc.toRadixString(16)} (Counter GI)';
 }
 
-/// C_RD_NA_1 (Type 102): Read Command (读命令)
+/// C_RD_NA_1 (Type 102): Read Command
 class ReadCommandObject extends InformationObject {
   ReadCommandObject({required super.ioa});
 
   @override
-  String get displayValue => '读点命令 (IOA: $ioa)';
+  String get displayValue => 'Read IOA: $ioa';
 }
 
-/// C_CS_NA_1 (Type 103): Clock Synchronization Command (时钟同步)
+/// C_CS_NA_1 (Type 103): Clock Synchronization Command
 class ClockSyncCommandObject extends InformationObject {
   final CP56Time2a time;
 
@@ -475,10 +478,10 @@ class ClockSyncCommandObject extends InformationObject {
   });
 
   @override
-  String get displayValue => '对时: $time';
+  String get displayValue => 'Clock Sync: $time';
 }
 
-/// C_RP_NA_1 (Type 105): Reset Process Command (复位进程)
+/// C_RP_NA_1 (Type 105): Reset Process Command
 class ResetProcessCommandObject extends InformationObject {
   final int qrp;
 
@@ -488,10 +491,10 @@ class ResetProcessCommandObject extends InformationObject {
   });
 
   @override
-  String get displayValue => 'QRP: $qrp (复位进程)';
+  String get displayValue => 'QRP: $qrp (Reset Process)';
 }
 
-/// M_EI_NA_1 (Type 70): End of Initialization (初始化结束)
+/// M_EI_NA_1 (Type 70): End of Initialization
 class EndOfInitObject extends InformationObject {
   final int coi; // Cause of initialization: 0 = Local power on, 1 = Local manual reset, 2 = Remote reset
 
@@ -501,5 +504,5 @@ class EndOfInitObject extends InformationObject {
   });
 
   @override
-  String get displayValue => '初始化结束 (COI: $coi)';
+  String get displayValue => 'End of Init (COI: $coi)';
 }

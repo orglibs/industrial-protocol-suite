@@ -78,13 +78,13 @@ class _GooseTabState extends State<GooseTab> {
                   color: Colors.teal[700],
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.radar, size: 16, color: Colors.white),
-                    SizedBox(width: 6),
+                    const Icon(Icons.radar, size: 16, color: Colors.white),
+                    const SizedBox(width: 6),
                     Text(
                       i18n.t('gooseMonitorTitle'),
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
                     ),
                   ],
                 ),
@@ -164,14 +164,14 @@ class _GooseTabState extends State<GooseTab> {
                     children: [
                       Icon(Icons.stream, size: 56, color: isDark ? Colors.grey[700] : Colors.grey[400]),
                       const SizedBox(height: 12),
-                      const Text(
+                      Text(
                         i18n.t('emptyGoosePrompt'),
-                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.grey),
+                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.grey),
                       ),
                       const SizedBox(height: 6),
-                      const Text(
+                      Text(
                         i18n.t('emptyGooseSubPrompt'),
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                        style: const TextStyle(fontSize: 12, color: Colors.grey),
                       ),
                     ],
                   ),
@@ -287,10 +287,10 @@ class _GooseTabState extends State<GooseTab> {
                     Expanded(
                       flex: 5,
                       child: _selectedMessage == null
-                          ? const Center(
+                          ? Center(
                               child: Text(
                                 i18n.t('selectGooseFrameHint'),
-                                style: TextStyle(color: Colors.grey, fontSize: 13),
+                                style: const TextStyle(color: Colors.grey, fontSize: 13),
                                 textAlign: TextAlign.center,
                               ),
                             )
@@ -304,6 +304,7 @@ class _GooseTabState extends State<GooseTab> {
   }
 
   Widget _buildGooseInspector(GooseMessage msg, bool isDark) {
+    final i18n = AppI18n.instance;
     final hexDump = _formatHexDump(msg.rawBytes);
 
     return ListView(
@@ -314,9 +315,9 @@ class _GooseTabState extends State<GooseTab> {
           children: [
             const Icon(Icons.info_outline, size: 18, color: Colors.tealAccent),
             const SizedBox(width: 8),
-            const Text(
+            Text(
               i18n.t('gooseAsnTitle'),
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
             const Spacer(),
             Text(
@@ -358,9 +359,9 @@ class _GooseTabState extends State<GooseTab> {
 
         const SizedBox(height: 12),
         // AllData Entries
-        const Text(
+        Text(
           i18n.t('datasetContent'),
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
         ),
         const SizedBox(height: 6),
         Container(
@@ -407,9 +408,9 @@ class _GooseTabState extends State<GooseTab> {
 
         const SizedBox(height: 12),
         // Raw Hex Dump
-        const Text(
+        Text(
           i18n.t('rawEthHexDump'),
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
         ),
         const SizedBox(height: 6),
         Container(

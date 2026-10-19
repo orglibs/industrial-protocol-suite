@@ -1,3 +1,4 @@
+import '../i18n/app_i18n.dart';
 import '../protocol/asdu.dart';
 import '../protocol/asdu_types.dart';
 
@@ -18,6 +19,7 @@ class ClientPointModel {
   final int ioa;
   final AsduTypeId typeId;
   String name;
+  String? nameKey;
   dynamic value;
   QualityDescriptor? quality;
   DateTime lastUpdated;
@@ -29,6 +31,7 @@ class ClientPointModel {
     required this.ioa,
     required this.typeId,
     required this.name,
+    this.nameKey,
     required this.value,
     this.quality,
     DateTime? lastUpdated,
@@ -36,6 +39,10 @@ class ClientPointModel {
   }) : lastUpdated = lastUpdated ?? DateTime.now() {
     recordHistory(value, quality, this.lastUpdated);
   }
+
+  String get displayName => (nameKey != null && nameKey!.isNotEmpty)
+      ? AppI18n.instance.t(nameKey!)
+      : name;
 
   void update(dynamic newVal, QualityDescriptor? newQuality, [DateTime? time]) {
     value = newVal;
@@ -53,13 +60,16 @@ class ClientPointModel {
   }
 
   String get displayValue {
+    final i18n = AppI18n.instance;
     if (value is bool) {
-      return value ? '1 (合/ON)' : '0 (分/OFF)';
+      return value ? i18n.t('spStateOn') : i18n.t('spStateOff');
     } else if (value is double) {
       return (value as double).toStringAsFixed(2);
     } else if (value is int) {
       if (typeId == AsduTypeId.mDpNa1 || typeId == AsduTypeId.mDpTb1) {
-        return value == 2 ? '10 (合/ON)' : (value == 1 ? '01 (分/OFF)' : '00 (不确定)');
+        return value == 2
+            ? i18n.t('dpStateOn')
+            : (value == 1 ? i18n.t('dpStateOff') : (value == 3 ? i18n.t('dpStateFault') : i18n.t('dpStateIndeterminate')));
       }
       return value.toString();
     }
@@ -67,21 +77,23 @@ class ClientPointModel {
   }
 
   String get typeCategory {
-    if (typeId == AsduTypeId.mSpNa1 || typeId == AsduTypeId.mSpTb1) return '单点遥信 (YX)';
-    if (typeId == AsduTypeId.mDpNa1 || typeId == AsduTypeId.mDpTb1) return '双点遥信 (YX)';
-    if (typeId == AsduTypeId.mMeNc1 || typeId == AsduTypeId.mMeTf1) return '短浮点遥测 (YC)';
-    if (typeId == AsduTypeId.mMeNa1 || typeId == AsduTypeId.mMeTd1) return '归一化遥测 (YC)';
-    if (typeId == AsduTypeId.mMeNb1 || typeId == AsduTypeId.mMeTe1) return '标度化遥测 (YC)';
-    if (typeId == AsduTypeId.mItNa1 || typeId == AsduTypeId.mItTb1) return '电能量脉冲 (YM)';
-    if (typeId == AsduTypeId.mStNa1 || typeId == AsduTypeId.mStTb1) return '变压器档位 (ST)';
-    if (typeId == AsduTypeId.mBoNa1 || typeId == AsduTypeId.mBoTb1) return '二进制串 (BO)';
-    return '其他监视';
+    final i18n = AppI18n.instance;
+    if (typeId == AsduTypeId.mSpNa1 || typeId == AsduTypeId.mSpTb1) return i18n.t('pointTypeSp');
+    if (typeId == AsduTypeId.mDpNa1 || typeId == AsduTypeId.mDpTb1) return i18n.t('pointTypeDp');
+    if (typeId == AsduTypeId.mMeNc1 || typeId == AsduTypeId.mMeTf1) return i18n.t('pointTypeMeNc');
+    if (typeId == AsduTypeId.mMeNa1 || typeId == AsduTypeId.mMeTd1) return i18n.t('pointTypeMeNa');
+    if (typeId == AsduTypeId.mMeNb1 || typeId == AsduTypeId.mMeTe1) return i18n.t('pointTypeMeNb');
+    if (typeId == AsduTypeId.mItNa1 || typeId == AsduTypeId.mItTb1) return i18n.t('pointTypeIt');
+    if (typeId == AsduTypeId.mStNa1 || typeId == AsduTypeId.mStTb1) return i18n.t('pointTypeSt');
+    if (typeId == AsduTypeId.mBoNa1 || typeId == AsduTypeId.mBoTb1) return i18n.t('pointTypeBo');
+    return i18n.t('pointTypeOther');
   }
 
   Map<String, dynamic> toJson() => {
         'ioa': ioa,
         'typeId': typeId.id,
         'name': name,
+        'nameKey': nameKey,
         'value': value,
       };
 
@@ -89,14 +101,56 @@ class ClientPointModel {
     final typeIdInt = json['typeId'] as int? ?? AsduTypeId.mMeNc1.id;
     final typeId = AsduTypeId.fromId(typeIdInt) ?? AsduTypeId.mMeNc1;
     final ioa = json['ioa'] as int? ?? 1;
-    final name = json['name'] as String? ?? '点位 #$ioa';
+    final name = json['name'] as String? ?? 'Point #$ioa';
     final val = json['value'];
+    String? nameKey = json['nameKey'] as String? ?? json['NameKey'] as String?;
+
+    if (nameKey == null) {
+      if (ioa == 1) {
+        nameKey = 'point_breaker_101';
+      } else if (ioa == 2) {
+        nameKey = 'point_disconnector_1011';
+      } else if (ioa == 3) {
+        nameKey = 'point_earth_switch_101';
+      } else if (ioa == 4) {
+        nameKey = 'point_station_alarm';
+      } else if (ioa == 101) {
+        nameKey = 'point_breaker_dp';
+      } else if (ioa == 102) {
+        nameKey = 'point_tap_changer_dp';
+      } else if (ioa == 0x4001 || ioa == 16385) {
+        nameKey = 'point_volt_a';
+      } else if (ioa == 0x4002 || ioa == 16386) {
+        nameKey = 'point_volt_b';
+      } else if (ioa == 0x4003 || ioa == 16387) {
+        nameKey = 'point_volt_c';
+      } else if (ioa == 0x4004 || ioa == 16388) {
+        nameKey = 'point_curr_a';
+      } else if (ioa == 0x4005 || ioa == 16389) {
+        nameKey = 'point_active_power';
+      } else if (ioa == 0x4006 || ioa == 16390) {
+        nameKey = 'point_grid_freq';
+      } else if (ioa == 16400) {
+        nameKey = 'point_norm_load';
+      } else if (ioa == 16401) {
+        nameKey = 'point_norm_temp';
+      } else if (ioa == 16500) {
+        nameKey = 'point_oil_temp';
+      } else if (ioa == 16501) {
+        nameKey = 'point_tap_pos';
+      } else if (ioa == 0x6401 || ioa == 25601) {
+        nameKey = 'point_energy_active_fwd';
+      } else if (ioa == 0x6402 || ioa == 25602) {
+        nameKey = 'point_energy_active_rev';
+      }
+    }
 
     return ClientPointModel(
       commonAddress: ca,
       ioa: ioa,
       typeId: typeId,
       name: name,
+      nameKey: nameKey,
       value: val ?? (typeId == AsduTypeId.mSpNa1 || typeId == AsduTypeId.mSpTb1 ? false : 0.0),
     );
   }
@@ -105,18 +159,24 @@ class ClientPointModel {
 class ClientStationModel {
   int commonAddress;
   String name;
+  String? nameKey;
   final Map<int, ClientPointModel> points = {};
   void Function()? onDataChanged;
 
   ClientStationModel({
     required this.commonAddress,
     this.name = '',
+    this.nameKey,
     this.onDataChanged,
   }) {
     if (name.isEmpty) {
-      name = '从站 (CA=$commonAddress)';
+      name = 'Station (CA=$commonAddress)';
     }
   }
+
+  String get displayName => (nameKey != null && nameKey!.isNotEmpty)
+      ? AppI18n.instance.t(nameKey!)
+      : name;
 
   List<ClientPointModel> get pointList => points.values.toList()..sort((a, b) => a.ioa.compareTo(b.ioa));
 
@@ -163,11 +223,51 @@ class ClientStationModel {
         }
       }
 
+      String? key;
+      if (ioa == 1) {
+        key = 'point_breaker_101';
+      } else if (ioa == 2) {
+        key = 'point_disconnector_1011';
+      } else if (ioa == 3) {
+        key = 'point_earth_switch_101';
+      } else if (ioa == 4) {
+        key = 'point_station_alarm';
+      } else if (ioa == 101) {
+        key = 'point_breaker_dp';
+      } else if (ioa == 102) {
+        key = 'point_tap_changer_dp';
+      } else if (ioa == 0x4001 || ioa == 16385) {
+        key = 'point_volt_a';
+      } else if (ioa == 0x4002 || ioa == 16386) {
+        key = 'point_volt_b';
+      } else if (ioa == 0x4003 || ioa == 16387) {
+        key = 'point_volt_c';
+      } else if (ioa == 0x4004 || ioa == 16388) {
+        key = 'point_curr_a';
+      } else if (ioa == 0x4005 || ioa == 16389) {
+        key = 'point_active_power';
+      } else if (ioa == 0x4006 || ioa == 16390) {
+        key = 'point_grid_freq';
+      } else if (ioa == 16400) {
+        key = 'point_norm_load';
+      } else if (ioa == 16401) {
+        key = 'point_norm_temp';
+      } else if (ioa == 16500) {
+        key = 'point_oil_temp';
+      } else if (ioa == 16501) {
+        key = 'point_tap_pos';
+      } else if (ioa == 0x6401 || ioa == 25601) {
+        key = 'point_energy_active_fwd';
+      } else if (ioa == 0x6402 || ioa == 25602) {
+        key = 'point_energy_active_rev';
+      }
+
       points[ioa] = ClientPointModel(
         commonAddress: commonAddress,
         ioa: ioa,
         typeId: typeId,
         name: '$prefix #${i + 1}',
+        nameKey: key,
         value: val,
       );
     }
@@ -176,56 +276,58 @@ class ClientStationModel {
 
   void applyTemplate(String templateKey) {
     if (templateKey == 'distribution') {
-      // 典型配网模板: 16 YX + 8 YC + 4 DP + 2 YM
+      nameKey = 'preset_station_10kv';
+      // Distribution Substation Template: 16 YX + 8 YC + 4 DP + 2 YM
       batchGeneratePoints(
         typeId: AsduTypeId.mSpNa1,
         startIoa: 1,
         count: 16,
-        prefix: '配电开关分合位置',
+        prefix: 'Distribution Switch Position',
       );
       batchGeneratePoints(
         typeId: AsduTypeId.mDpNa1,
         startIoa: 1001,
         count: 4,
-        prefix: '出线隔离刀闸状态',
+        prefix: 'Feeder Disconnector Status',
       );
       batchGeneratePoints(
         typeId: AsduTypeId.mMeNc1,
         startIoa: 16385,
         count: 8,
-        prefix: '主变馈线电压电流遥测',
+        prefix: 'Feeder Measurand',
       );
       batchGeneratePoints(
         typeId: AsduTypeId.mItNa1,
         startIoa: 25601,
         count: 2,
-        prefix: '关口进线有功电能表',
+        prefix: 'Energy Meter',
       );
     } else if (templateKey == 'substation') {
-      // 典型变电站模板: 32 YX + 16 YC + 8 DP + 4 YM
+      nameKey = 'preset_station_110kv';
+      // Substation Template: 32 YX + 16 YC + 8 DP + 4 YM
       batchGeneratePoints(
         typeId: AsduTypeId.mSpNa1,
         startIoa: 1,
         count: 32,
-        prefix: '站内断路器位置遥信',
+        prefix: 'Station Breaker Status',
       );
       batchGeneratePoints(
         typeId: AsduTypeId.mDpNa1,
         startIoa: 1001,
         count: 8,
-        prefix: '母线接地刀闸双点遥信',
+        prefix: 'Bus Earth Switch Status',
       );
       batchGeneratePoints(
         typeId: AsduTypeId.mMeNc1,
         startIoa: 16385,
         count: 16,
-        prefix: '110kV母线电压频率遥测',
+        prefix: '110kV Bus Measurand',
       );
       batchGeneratePoints(
         typeId: AsduTypeId.mItNa1,
         startIoa: 25601,
         count: 4,
-        prefix: '主变高压侧关口电能量',
+        prefix: 'Transformer High-Voltage Energy',
       );
     }
   }
@@ -233,11 +335,24 @@ class ClientStationModel {
   Map<String, dynamic> toJson() => {
         'commonAddress': commonAddress,
         'name': name,
+        'nameKey': nameKey,
         'points': points.values.map((p) => p.toJson()).toList(),
       };
 
   void loadFromJson(Map<String, dynamic> json) {
     name = json['name'] as String? ?? name;
+    nameKey = json['nameKey'] as String? ?? json['NameKey'] as String?;
+    if (nameKey == null) {
+      if (commonAddress == 1) {
+        nameKey = 'preset_station_110kv';
+      } else if (commonAddress == 2) {
+        nameKey = 'preset_station_10kv';
+      } else if (commonAddress == 3) {
+        nameKey = 'preset_station_solar';
+      } else if (commonAddress == 4) {
+        nameKey = 'preset_station_bms';
+      }
+    }
     final list = json['points'] as List?;
     if (list != null) {
       for (final item in list) {

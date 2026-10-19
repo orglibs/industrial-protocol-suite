@@ -24,52 +24,36 @@ class WorkspaceStorage {
 
   static String get defaultFilePath => '$defaultStorageDirectory/$_defaultFileName';
 
-  /// Loads workspace configuration
-  static Future<WorkspaceData> loadWorkspace() async {
+  /// Loads all connections from workspace storage
+  static Future<List<ServerConfig>> loadConnections() async {
     try {
       final file = File(defaultFilePath);
       if (await file.exists()) {
         final content = await file.readAsString();
         final json = jsonDecode(content);
         if (json is Map<String, dynamic>) {
-          final config = ServerConfig.fromJson(Map<String, dynamic>.from(json['Config'] ?? {}));
-          final vars = <ServerVariableModel>[];
-          if (json['MonitoredVariables'] != null) {
-            for (var v in (json['MonitoredVariables'] as List)) {
-              vars.add(ServerVariableModel.fromJson(Map<String, dynamic>.from(v)));
+          if (json['Connections'] is List) {
+            final list = <ServerConfig>[];
+            for (final c in (json['Connections'] as List)) {
+              if (c is Map<String, dynamic>) {
+                list.add(ServerConfig.fromJson(c));
+              }
             }
+            if (list.isNotEmpty) return list;
           }
-          return WorkspaceData(config: config, monitoredVariables: vars);
+          if (json['Config'] != null) {
+            final single = ServerConfig.fromJson(Map<String, dynamic>.from(json['Config']));
+            return [single];
+          }
         }
       }
     } catch (_) {}
 
-    // Fallback default
-    final defaultIcd = _findDefaultIcdPath();
-    final config = ServerConfig(
-      name: 'IEC 61850 MMS 默认服务 (Port 102)',
-      ip: '0.0.0.0',
-      port: 102,
-      sclFilePath: defaultIcd,
-    );
-    return WorkspaceData(config: config, monitoredVariables: []);
+    return ServerConfig.createDefaultConnections();
   }
 
-  static String? _findDefaultIcdPath() {
-    final candidatePaths = [
-      'assets/examples/server_example_basic_io.icd',
-      '../iec61850_server/assets/examples/server_example_basic_io.icd',
-      '/home/douqi/workspaces/nixiangwork/iec104serversimulator/iec61850_server/assets/examples/server_example_basic_io.icd',
-      '/home/douqi/Downloads/IEC61850ServerSimulator-2.2.0.2-linux-x64/examples/server_example_basic_io.icd',
-    ];
-    for (final p in candidatePaths) {
-      if (File(p).existsSync()) return p;
-    }
-    return null;
-  }
-
-  /// Saves workspace configuration
-  static Future<void> saveWorkspace(ServerConfig config, List<ServerVariableModel> monitoredVars) async {
+  /// Saves all connections to workspace storage
+  static Future<void> saveConnections(List<ServerConfig> connections) async {
     try {
       final dir = Directory(defaultStorageDirectory);
       if (!await dir.exists()) {
@@ -77,11 +61,24 @@ class WorkspaceStorage {
       }
       final file = File(defaultFilePath);
       final data = {
-        'Config': config.toJson(),
-        'MonitoredVariables': monitoredVars.map((v) => v.toJson()).toList(),
+        'Version': 2,
+        'Connections': connections.map((c) => c.toJson()).toList(),
+        'Config': connections.isNotEmpty ? connections.first.toJson() : null,
       };
       final jsonStr = const JsonEncoder.withIndent('  ').convert(data);
       await file.writeAsString(jsonStr);
     } catch (_) {}
+  }
+
+  /// Loads workspace configuration (single-connection legacy compatibility)
+  static Future<WorkspaceData> loadWorkspace() async {
+    final conns = await loadConnections();
+    final first = conns.isNotEmpty ? conns.first : ServerConfig.createDefaultConnections().first;
+    return WorkspaceData(config: first, monitoredVariables: []);
+  }
+
+  /// Saves workspace configuration (single-connection legacy compatibility)
+  static Future<void> saveWorkspace(ServerConfig config, List<ServerVariableModel> monitoredVars) async {
+    await saveConnections([config]);
   }
 }

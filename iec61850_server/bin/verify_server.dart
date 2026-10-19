@@ -5,7 +5,6 @@ import 'dart:typed_data';
 
 import 'package:iec61850_server/src/models/scl_parser.dart';
 import 'package:iec61850_server/src/models/server_config.dart';
-import 'package:iec61850_server/src/protocol/goose_publisher.dart';
 import 'package:iec61850_server/src/protocol/iec61850_server_manager.dart';
 import 'package:iec61850_server/src/protocol/iso_acse_mms.dart';
 import 'package:iec61850_server/src/protocol/tpkt_cotp.dart';
@@ -58,10 +57,6 @@ void main() async {
   // 3. Connect client socket and execute ISO/COTP/ACSE/MMS handshake
   print('3. Connecting client to 127.0.0.1:$testPort ...');
   final client = await Socket.connect('127.0.0.1', testPort);
-  final completerCc = Completer<Uint8List>();
-  final completerAare = Completer<Uint8List>();
-  final completerMmsResp = Completer<Uint8List>();
-
   final rxStream = StreamController<Uint8List>.broadcast();
 
   final clientBuffer = <int>[];

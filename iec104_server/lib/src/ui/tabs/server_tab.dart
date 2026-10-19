@@ -1,87 +1,199 @@
-import "../../i18n/app_i18n.dart";
 import 'package:flutter/material.dart';
+import '../../i18n/app_i18n.dart';
+import '../../models/connection_config.dart';
 import '../../server/client_session.dart';
 import '../../server/iec104_server.dart';
+import '../../server/station.dart';
+import '../../server/workspace_storage.dart';
+import '../dialogs/add_station_dialog.dart';
+import '../dialogs/edit_connection_dialog.dart';
+import '../dialogs/edit_station_dialog.dart';
 
 class ServerTab extends StatefulWidget {
-  final Iec104Server server;
+  final List<Iec104ConnectionConfig>? connections;
+  final Iec104Server? server;
+  final VoidCallback? onDataChanged;
 
-  const ServerTab({super.key, required this.server});
+  const ServerTab({
+    super.key,
+    this.connections,
+    this.server,
+    this.onDataChanged,
+  });
 
   @override
   State<ServerTab> createState() => _ServerTabState();
 }
 
 class _ServerTabState extends State<ServerTab> {
-  late TextEditingController _hostController;
-  late TextEditingController _portController;
-  late TextEditingController _t0Controller;
-  late TextEditingController _t1Controller;
-  late TextEditingController _t2Controller;
-  late TextEditingController _t3Controller;
-  late TextEditingController _kController;
-  late TextEditingController _wController;
+  late List<Iec104ConnectionConfig> _connections;
+  Iec104ConnectionConfig? _selectedConnection;
+  Station? _selectedStation;
+
+  // Controllers for selected connection parameters
+  late TextEditingController _hostCtrl;
+  late TextEditingController _portCtrl;
+  late TextEditingController _t0Ctrl;
+  late TextEditingController _t1Ctrl;
+  late TextEditingController _t2Ctrl;
+  late TextEditingController _t3Ctrl;
+  late TextEditingController _kCtrl;
+  late TextEditingController _wCtrl;
 
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _hostController = TextEditingController(text: widget.server.host);
-    _portController = TextEditingController(text: widget.server.port.toString());
-    _t0Controller = TextEditingController(text: widget.server.t0.toString());
-    _t1Controller = TextEditingController(text: widget.server.t1.toString());
-    _t2Controller = TextEditingController(text: widget.server.t2.toString());
-    _t3Controller = TextEditingController(text: widget.server.t3.toString());
-    _kController = TextEditingController(text: widget.server.k.toString());
-    _wController = TextEditingController(text: widget.server.w.toString());
+    _initConnections();
+    _syncSelection();
+    _initControllers();
+    _listenToStreams();
+  }
+
+  @override
+  void didUpdateWidget(covariant ServerTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.connections != oldWidget.connections || widget.server != oldWidget.server) {
+      _initConnections();
+      _syncSelection();
+      _syncControllersFromConnection();
+    }
+  }
+
+  void _initConnections() {
+    if (widget.connections != null && widget.connections!.isNotEmpty) {
+      _connections = widget.connections!;
+    } else if (widget.server != null) {
+      _connections = [
+        Iec104ConnectionConfig(
+          id: 'conn-server',
+          name: 'IEC 104 Server',
+          host: widget.server!.host,
+          port: widget.server!.port,
+          server: widget.server!,
+        ),
+      ];
+    } else {
+      _connections = [];
+    }
+  }
+
+  void _initControllers() {
+    final c = _selectedConnection;
+    _hostCtrl = TextEditingController(text: c?.host ?? '0.0.0.0');
+    _portCtrl = TextEditingController(text: (c?.port ?? 2404).toString());
+    _t0Ctrl = TextEditingController(text: (c?.t0 ?? 30).toString());
+    _t1Ctrl = TextEditingController(text: (c?.t1 ?? 15).toString());
+    _t2Ctrl = TextEditingController(text: (c?.t2 ?? 10).toString());
+    _t3Ctrl = TextEditingController(text: (c?.t3 ?? 20).toString());
+    _kCtrl = TextEditingController(text: (c?.k ?? 12).toString());
+    _wCtrl = TextEditingController(text: (c?.w ?? 8).toString());
+  }
+
+  void _syncControllersFromConnection() {
+    final c = _selectedConnection;
+    if (c == null) return;
+    _hostCtrl.text = c.host;
+    _portCtrl.text = c.port.toString();
+    _t0Ctrl.text = c.t0.toString();
+    _t1Ctrl.text = c.t1.toString();
+    _t2Ctrl.text = c.t2.toString();
+    _t3Ctrl.text = c.t3.toString();
+    _kCtrl.text = c.k.toString();
+    _wCtrl.text = c.w.toString();
   }
 
   @override
   void dispose() {
-    _hostController.dispose();
-    _portController.dispose();
-    _t0Controller.dispose();
-    _t1Controller.dispose();
-    _t2Controller.dispose();
-    _t3Controller.dispose();
-    _kController.dispose();
-    _wController.dispose();
+    _hostCtrl.dispose();
+    _portCtrl.dispose();
+    _t0Ctrl.dispose();
+    _t1Ctrl.dispose();
+    _t2Ctrl.dispose();
+    _t3Ctrl.dispose();
+    _kCtrl.dispose();
+    _wCtrl.dispose();
     super.dispose();
   }
 
-  Future<void> _toggleServer() async {
-    setState(() => _isLoading = true);
-    try {
-      if (widget.server.isRunning) {
-        await widget.server.stop();
+  void _syncSelection() {
+    if (_connections.isNotEmpty) {
+      if (_selectedConnection == null || !_connections.contains(_selectedConnection)) {
+        _selectedConnection = _connections.first;
+      }
+      final stations = _selectedConnection?.stations ?? [];
+      if (stations.isNotEmpty) {
+        if (_selectedStation == null || !stations.contains(_selectedStation)) {
+          _selectedStation = stations.first;
+        }
       } else {
-        widget.server.host = _hostController.text.trim();
-        widget.server.port = int.tryParse(_portController.text.trim()) ?? 2404;
-        widget.server.t0 = int.tryParse(_t0Controller.text.trim()) ?? 30;
-        widget.server.t1 = int.tryParse(_t1Controller.text.trim()) ?? 15;
-        widget.server.t2 = int.tryParse(_t2Controller.text.trim()) ?? 10;
-        widget.server.t3 = int.tryParse(_t3Controller.text.trim()) ?? 20;
-        widget.server.k = int.tryParse(_kController.text.trim()) ?? 12;
-        widget.server.w = int.tryParse(_wController.text.trim()) ?? 8;
+        _selectedStation = null;
+      }
+    } else {
+      _selectedConnection = null;
+      _selectedStation = null;
+    }
+  }
 
-        await widget.server.start();
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("${AppI18n.instance.t('parseError')}: $e"), backgroundColor: Colors.red),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+  void _listenToStreams() {
+    for (final conn in _connections) {
+      conn.server.statusStream.listen((_) {
+        if (mounted) setState(() {});
+      });
+      conn.server.clientsStream.listen((_) {
+        if (mounted) setState(() {});
+      });
+      conn.server.stationsStream.listen((_) {
+        if (mounted) setState(() {});
+      });
+    }
+  }
+
+  Future<void> _applyParameters() async {
+    final c = _selectedConnection;
+    if (c == null) return;
+
+    final host = _hostCtrl.text.trim();
+    final port = int.tryParse(_portCtrl.text.trim()) ?? 2404;
+    final t0 = int.tryParse(_t0Ctrl.text.trim()) ?? 30;
+    final t1 = int.tryParse(_t1Ctrl.text.trim()) ?? 15;
+    final t2 = int.tryParse(_t2Ctrl.text.trim()) ?? 10;
+    final t3 = int.tryParse(_t3Ctrl.text.trim()) ?? 20;
+    final k = int.tryParse(_kCtrl.text.trim()) ?? 12;
+    final w = int.tryParse(_wCtrl.text.trim()) ?? 8;
+
+    c.host = host;
+    c.port = port;
+    c.t0 = t0;
+    c.t1 = t1;
+    c.t2 = t2;
+    c.t3 = t3;
+    c.k = k;
+    c.w = w;
+
+    if (c.isRunning) {
+      // Restart with new parameters
+      await Iec104ServerManager.instance.stopServer(c);
+      await Iec104ServerManager.instance.startServer(c);
+    }
+
+    setState(() {});
+    widget.onDataChanged?.call();
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppI18n.instance.t('save')), duration: const Duration(seconds: 1)),
+      );
     }
   }
 
   Future<void> _runVerification() async {
+    final c = _selectedConnection;
+    if (c == null) return;
+
     setState(() => _isLoading = true);
     try {
-      final results = await widget.server.runAutomatedVerification();
+      final results = await c.server.runAutomatedVerification();
       if (!mounted) return;
       showDialog(
         context: context,
@@ -144,346 +256,597 @@ class _ServerTabState extends State<ServerTab> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final isRunning = widget.server.isRunning;
+    final i18n = AppI18n.instance;
+    _syncSelection();
 
-    return StreamBuilder<List<ClientSession>>(
-      stream: widget.server.clientsStream,
-      initialData: widget.server.clients,
-      builder: (context, snapshot) {
-        final clients = snapshot.data ?? [];
-
-        return ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            // Status Card
-            Card(
-              elevation: 1,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              color: isRunning
-                  ? (isDark ? const Color(0xFF132F24) : Colors.green.shade50)
-                  : (isDark ? const Color(0xFF25252D) : Colors.grey.shade100),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
+    return Scaffold(
+      body: Column(
+        children: [
+          // Global Actions Bar matching modbus_slave TopologyTab
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+              border: Border(bottom: BorderSide(color: theme.dividerColor)),
+            ),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              alignment: WrapAlignment.spaceBetween,
+              children: [
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    Icon(
-                      isRunning ? Icons.check_circle : Icons.stop_circle,
-                      size: 48,
-                      color: isRunning ? Colors.green : Colors.grey,
-                    ),
-                    const SizedBox(width: 20),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            isRunning
-                                ? (widget.server.isWebVirtualMode ? 'IEC 104 Service Running (Web Virtual)' : 'IEC 104 Service Running')
-                                : 'IEC 104 Service Stopped',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: isRunning
-                                  ? (isDark ? Colors.greenAccent : Colors.green.shade900)
-                                  : theme.textTheme.titleLarge?.color,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            isRunning
-                                ? (widget.server.isWebVirtualMode
-                                    ? 'Web Virtual Mode | Clients: ${clients.length}'
-                                    : 'TCP: ${widget.server.host}:${widget.server.port} | Clients: ${clients.length}')
-                                : 'Server stopped. Click Start to listen.',
-                            style: TextStyle(color: theme.colorScheme.outline),
-                          ),
-                        ],
-                      ),
+                    FilledButton.icon(
+                      icon: const Icon(Icons.play_arrow, size: 18),
+                      label: Text(i18n.t('openAll')),
+                      style: FilledButton.styleFrom(backgroundColor: Colors.green),
+                      onPressed: () async {
+                        await Iec104ServerManager.instance.startAll(_connections);
+                        setState(() {});
+                        widget.onDataChanged?.call();
+                      },
                     ),
                     OutlinedButton.icon(
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                      ),
-                      onPressed: _isLoading ? null : _runVerification,
-                      icon: Icon(Icons.verified, color: theme.colorScheme.primary),
-                      label: const Text('Self-Test'),
-                    ),
-                    const SizedBox(width: 12),
-                    FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: isRunning ? Colors.red.shade600 : Colors.green.shade700,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                      ),
-                      onPressed: _isLoading ? null : _toggleServer,
-                      icon: Icon(isRunning ? Icons.stop : Icons.play_arrow),
-                      label: Text(isRunning ? AppI18n.instance.t('stopListen') : AppI18n.instance.t('startListen')),
+                      icon: const Icon(Icons.stop, size: 18),
+                      label: Text(i18n.t('closeAll')),
+                      style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+                      onPressed: () async {
+                        await Iec104ServerManager.instance.stopAll(_connections);
+                        setState(() {});
+                        widget.onDataChanged?.call();
+                      },
                     ),
                   ],
+                ),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.file_upload_outlined, size: 18),
+                      label: Text(i18n.t('importWorkspace')),
+                      onPressed: () async {
+                        final path = WorkspaceStorage.getWorkspaceFilePath();
+                        try {
+                          final imported = await WorkspaceStorage.loadConnections();
+                          setState(() {
+                            _connections.clear();
+                            _connections.addAll(imported);
+                            _syncSelection();
+                            _syncControllersFromConnection();
+                          });
+                          widget.onDataChanged?.call();
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('${i18n.t('importWorkspace')}: $path')),
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('${i18n.t('parseError')}: $e')),
+                            );
+                          }
+                        }
+                      },
+                    ),
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.file_download_outlined, size: 18),
+                      label: Text(i18n.t('saveWorkspace')),
+                      onPressed: () async {
+                        await WorkspaceStorage.saveConnections(_connections);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('${i18n.t('saveWorkspace')} -> ${WorkspaceStorage.getWorkspaceFilePath()}')),
+                          );
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // 3 Columns: Connections -> Slaves (Stations) -> Connection Details & Clients
+          Expanded(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Column 1: Connection Servers
+                Expanded(flex: 3, child: _buildConnectionsColumn(theme, i18n)),
+                const VerticalDivider(width: 1),
+                // Column 2: Slaves (Stations) under selected Connection
+                Expanded(flex: 3, child: _buildSlavesColumn(theme, i18n)),
+                const VerticalDivider(width: 1),
+                // Column 3: Parameters & Connected Clients
+                Expanded(flex: 4, child: _buildDetailsColumn(theme, i18n)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Column 1: Connections
+  Widget _buildConnectionsColumn(ThemeData theme, AppI18n i18n) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          color: theme.colorScheme.surfaceVariant.withOpacity(0.2),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  '${i18n.t('connServers')} (${_connections.length})',
+                  style: theme.textTheme.titleMedium,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-            ),
-            if (widget.server.isWebVirtualMode) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF332A16) : Colors.amber.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: isDark ? const Color(0xFF7A5813) : Colors.amber.shade300),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.info_outline, color: isDark ? Colors.amberAccent : Colors.amber.shade900),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Web environment uses virtual loopback simulation. For native TCP 2404 listening, run desktop executable: ./build/iec104_server',
-                        style: TextStyle(color: isDark ? Colors.amberAccent : Colors.amber.shade900, fontSize: 13),
-                      ),
-                    ),
-                  ],
-                ),
+              IconButton(
+                icon: const Icon(Icons.add_circle, color: Colors.blue),
+                tooltip: i18n.t('newConn'),
+                onPressed: () async {
+                  final newConn = await showDialog<Iec104ConnectionConfig>(
+                    context: context,
+                    builder: (_) => const EditConnectionDialog(),
+                  );
+                  if (newConn != null) {
+                    setState(() {
+                      _connections.add(newConn);
+                      _selectedConnection = newConn;
+                      _syncSelection();
+                      _syncControllersFromConnection();
+                    });
+                    widget.onDataChanged?.call();
+                  }
+                },
               ),
             ],
-            const SizedBox(height: 20),
+          ),
+        ),
+        const Divider(height: 1),
+        Expanded(
+          child: _connections.isEmpty
+              ? Center(child: Text(i18n.t('noConnHint')))
+              : ListView.builder(
+                  itemCount: _connections.length,
+                  itemBuilder: (context, idx) {
+                    final conn = _connections[idx];
+                    final isSelected = conn == _selectedConnection;
+                    final isRunning = conn.isRunning;
 
-            // Server Network & Protocol Settings
-            Card(
-              elevation: 1,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(AppI18n.instance.t('serverNetworkConfig'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _hostController,
-                            enabled: !isRunning,
-                            decoration: InputDecoration(
-                              labelText: AppI18n.instance.t('listenIp'),
-                              border: OutlineInputBorder(),
-                              helperText: '0.0.0.0 | 127.0.0.1',
+                    return Card(
+                      color: isSelected ? theme.colorScheme.primaryContainer.withOpacity(0.4) : null,
+                      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      child: ListTile(
+                        leading: Icon(
+                          Icons.router,
+                          color: isRunning ? Colors.green : Colors.grey,
+                        ),
+                        title: Text(conn.displayName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: Text(
+                            '${conn.host}:${conn.port} | ${conn.stations.length} ${i18n.t('coa')}',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                isRunning ? Icons.stop_circle : Icons.play_circle,
+                                color: isRunning ? Colors.red : Colors.green,
+                              ),
+                              tooltip: isRunning ? i18n.t('stopService') : i18n.t('startListen'),
+                              onPressed: () async {
+                                if (isRunning) {
+                                  await Iec104ServerManager.instance.stopServer(conn);
+                                } else {
+                                  try {
+                                    await Iec104ServerManager.instance.startServer(conn);
+                                  } catch (e) {
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('${i18n.t('startListen')} failed: $e')),
+                                      );
+                                    }
+                                  }
+                                }
+                                setState(() {});
+                                widget.onDataChanged?.call();
+                              },
                             ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: TextField(
-                            controller: _portController,
-                            enabled: !isRunning,
-                            decoration: InputDecoration(
-                              labelText: AppI18n.instance.t('listenPort'),
-                              border: OutlineInputBorder(),
-                              helperText: 'Default: 2404',
+                            PopupMenuButton<String>(
+                              onSelected: (val) async {
+                                if (val == 'edit') {
+                                  final edited = await showDialog<Iec104ConnectionConfig>(
+                                    context: context,
+                                    builder: (_) => EditConnectionDialog(initialConfig: conn),
+                                  );
+                                  if (edited != null) {
+                                    setState(() {
+                                      _syncControllersFromConnection();
+                                    });
+                                    widget.onDataChanged?.call();
+                                  }
+                                } else if (val == 'delete') {
+                                  if (conn.isRunning) {
+                                    await Iec104ServerManager.instance.stopServer(conn);
+                                  }
+                                  setState(() {
+                                    _connections.remove(conn);
+                                    if (_selectedConnection == conn) {
+                                      _selectedConnection = null;
+                                    }
+                                    _syncSelection();
+                                    _syncControllersFromConnection();
+                                  });
+                                  widget.onDataChanged?.call();
+                                }
+                              },
+                              itemBuilder: (_) => [
+                                PopupMenuItem(value: 'edit', child: Text(i18n.t('editParams'))),
+                                PopupMenuItem(value: 'delete', child: Text(i18n.t('deleteConn'), style: const TextStyle(color: Colors.red))),
+                              ],
                             ),
-                            keyboardType: TextInputType.number,
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    const Divider(),
-                    const SizedBox(height: 8),
-                    const Text('IEC 60870-5-104 Timers & Windowing:',
-                        style: TextStyle(fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _t0Controller,
-                            enabled: !isRunning,
-                            decoration: InputDecoration(labelText: 't0: Connect Timeout (s)', border: OutlineInputBorder()),
-                            keyboardType: TextInputType.number,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: TextField(
-                            controller: _t1Controller,
-                            enabled: !isRunning,
-                            decoration: InputDecoration(labelText: 't1: Send Timeout (s)', border: OutlineInputBorder()),
-                            keyboardType: TextInputType.number,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: TextField(
-                            controller: _t2Controller,
-                            enabled: !isRunning,
-                            decoration: InputDecoration(labelText: 't2: Ack Timeout (s)', border: OutlineInputBorder()),
-                            keyboardType: TextInputType.number,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: TextField(
-                            controller: _t3Controller,
-                            enabled: !isRunning,
-                            decoration: InputDecoration(labelText: 't3: Test Frame (s)', border: OutlineInputBorder()),
-                            keyboardType: TextInputType.number,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _kController,
-                            enabled: !isRunning,
-                            decoration: InputDecoration(labelText: 'k: Max Unack Frames', border: OutlineInputBorder()),
-                            keyboardType: TextInputType.number,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: TextField(
-                            controller: _wController,
-                            enabled: !isRunning,
-                            decoration: InputDecoration(labelText: 'w: Ack Threshold', border: OutlineInputBorder()),
-                            keyboardType: TextInputType.number,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: DropdownButtonFormField<int>(
-                            initialValue: widget.server.cotSize,
-                            isExpanded: true,
-                            decoration: InputDecoration(labelText: 'COT Size', border: OutlineInputBorder()),
-                            items: const [
-                              DropdownMenuItem(value: 1, child: Text('1 Byte')),
-                              DropdownMenuItem(value: 2, child: Text('2 Bytes (Standard)')),
-                            ],
-                            onChanged: isRunning ? null : (v) => widget.server.cotSize = v!,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: DropdownButtonFormField<int>(
-                            initialValue: widget.server.ioaSize,
-                            isExpanded: true,
-                            decoration: InputDecoration(labelText: 'IOA Size', border: OutlineInputBorder()),
-                            items: const [
-                              DropdownMenuItem(value: 2, child: Text('2 Bytes')),
-                              DropdownMenuItem(value: 3, child: Text('3 Bytes (Standard)')),
-                            ],
-                            onChanged: isRunning ? null : (v) => widget.server.ioaSize = v!,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                        onTap: () {
+                          setState(() {
+                            _selectedConnection = conn;
+                            _syncSelection();
+                            _syncControllersFromConnection();
+                          });
+                        },
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+
+  // Column 2: Slaves (Stations) under selected Connection
+  Widget _buildSlavesColumn(ThemeData theme, AppI18n i18n) {
+    final stations = _selectedConnection?.stations ?? [];
+
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          color: theme.colorScheme.surfaceVariant.withOpacity(0.2),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  '${i18n.t('slavesList')} (${stations.length})',
+                  style: theme.textTheme.titleMedium,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-
-            // Connected Clients Table
-            Card(
-              elevation: 1,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("${AppI18n.instance.t('connectedMasters')} (${clients.length})",
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                        if (clients.isNotEmpty)
-                          TextButton.icon(
-                            icon: const Icon(Icons.link_off, size: 18),
-                            label: Text(AppI18n.instance.t('closeAll')),
-                            onPressed: () {
-                              for (final c in List.from(clients)) {
-                                c.close();
-                              }
+              IconButton(
+                icon: const Icon(Icons.add_circle, color: Colors.blue),
+                tooltip: i18n.t('newSlave'),
+                onPressed: _selectedConnection == null
+                    ? null
+                    : () async {
+                        showDialog(
+                          context: context,
+                          builder: (_) => AddStationDialog(
+                            connection: _selectedConnection,
+                            onAdded: (newCa) {
+                              setState(() {
+                                _selectedStation = _selectedConnection?.server.stations[newCa];
+                              });
+                              widget.onDataChanged?.call();
                             },
                           ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    if (clients.isEmpty)
-                      Container(
-                        padding: const EdgeInsets.all(24),
-                        alignment: Alignment.center,
-                        child: Text(
-                          isRunning ? 'Waiting for client connections...' : 'Server stopped',
-                          style: TextStyle(color: theme.colorScheme.outline),
-                        ),
-                      )
-                    else
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: DataTable(
-                          headingRowColor: WidgetStateProperty.all(theme.colorScheme.surfaceVariant.withOpacity(0.35)),
-                          headingRowHeight: 40,
-                          dataRowMinHeight: 44,
-                          dataRowMaxHeight: 44,
-                          columns: [
-                            DataColumn(label: const Text('Client ID', style: TextStyle(fontWeight: FontWeight.bold))),
-                            DataColumn(label: const Text('Remote Address', style: TextStyle(fontWeight: FontWeight.bold))),
-                            DataColumn(label: const Text('STARTDT State', style: TextStyle(fontWeight: FontWeight.bold))),
-                            DataColumn(label: const Text('N(S)', style: TextStyle(fontWeight: FontWeight.bold))),
-                            DataColumn(label: const Text('N(R)', style: TextStyle(fontWeight: FontWeight.bold))),
-                            DataColumn(label: Text(AppI18n.instance.t('operation'), style: const TextStyle(fontWeight: FontWeight.bold))),
-                          ],
-                          rows: clients.map((c) {
-                            return DataRow(cells: [
-                              DataCell(Text('#${c.sessionId}')),
-                              DataCell(Text(c.remoteAddress, style: const TextStyle(fontWeight: FontWeight.bold))),
-                              DataCell(
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: (c.isDataTransferActive ? Colors.green : Colors.amber).withOpacity(0.15),
-                                    borderRadius: BorderRadius.circular(4),
-                                    border: Border.all(color: (c.isDataTransferActive ? Colors.green : Colors.amber).withOpacity(0.5)),
-                                  ),
-                                  child: Text(
-                                    c.isDataTransferActive ? 'ACTIVE (STARTDT)' : 'PENDING',
-                                    style: TextStyle(
-                                      color: c.isDataTransferActive ? Colors.green : Colors.amber,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              DataCell(Text('${c.txSeq}')),
-                              DataCell(Text('${c.rxSeq}')),
-                              DataCell(
+                        );
+                      },
+              ),
+            ],
+          ),
+        ),
+        const Divider(height: 1),
+        Expanded(
+          child: _selectedConnection == null
+              ? Center(child: Text(i18n.t('selectConnFirst')))
+              : stations.isEmpty
+                  ? Center(child: Text(i18n.t('noSlaveHint')))
+                  : ListView.builder(
+                      itemCount: stations.length,
+                      itemBuilder: (context, idx) {
+                        final s = stations[idx];
+                        final isSelected = s == _selectedStation;
+
+                        return Card(
+                          color: isSelected ? theme.colorScheme.primaryContainer.withOpacity(0.4) : null,
+                          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          child: ListTile(
+                            leading: const Icon(Icons.domain, color: Colors.blueAccent),
+                            title: Text(s.displayName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                            subtitle: Text('CA: ${s.commonAddress} | ${s.points.length} ${i18n.t('pointsCount')}', style: const TextStyle(fontSize: 12)),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
                                 IconButton(
-                                  icon: const Icon(Icons.close, color: Colors.red),
-                                  tooltip: AppI18n.instance.t('disconnect'),
-                                  onPressed: () => c.close(),
+                                  icon: const Icon(Icons.settings_outlined, size: 20),
+                                  tooltip: i18n.t('editStation'),
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (_) => EditStationDialog(
+                                        connection: _selectedConnection,
+                                        station: s,
+                                        onStationChanged: (newCa) {
+                                          setState(() {
+                                            _selectedStation = _selectedConnection?.server.stations[newCa];
+                                          });
+                                          widget.onDataChanged?.call();
+                                        },
+                                        onStationDeleted: () {
+                                          setState(() {
+                                            _syncSelection();
+                                          });
+                                          widget.onDataChanged?.call();
+                                        },
+                                      ),
+                                    );
+                                  },
                                 ),
-                              ),
-                            ]);
-                          }).toList(),
+                              ],
+                            ),
+                            onTap: () {
+                              setState(() => _selectedStation = s);
+                            },
+                          ),
+                        );
+                      },
+                    ),
+        ),
+      ],
+    );
+  }
+
+  // Column 3: Parameters & Connected Clients
+  Widget _buildDetailsColumn(ThemeData theme, AppI18n i18n) {
+    final conn = _selectedConnection;
+    if (conn == null) {
+      return Center(child: Text(i18n.t('selectConnFirst')));
+    }
+
+    final clients = conn.server.clients;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Connection Status & Parameters Card
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          '${conn.displayName} - ${i18n.t('editParams')}',
+                          style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                  ],
-                ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: conn.isRunning ? Colors.green.withOpacity(0.12) : Colors.grey.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: conn.isRunning ? Colors.green : Colors.grey),
+                        ),
+                        child: Text(
+                          conn.isRunning ? i18n.t('serversRunning') : i18n.t('allServersStopped'),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: conn.isRunning ? Colors.green : Colors.grey,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: TextField(
+                          controller: _hostCtrl,
+                          decoration: const InputDecoration(
+                            labelText: 'Host IP',
+                            isDense: true,
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: TextField(
+                          controller: _portCtrl,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: i18n.t('port'),
+                            isDense: true,
+                            border: const OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _t0Ctrl,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(labelText: 't0 (s)', isDense: true, border: OutlineInputBorder()),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: TextField(
+                          controller: _t1Ctrl,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(labelText: 't1 (s)', isDense: true, border: OutlineInputBorder()),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _t2Ctrl,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(labelText: 't2 (s)', isDense: true, border: OutlineInputBorder()),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: TextField(
+                          controller: _t3Ctrl,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(labelText: 't3 (s)', isDense: true, border: OutlineInputBorder()),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _kCtrl,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(labelText: 'k (APDU)', isDense: true, border: OutlineInputBorder()),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: TextField(
+                          controller: _wCtrl,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(labelText: 'w (APDU)', isDense: true, border: OutlineInputBorder()),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      FilledButton.icon(
+                        icon: const Icon(Icons.check, size: 16),
+                        label: Text(i18n.t('save')),
+                        onPressed: _applyParameters,
+                      ),
+                      OutlinedButton.icon(
+                        icon: const Icon(Icons.verified, size: 16),
+                        label: const Text('Self-Test'),
+                        onPressed: _isLoading ? null : _runVerification,
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-          ],
-        );
-      },
+          ),
+          const SizedBox(height: 12),
+
+          // Connected Clients Card
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${i18n.t('connectedMasters')} (${clients.length})',
+                        style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      if (clients.isNotEmpty)
+                        Text(
+                          'Rx: ${conn.server.rxCount} | Tx: ${conn.server.txCount}',
+                          style: TextStyle(fontSize: 12, color: theme.colorScheme.outline),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  if (clients.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: Center(
+                        child: Text(
+                          i18n.t('noClientsConnected'),
+                          style: TextStyle(color: theme.hintColor),
+                        ),
+                      ),
+                    )
+                  else
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: clients.length,
+                      separatorBuilder: (_, __) => const Divider(height: 8),
+                      itemBuilder: (context, i) {
+                        final ClientSession c = clients[i];
+                        return ListTile(
+                          dense: true,
+                          contentPadding: EdgeInsets.zero,
+                          leading: const Icon(Icons.computer, color: Colors.green, size: 20),
+                          title: Text(c.remoteAddress),
+                          subtitle: Text(
+                            'State: ${c.isDataTransferActive ? "Active" : "Standby"} | Rx: ${c.rxFrameCount} Tx: ${c.txFrameCount}',
+                            style: const TextStyle(fontSize: 11),
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.close, color: Colors.red, size: 18),
+                            tooltip: 'Disconnect',
+                            onPressed: () {
+                              conn.server.disconnectClient(c);
+                              setState(() {});
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

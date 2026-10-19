@@ -63,7 +63,7 @@ class _EditStationDialogState extends State<EditStationDialog> {
           ],
         ),
         content: Text(
-          '${i18n.t('deleteStationConfirm')}\n[${widget.station.name}] (COA: ${widget.station.commonAddress})',
+          '${i18n.t('deleteStationConfirm')}\n[${widget.station.displayName}] (COA: ${widget.station.commonAddress})',
         ),
         actions: [
           TextButton(

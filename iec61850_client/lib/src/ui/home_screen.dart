@@ -18,7 +18,6 @@ import 'tabs/scl_tools_tab.dart';
 import 'tabs/traffic_tab.dart';
 import 'package:window_manager/window_manager.dart';
 import '../i18n/app_i18n.dart';
-import 'widgets/iec61850_client_icon.dart';
 import 'widgets/language_picker.dart';
 import 'widgets/window_title_bar.dart';
 
@@ -78,52 +77,40 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // 2. Load workspace storage
     final ws = await ClientWorkspaceStorage.loadWorkspace();
-    for (final conn in ws.connections) {
+    final connsToLoad = ws.connections.isNotEmpty
+        ? ws.connections
+        : ConnectionConfig.createDefaultConnections();
+
+    for (final conn in connsToLoad) {
       _manager.addConnection(conn);
-      // Bind SCL if file exists
-      if (conn.boundSclPath != null && conn.boundSclPath!.isNotEmpty) {
-        try {
-          final f = File(conn.boundSclPath!);
-          if (f.existsSync()) {
-            final res = SclParser.parseString(f.readAsStringSync());
-            _manager.bindSclToConnection(conn, res);
-          }
-        } catch (_) {}
-      }
-    }
-
-    if (_manager.connections.isEmpty) {
-      final defaultConn = ConnectionConfig(
-        id: 'conn_default',
-        name: 'Local Test Server (127.0.0.1:102)',
-        ip: '127.0.0.1',
-        port: 102,
-        boundSclPath: 'assets/examples/server_example_basic_io.icd',
-      );
-      _manager.addConnection(defaultConn);
-
-      try {
-        final f = File('assets/examples/server_example_basic_io.icd');
-        if (f.existsSync()) {
-          final res = SclParser.parseString(f.readAsStringSync());
-          _manager.bindSclToConnection(defaultConn, res);
-        }
-      } catch (_) {}
-    }
-
-    // Bind default template to first connection if variables still empty
-    final active = _manager.activeEngine;
-    if (active != null && active.allVariables.isEmpty) {
-      try {
-        final f = File('assets/examples/server_example_basic_io.icd');
-        if (f.existsSync()) {
-          final res = SclParser.parseString(f.readAsStringSync());
-          active.bindSclModel(res);
-        }
-      } catch (_) {}
+      await _loadSclForConnection(conn);
     }
 
     if (mounted) setState(() {});
+  }
+
+  Future<void> _loadSclForConnection(ConnectionConfig conn) async {
+    if (conn.boundSclPath == null || conn.boundSclPath!.isEmpty) return;
+    try {
+      final content = _readSclFile(conn.boundSclPath!);
+      if (content != null && content.isNotEmpty) {
+        final res = SclParser.parseString(content);
+        _manager.bindSclToConnection(conn, res, conn.boundSclPath);
+      }
+    } catch (_) {}
+  }
+
+  String? _readSclFile(String path) {
+    try {
+      final f = File(path);
+      if (f.existsSync()) return f.readAsStringSync();
+    } catch (_) {}
+    final candidate = 'assets/examples/${path.split('/').last}';
+    try {
+      final f = File(candidate);
+      if (f.existsSync()) return f.readAsStringSync();
+    } catch (_) {}
+    return null;
   }
 
   Future<void> _toggleConnection() async {
@@ -159,6 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onSaved: (cfg) {
           if (editConfig != null) {
             editConfig.name = cfg.name;
+            editConfig.nameKey = cfg.nameKey;
             editConfig.ip = cfg.ip;
             editConfig.port = cfg.port;
             editConfig.localTsap = cfg.localTsap;
@@ -167,19 +155,15 @@ class _HomeScreenState extends State<HomeScreen> {
             editConfig.autoConnect = cfg.autoConnect;
             editConfig.pollIntervalMs = cfg.pollIntervalMs;
             editConfig.notifyUpdated();
+            if (cfg.boundSclPath != null && cfg.boundSclPath!.isNotEmpty) {
+              _loadSclForConnection(editConfig);
+            }
           } else {
             _manager.addConnection(cfg);
-          }
-
-          // If bound SCL changed, reload
-          if (cfg.boundSclPath != null && cfg.boundSclPath!.isNotEmpty) {
-            try {
-              final f = File(cfg.boundSclPath!);
-              if (f.existsSync()) {
-                final res = SclParser.parseString(f.readAsStringSync());
-                _manager.bindSclToConnection(cfg, res);
-              }
-            } catch (_) {}
+            _manager.selectedConnectionId = cfg.id;
+            if (cfg.boundSclPath != null && cfg.boundSclPath!.isNotEmpty) {
+              _loadSclForConnection(cfg);
+            }
           }
 
           ClientWorkspaceStorage.saveWorkspace(
@@ -192,6 +176,46 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _copyCurrentConnection() {
+    final conn = _manager.selectedConnection;
+    if (conn == null) return;
+
+    final newId = 'conn_${DateTime.now().millisecondsSinceEpoch}';
+    final copiedName = '${conn.displayName} (${AppI18n.instance.t("copyConn")})';
+    final newConn = ConnectionConfig(
+      id: newId,
+      name: copiedName,
+      nameKey: null,
+      ip: conn.ip,
+      port: conn.port,
+      localTsap: conn.localTsap,
+      remoteTsap: conn.remoteTsap,
+      boundSclPath: conn.boundSclPath,
+      autoConnect: false,
+      pollIntervalMs: conn.pollIntervalMs,
+    );
+
+    _manager.addConnection(newConn);
+    _manager.selectedConnectionId = newId;
+
+    if (newConn.boundSclPath != null && newConn.boundSclPath!.isNotEmpty) {
+      _loadSclForConnection(newConn);
+    }
+
+    ClientWorkspaceStorage.saveWorkspace(
+      _manager.connections,
+      _manager.activeEngine?.allVariables ?? [],
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppI18n.instance.t('copyConnSuccess')),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+    setState(() {});
+  }
+
   void _deleteCurrentConnection() {
     final conn = _manager.selectedConnection;
     if (conn == null) return;
@@ -200,7 +224,7 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(AppI18n.instance.t('confirmDeleteConn')),
-        content: Text('${AppI18n.instance.t("confirmDeleteConn")}: "${conn.name}" (${conn.ip}:${conn.port})?'),
+        content: Text('${AppI18n.instance.t("confirmDeleteConn")}: "${conn.displayName}" (${conn.ip}:${conn.port})?'),
         actions: [
           TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text(AppI18n.instance.t('cancel'))),
           FilledButton(
@@ -217,6 +241,85 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Text(AppI18n.instance.t('delete')),
           ),
         ],
+      ),
+    );
+  }
+
+  NavigationRailDestination _buildRailDestination({
+    required IconData icon,
+    required IconData selectedIcon,
+    required String labelText,
+  }) {
+    return NavigationRailDestination(
+      icon: Tooltip(
+        message: labelText,
+        waitDuration: const Duration(milliseconds: 300),
+        child: Icon(icon),
+      ),
+      selectedIcon: Tooltip(
+        message: labelText,
+        waitDuration: const Duration(milliseconds: 300),
+        child: Icon(selectedIcon),
+      ),
+      label: Tooltip(
+        message: labelText,
+        waitDuration: const Duration(milliseconds: 300),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 72),
+          child: Text(
+            labelText,
+            textAlign: TextAlign.center,
+            softWrap: true,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 11),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeaderIconButton({
+    required IconData icon,
+    required String tooltip,
+    required VoidCallback? onPressed,
+    Color? color,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isEnabled = onPressed != null;
+    return Tooltip(
+      message: tooltip,
+      waitDuration: const Duration(milliseconds: 200),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(6),
+          onTap: onPressed,
+          child: Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(
+                color: isEnabled
+                    ? (color?.withValues(alpha: isDark ? 0.35 : 0.25) ?? (isDark ? Colors.grey[700]! : Colors.grey[350]!))
+                    : (isDark ? Colors.grey[850]! : Colors.grey[300]!),
+                width: 0.8,
+              ),
+              color: isEnabled
+                  ? (color?.withValues(alpha: isDark ? 0.12 : 0.06) ?? (isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.03)))
+                  : (isDark ? Colors.white.withValues(alpha: 0.02) : Colors.black.withValues(alpha: 0.02)),
+            ),
+            alignment: Alignment.center,
+            child: Icon(
+              icon,
+              size: 17,
+              color: isEnabled
+                  ? (color ?? (isDark ? Colors.grey[300] : Colors.grey[750]!))
+                  : (isDark ? Colors.grey[600] : Colors.grey[400]),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -255,7 +358,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     final logoAndTitle = Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Iec61850ClientIcon(size: 28, color: Color(0xFF0284C7), accentColor: Color(0xFF818CF8)),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: Image.asset(
+                            'assets/icons/iec61850_client_app_512.png',
+                            width: 28,
+                            height: 28,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
                         const SizedBox(width: 10),
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -284,82 +395,105 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(width: 12),
 
                         // Connection Dropdown Selector
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: isDark ? const Color(0xFF2D2D2D) : Colors.white,
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: isDark ? Colors.grey[700]! : Colors.grey[350]!),
-                          ),
-                          child: DropdownButton<String>(
-                            value: _manager.connections.any((c) => c.id == _manager.selectedConnectionId)
-                                ? _manager.selectedConnectionId
-                                : (_manager.connections.isNotEmpty ? _manager.connections.first.id : null),
-                            underline: const SizedBox(),
-                            isDense: true,
-                            icon: const Icon(Icons.arrow_drop_down),
-                            items: _manager.connections.map((c) {
-                              return DropdownMenuItem<String>(
-                                value: c.id,
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.circle,
-                                      size: 10,
-                                      color: c.isConnected ? Colors.greenAccent : Colors.grey,
+                        Tooltip(
+                          message: conn != null
+                              ? '${conn.displayName} (${conn.ip}:${conn.port})'
+                                  '${conn.boundSclPath != null && conn.boundSclPath!.isNotEmpty ? "\nSCL: ${conn.boundSclPath}" : ""}'
+                                  '\n${i18n.t(conn.isConnected ? "connectedStatus" : "disconnectedStatus")}'
+                              : i18n.t('noConnHint'),
+                          waitDuration: const Duration(milliseconds: 200),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF2D2D2D) : Colors.white,
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: isDark ? Colors.grey[700]! : Colors.grey[350]!),
+                            ),
+                            child: DropdownButton<String>(
+                              value: _manager.connections.any((c) => c.id == _manager.selectedConnectionId)
+                                  ? _manager.selectedConnectionId
+                                  : (_manager.connections.isNotEmpty ? _manager.connections.first.id : null),
+                              underline: const SizedBox(),
+                              isDense: true,
+                              icon: const Icon(Icons.arrow_drop_down),
+                              items: _manager.connections.map((c) {
+                                final itemTooltip = '${c.displayName} (${c.ip}:${c.port})'
+                                    '${c.boundSclPath != null && c.boundSclPath!.isNotEmpty ? "\nSCL: ${c.boundSclPath}" : ""}'
+                                    '\n${i18n.t(c.isConnected ? "connectedStatus" : "disconnectedStatus")}';
+                                return DropdownMenuItem<String>(
+                                  value: c.id,
+                                  child: Tooltip(
+                                    message: itemTooltip,
+                                    waitDuration: const Duration(milliseconds: 200),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.circle,
+                                          size: 10,
+                                          color: c.isConnected ? Colors.greenAccent : Colors.grey,
+                                        ),
+                                        const SizedBox(width: 6),
+                                        ConstrainedBox(
+                                          constraints: BoxConstraints(maxWidth: isWide ? 180 : 130),
+                                          child: Text(
+                                            '${c.displayName} (${c.ip}:${c.port})',
+                                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(width: 6),
-                                    ConstrainedBox(
-                                      constraints: BoxConstraints(maxWidth: isWide ? 180 : 130),
-                                      child: Text(
-                                        '${c.name} (${c.ip}:${c.port})',
-                                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                            onChanged: (id) {
-                              if (id != null) {
-                                setState(() {
-                                  _manager.selectedConnectionId = id;
-                                });
-                              }
-                            },
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (id) {
+                                if (id != null) {
+                                  setState(() {
+                                    _manager.selectedConnectionId = id;
+                                  });
+                                }
+                              },
+                            ),
                           ),
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 8),
 
                         // Add Connection Button
-                        IconButton(
-                          icon: const Icon(Icons.add_circle_outline, color: Colors.blueAccent, size: 20),
+                        _buildHeaderIconButton(
+                          icon: Icons.add_circle_outline,
                           tooltip: i18n.t('newConn'),
-                          constraints: const BoxConstraints(maxWidth: 32, maxHeight: 32),
-                          padding: EdgeInsets.zero,
+                          color: Colors.blueAccent,
                           onPressed: () => _openCreateConnectionDialog(),
                         ),
+                        const SizedBox(width: 6),
+
+                        // Copy Connection Button
+                        _buildHeaderIconButton(
+                          icon: Icons.copy_outlined,
+                          tooltip: i18n.t('copyConn'),
+                          onPressed: conn != null ? _copyCurrentConnection : null,
+                        ),
+                        const SizedBox(width: 6),
+
                         // Edit Connection Button
-                        IconButton(
-                          icon: const Icon(Icons.edit_outlined, size: 20),
+                        _buildHeaderIconButton(
+                          icon: Icons.edit_outlined,
                           tooltip: i18n.t('editConn'),
-                          constraints: const BoxConstraints(maxWidth: 32, maxHeight: 32),
-                          padding: EdgeInsets.zero,
                           onPressed: conn != null ? () => _openCreateConnectionDialog(editConfig: conn) : null,
                         ),
+                        const SizedBox(width: 6),
+
                         // Delete Connection Button
-                        IconButton(
-                          icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20),
+                        _buildHeaderIconButton(
+                          icon: Icons.delete_outline,
                           tooltip: i18n.t('deleteConn'),
-                          constraints: const BoxConstraints(maxWidth: 32, maxHeight: 32),
-                          padding: EdgeInsets.zero,
+                          color: Colors.redAccent,
                           onPressed: _manager.connections.length > 1 ? _deleteCurrentConnection : null,
                         ),
 
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 10),
 
                         // Connect / Disconnect Action Button
                         FilledButton.icon(
@@ -389,13 +523,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
 
                         // Theme Toggle Button
-                        IconButton(
-                          icon: Icon(widget.isDarkMode ? Icons.light_mode : Icons.dark_mode, size: 20),
+                        _buildHeaderIconButton(
+                          icon: widget.isDarkMode ? Icons.light_mode : Icons.dark_mode,
                           tooltip: widget.isDarkMode ? i18n.t('themeLight') : i18n.t('themeDark'),
-                          constraints: const BoxConstraints(maxWidth: 36, maxHeight: 36),
-                          padding: EdgeInsets.zero,
+                          color: widget.isDarkMode ? Colors.amber : Colors.blueGrey,
                           onPressed: widget.onToggleTheme,
                         ),
+                        const SizedBox(width: 8),
 
                         // LanguagePickerButton
                         LanguagePickerButton(
@@ -404,7 +538,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             widget.onLanguageChanged?.call();
                           },
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 8),
 
                         // WindowControls
                         WindowControls(brightness: Theme.of(context).brightness),
@@ -420,51 +554,54 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: Row(
               children: [
-                // Modern Navigation Rail
-                NavigationRail(
-                  selectedIndex: _selectedTabIndex,
-                  labelType: NavigationRailLabelType.all,
-                  minWidth: 76,
-                  destinations: [
-                    NavigationRailDestination(
-                      icon: const Icon(Icons.account_tree_outlined),
-                      selectedIcon: const Icon(Icons.account_tree),
-                      label: Text(i18n.t('tabModel'), style: const TextStyle(fontSize: 11)),
-                    ),
-                    NavigationRailDestination(
-                      icon: const Icon(Icons.grid_view_outlined),
-                      selectedIcon: const Icon(Icons.grid_view),
-                      label: Text(i18n.t('tabMonitor'), style: const TextStyle(fontSize: 11)),
-                    ),
-                    NavigationRailDestination(
-                      icon: const Icon(Icons.mark_email_unread_outlined),
-                      selectedIcon: const Icon(Icons.mark_email_unread),
-                      label: Text(i18n.t('tabReports'), style: const TextStyle(fontSize: 11)),
-                    ),
-                    NavigationRailDestination(
-                      icon: const Icon(Icons.radar_outlined),
-                      selectedIcon: const Icon(Icons.radar),
-                      label: Text(i18n.t('tabGoose'), style: const TextStyle(fontSize: 11)),
-                    ),
-                    NavigationRailDestination(
-                      icon: const Icon(Icons.folder_shared_outlined),
-                      selectedIcon: const Icon(Icons.folder_shared),
-                      label: Text(i18n.t('tabFiles'), style: const TextStyle(fontSize: 11)),
-                    ),
-                    NavigationRailDestination(
-                      icon: const Icon(Icons.troubleshoot_outlined),
-                      selectedIcon: const Icon(Icons.troubleshoot),
-                      label: Text(i18n.t('tabTraffic'), style: const TextStyle(fontSize: 11)),
-                    ),
-                    NavigationRailDestination(
-                      icon: const Icon(Icons.library_books_outlined),
-                      selectedIcon: const Icon(Icons.library_books),
-                      label: Text(i18n.t('tabScl'), style: const TextStyle(fontSize: 11)),
-                    ),
-                  ],
-                  onDestinationSelected: (index) {
-                    setState(() => _selectedTabIndex = index);
-                  },
+                // Modern Navigation Rail with fixed maxWidth and no top leading icon
+                ConstrainedBox(
+                  constraints: const BoxConstraints(minWidth: 72, maxWidth: 88),
+                  child: NavigationRail(
+                    selectedIndex: _selectedTabIndex,
+                    labelType: NavigationRailLabelType.all,
+                    minWidth: 72,
+                    destinations: [
+                      _buildRailDestination(
+                        icon: Icons.account_tree_outlined,
+                        selectedIcon: Icons.account_tree,
+                        labelText: i18n.t('tabModel'),
+                      ),
+                      _buildRailDestination(
+                        icon: Icons.grid_view_outlined,
+                        selectedIcon: Icons.grid_view,
+                        labelText: i18n.t('tabMonitor'),
+                      ),
+                      _buildRailDestination(
+                        icon: Icons.mark_email_unread_outlined,
+                        selectedIcon: Icons.mark_email_unread,
+                        labelText: i18n.t('tabReports'),
+                      ),
+                      _buildRailDestination(
+                        icon: Icons.radar_outlined,
+                        selectedIcon: Icons.radar,
+                        labelText: i18n.t('tabGoose'),
+                      ),
+                      _buildRailDestination(
+                        icon: Icons.folder_shared_outlined,
+                        selectedIcon: Icons.folder_shared,
+                        labelText: i18n.t('tabFiles'),
+                      ),
+                      _buildRailDestination(
+                        icon: Icons.troubleshoot_outlined,
+                        selectedIcon: Icons.troubleshoot,
+                        labelText: i18n.t('tabTraffic'),
+                      ),
+                      _buildRailDestination(
+                        icon: Icons.library_books_outlined,
+                        selectedIcon: Icons.library_books,
+                        labelText: i18n.t('tabScl'),
+                      ),
+                    ],
+                    onDestinationSelected: (index) {
+                      setState(() => _selectedTabIndex = index);
+                    },
+                  ),
                 ),
 
                 const VerticalDivider(width: 1, thickness: 1),
@@ -472,6 +609,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 // Active Tab Content
                 Expanded(
                   child: IndexedStack(
+                    key: ValueKey(i18n.currentLanguage.code),
                     index: _selectedTabIndex,
                     children: [
                       ModelExplorerTab(
@@ -580,9 +718,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

@@ -7,6 +7,8 @@ import 'package:modbus_master/src/protocol/modbus_data_types.dart';
 import 'package:modbus_master/src/models/connection_config.dart';
 import 'package:modbus_master/src/models/slave_model.dart';
 import 'package:modbus_master/src/protocol/modbus_client.dart';
+import 'package:modbus_master/src/i18n/app_i18n.dart';
+import 'package:modbus_master/src/models/workspace_storage.dart';
 
 
 void main() {
@@ -242,6 +244,102 @@ void main() {
       expect(restoredList[0].slaves.length, equals(2));
       expect(restoredList[1].name, equals('变压器温控串口RTU'));
       expect(restoredList[1].slaves.length, equals(2));
+    });
+  });
+
+  group('Preset Example Multi-Language i18n Tests', () {
+    test('Preset connection and default slave translate dynamically across languages', () {
+      final i18n = AppI18n.instance;
+      final conn = ConnectionConfig.createDefault();
+      final slave = conn.slaves.first;
+      final grp = slave.groups.first;
+      final reg = grp.registers.first;
+
+      // In Chinese (zh)
+      i18n.setLanguage(AppLanguage.zhCN);
+      expect(conn.displayName, equals('虚拟从站 (内置仿真)'));
+      expect(slave.displayName, contains('主变'));
+      expect(grp.displayGroupName, contains('电力模拟量'));
+      expect(reg.displayAlias, contains('A相电压'));
+
+      // Switch to English (en)
+      i18n.setLanguage(AppLanguage.enUS);
+      expect(conn.displayName, equals('Virtual Slave (Built-in Simulation)'));
+      expect(slave.displayName, contains('Main Transformer'));
+      expect(grp.displayGroupName, contains('Power Telemetry'));
+      expect(reg.displayAlias, contains('Phase A Voltage'));
+
+      // Switch to Russian (ru)
+      i18n.setLanguage(AppLanguage.ruRU);
+      expect(conn.displayName, equals('Виртуальный Slave (Встроенная симуляция)'));
+      expect(slave.displayName, contains('трансформатор'));
+
+      // Switch to Japanese (ja)
+      i18n.setLanguage(AppLanguage.jaJP);
+      expect(slave.displayName, contains('変圧器'));
+
+      // Switch to German (de)
+      i18n.setLanguage(AppLanguage.deDE);
+      expect(slave.displayName, contains('Haupttransformator'));
+
+      // Reset to zh
+      i18n.setLanguage(AppLanguage.zhCN);
+    });
+
+    test('WorkspaceStorage presets support multi-language translation and inference', () {
+      final i18n = AppI18n.instance;
+      final presets = WorkspaceStorage.createDefaultConnections();
+      expect(presets.length, equals(3));
+
+      i18n.setLanguage(AppLanguage.zhCN);
+      expect(presets[0].displayName, equals('虚拟从站 (内置仿真)'));
+      expect(presets[1].displayName, equals('Modbus RTU 串口从站服务 (/dev/ttyUSB0)'));
+      expect(presets[2].displayName, equals('Modbus TCP 默认从站服务 (Port 502)'));
+
+      i18n.setLanguage(AppLanguage.enUS);
+      expect(presets[0].displayName, equals('Virtual Slave (Built-in Simulation)'));
+      expect(presets[1].displayName, equals('Modbus RTU Serial Server (/dev/ttyUSB0)'));
+      expect(presets[2].displayName, equals('Modbus TCP Default Server (Port 502)'));
+
+      // Legacy JSON without keys auto-detects preset keys
+      final legacyJson = {
+        'name': '虚拟仿真回路 (Virtual Simulation)',
+        'mode': 'virtual',
+        'slaves': [
+          {
+            'name': '1# 主变压器测控终端',
+            'slaveId': 1,
+            'groups': [
+              {
+                'groupName': '三相电力遥测参数',
+                'type': 'holdingRegisters',
+                'registers': [
+                  {
+                    'address': 0,
+                    'alias': 'A相电压 Ua',
+                    'comment': '仿真工频50Hz正弦波动',
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      };
+
+      final restored = ConnectionConfig.fromJson(legacyJson);
+      expect(restored.nameKey, equals('transportVirtual'));
+      expect(restored.slaves.first.nameKey, equals('preset_slave_transformer'));
+      expect(restored.slaves.first.groups.first.groupNameKey, equals('preset_grp_holding_power'));
+      expect(restored.slaves.first.groups.first.registers.first.aliasKey, equals('reg_volt_a'));
+      expect(restored.slaves.first.groups.first.registers.first.commentKey, equals('cmt_sine_wave'));
+
+      // Now verify that restored legacy preset also translates to English
+      expect(restored.displayName, equals('Virtual Slave (Built-in Simulation)'));
+      expect(restored.slaves.first.displayName, contains('Main Transformer'));
+      expect(restored.slaves.first.groups.first.displayGroupName, contains('Power Telemetry'));
+      expect(restored.slaves.first.groups.first.registers.first.displayAlias, contains('Phase A Voltage'));
+
+      i18n.setLanguage(AppLanguage.zhCN);
     });
   });
 }

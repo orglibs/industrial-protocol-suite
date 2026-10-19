@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import '../i18n/app_i18n.dart';
 
 /// IEC 60870-5-104 APCI (Application Protocol Control Information) Format Types
 enum ApciType {
@@ -9,16 +10,36 @@ enum ApciType {
 
 /// IEC 60870-5-104 U-Format Function Types
 enum UFormatType {
-  startDtAct(0x07, 'STARTDT act (激活数据传输)'),
-  startDtCon(0x0B, 'STARTDT con (确认激活传输)'),
-  stopDtAct(0x13, 'STOPDT act (停止数据传输)'),
-  stopDtCon(0x23, 'STOPDT con (确认停止传输)'),
-  testFrAct(0x43, 'TESTFR act (测试链路激活)'),
-  testFrCon(0x83, 'TESTFR con (确认测试链路)');
+  startDtAct(0x07, 'STARTDT act (Activate data transfer)'),
+  startDtCon(0x0B, 'STARTDT con (Confirm data transfer)'),
+  stopDtAct(0x13, 'STOPDT act (Stop data transfer)'),
+  stopDtCon(0x23, 'STOPDT con (Confirm stop transfer)'),
+  testFrAct(0x43, 'TESTFR act (Test frame activation)'),
+  testFrCon(0x83, 'TESTFR con (Test frame confirmation)');
 
   final int byteValue;
-  final String description;
-  const UFormatType(this.byteValue, this.description);
+  final String englishDescription;
+  const UFormatType(this.byteValue, this.englishDescription);
+
+  String get description {
+    final i18n = AppI18n.instance;
+    switch (this) {
+      case UFormatType.startDtAct:
+        return i18n.t('u_startdt_act');
+      case UFormatType.startDtCon:
+        return i18n.t('u_startdt_con');
+      case UFormatType.stopDtAct:
+        return i18n.t('u_stopdt_act');
+      case UFormatType.stopDtCon:
+        return i18n.t('u_stopdt_con');
+      case UFormatType.testFrAct:
+        return i18n.t('u_testfr_act');
+      case UFormatType.testFrCon:
+        return i18n.t('u_testfr_con');
+    }
+  }
+
+  String get label => description;
 
   static UFormatType? fromByte(int byte) {
     for (final v in UFormatType.values) {

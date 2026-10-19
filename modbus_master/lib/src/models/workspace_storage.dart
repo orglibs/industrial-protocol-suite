@@ -48,16 +48,23 @@ class WorkspaceStorage {
       // If error occurs, fallback to defaults
     }
 
+    return createDefaultConnections();
+  }
+
+  /// Creates default preset connections with i18n keys
+  static List<ConnectionConfig> createDefaultConnections() {
     return [
       ConnectionConfig(
-        name: '本地虚拟从站 (Virtual Test)',
+        name: 'Local Virtual Slave (Virtual Test)',
+        nameKey: 'transportVirtual',
         mode: ModbusTransportMode.virtual,
         ip: '127.0.0.1',
         port: 502,
-        slaves: [ConnectionConfig.createDefaultSlave()],
+        slaves: [ConnectionConfig.createDefaultSlave(1, 'Substation Main Transformer (Unit 1)', 'preset_slave_transformer')],
       ),
       ConnectionConfig(
-        name: 'Modbus RTU 串口通信 (Serial/COM)',
+        name: 'Modbus RTU Serial (Serial/COM)',
+        nameKey: 'preset_conn_rtu',
         mode: ModbusTransportMode.serialRtu,
         serialPortName: '/dev/ttyUSB0',
         baudRate: 9600,
@@ -65,14 +72,15 @@ class WorkspaceStorage {
         parity: 0,
         stopBits: 1,
         messageFrameFormat: 1,
-        slaves: [ConnectionConfig.createDefaultSlave()],
+        slaves: [ConnectionConfig.createDefaultSlave(2, 'Serial Acquisition Slave (Unit 2)', 'preset_slave_serial')],
       ),
       ConnectionConfig(
-        name: 'Modbus TCP 默认连接',
+        name: 'Modbus TCP Default Connection',
+        nameKey: 'preset_conn_tcp',
         mode: ModbusTransportMode.tcp,
         ip: '127.0.0.1',
         port: 502,
-        slaves: [ConnectionConfig.createDefaultSlave()],
+        slaves: [ConnectionConfig.createDefaultSlave(3, 'Gateway Slave (Unit 3)', 'preset_slave_gateway')],
       ),
     ];
   }
@@ -97,13 +105,13 @@ class WorkspaceStorage {
   /// Import from custom file path
   static Future<List<ConnectionConfig>> importFromFile(String path) async {
     final file = File(path);
-    if (!await file.exists()) throw Exception('文件不存在: $path');
+    if (!await file.exists()) throw Exception('File not found: $path');
     final content = await file.readAsString();
     final list = jsonDecode(content);
     if (list is List) {
       return list.map((e) => ConnectionConfig.fromJson(Map<String, dynamic>.from(e))).toList();
     }
-    throw Exception('文件格式错误: 顶层必须为数组');
+    throw Exception('Invalid file format: top level must be an array');
   }
 
   /// Export to custom file path

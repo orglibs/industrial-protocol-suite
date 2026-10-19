@@ -94,7 +94,7 @@ class _ChartTabState extends State<ChartTab> {
                 value: _selectedSlave,
                 underline: const SizedBox(),
                 items: widget.config.slaves.map((s) {
-                  return DropdownMenuItem(value: s, child: Text(s.name));
+                  return DropdownMenuItem(value: s, child: Text(s.displayName));
                 }).toList(),
                 onChanged: (s) {
                   setState(() {
@@ -110,7 +110,7 @@ class _ChartTabState extends State<ChartTab> {
                   value: _selectedGroup,
                   underline: const SizedBox(),
                   items: _selectedSlave!.groups.map((g) {
-                    return DropdownMenuItem(value: g, child: Text(g.groupName));
+                    return DropdownMenuItem(value: g, child: Text(g.displayGroupName));
                   }).toList(),
                   onChanged: (g) {
                     setState(() {
@@ -127,7 +127,7 @@ class _ChartTabState extends State<ChartTab> {
                   items: _selectedGroup!.registers.map((r) {
                     return DropdownMenuItem(
                       value: r,
-                      child: Text('${r.alias ?? "Point"}[${AppI18n.instance.t('colAddr')}:${r.address}] (${AppI18n.instance.t('currValue')}: ${r.rawValue})'),
+                      child: Text('${r.displayAlias ?? "Point"}[${AppI18n.instance.t('colAddr')}:${r.address}] (${AppI18n.instance.t('currValue')}: ${r.rawValue})'),
                     );
                   }).toList(),
                   onChanged: (r) {
@@ -153,7 +153,7 @@ class _ChartTabState extends State<ChartTab> {
             child: Row(
               children: [
                 Text(
-                  '${_selectedRegister!.alias ?? "Point"} [${AppI18n.instance.t('colAddr')}: ${_selectedRegister!.address}]',
+                  '${_selectedRegister!.displayAlias ?? "Point"} [${AppI18n.instance.t('colAddr')}: ${_selectedRegister!.address}]',
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                 ),
                 const SizedBox(width: 16),
@@ -178,7 +178,7 @@ class _ChartTabState extends State<ChartTab> {
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: _history.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Text(AppI18n.instance.t('noChartData'), style: const TextStyle(color: Colors.white60)),
                       )
                     : CustomPaint(

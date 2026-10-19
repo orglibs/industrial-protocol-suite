@@ -146,7 +146,7 @@ class SerialPortAdapter {
     if (isOpen) close();
 
     if (_cOpen == null || _cWrite == null || _cRead == null) {
-      throw Exception('当前平台未加载底层串口 C 接口');
+      throw Exception('Native C serial port interface is not loaded on this platform');
     }
 
     if (Platform.isLinux || Platform.isMacOS) {
@@ -195,7 +195,7 @@ class SerialPortAdapter {
     _cFree!(cPath.cast());
 
     if (_fd < 0) {
-      throw Exception('无法打开串口 "$portName" (可能无权限，可执行 sudo chmod 666 $portName，或端口被占用)');
+      throw Exception('Cannot open serial port "$portName" (check permissions with: sudo chmod 666 $portName, or port in use)');
     }
 
     _rxNativeBuf = _cMalloc!(_bufSize);
@@ -220,7 +220,7 @@ class SerialPortAdapter {
   /// Transmits raw Modbus RTU bytes across the serial bus
   void write(Uint8List data) {
     if (!isOpen || _cWrite == null) {
-      throw Exception('串口未打开，无法发送报文');
+      throw Exception('Serial port is not open, cannot transmit packet');
     }
 
     final txBuf = _cMalloc!(data.length);

@@ -86,99 +86,146 @@ class _TrafficTabState extends State<TrafficTab> {
       children: [
         // Top Toolbar
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             color: isDark ? const Color(0xFF252526) : const Color(0xFFF3F3F3),
             border: Border(bottom: BorderSide(color: isDark ? Colors.grey[800]! : Colors.grey[300]!)),
           ),
-          child: Row(
-            children: [
-              SizedBox(
-                width: 220,
-                height: 34,
-                child: TextField(
-                  controller: _searchCtrl,
-                  decoration: InputDecoration(
-                    hintText: i18n.t('searchTrafficHint'),
-                    prefixIcon: const Icon(Icons.search, size: 16),
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 6),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 220,
+                  height: 32,
+                  child: Tooltip(
+                    message: i18n.t('searchTrafficHint'),
+                    child: TextField(
+                      controller: _searchCtrl,
+                      style: const TextStyle(fontSize: 12),
+                      decoration: InputDecoration(
+                        hintText: i18n.t('searchTrafficHint'),
+                        hintStyle: const TextStyle(fontSize: 12),
+                        prefixIcon: const Icon(Icons.search, size: 16),
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              // Protocol Filter
-              DropdownButton<String>(
-                value: _protocolFilter,
-                underline: const SizedBox(),
-                items: const [
-                  DropdownMenuItem(value: 'ALL', child: Text(i18n.t('protoAll'))),
-                  DropdownMenuItem(value: 'COTP', child: Text('COTP (ISO 8073)')),
-                  DropdownMenuItem(value: 'ACSE', child: Text('ACSE (ISO 8650)')),
-                  DropdownMenuItem(value: 'MMS', child: Text('MMS (ISO 9506)')),
-                  DropdownMenuItem(value: 'GOOSE', child: Text('GOOSE (8-1)')),
-                ],
-                onChanged: (val) {
-                  if (val != null) setState(() => _protocolFilter = val);
-                },
-              ),
-              const SizedBox(width: 12),
-              // Direction Filter
-              DropdownButton<String>(
-                value: _directionFilter,
-                underline: const SizedBox(),
-                items: const [
-                  DropdownMenuItem(value: 'ALL', child: Text(i18n.t('dirAll'))),
-                  DropdownMenuItem(value: 'RX', child: Text(i18n.t('dirRxDesc'))),
-                  DropdownMenuItem(value: 'TX', child: Text(i18n.t('dirTxDesc'))),
-                ],
-                onChanged: (val) {
-                  if (val != null) setState(() => _directionFilter = val);
-                },
-              ),
-              const SizedBox(width: 16),
-              // Auto-scroll toggle
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Checkbox(
-                    value: _autoScroll,
-                    onChanged: (val) => setState(() => _autoScroll = val ?? true),
+                const SizedBox(width: 8),
+                // Protocol Filter
+                Container(
+                  height: 32,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF2D2D2D) : Colors.white,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: isDark ? Colors.grey[700]! : Colors.grey[350]!),
                   ),
-                  Text(i18n.t('autoScroll'), style: const TextStyle(fontSize: 12)),
-                ],
-              ),
-              const Spacer(),
-              // Logging Enable Toggle
-              IconButton(
-                icon: Icon(
-                  _logger.isLoggingEnabled ? Icons.pause_circle_outline : Icons.play_circle_outline,
-                  color: _logger.isLoggingEnabled ? Colors.green : Colors.grey,
+                  child: Tooltip(
+                    message: 'Protocol: $_protocolFilter',
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _protocolFilter,
+                        isDense: true,
+                        items: [
+                          DropdownMenuItem(value: 'ALL', child: Text(i18n.t('protoAll'), style: const TextStyle(fontSize: 12))),
+                          const DropdownMenuItem(value: 'COTP', child: Text('COTP (ISO 8073)', style: TextStyle(fontSize: 12))),
+                          const DropdownMenuItem(value: 'ACSE', child: Text('ACSE (ISO 8650)', style: TextStyle(fontSize: 12))),
+                          const DropdownMenuItem(value: 'MMS', child: Text('MMS (ISO 9506)', style: TextStyle(fontSize: 12))),
+                          const DropdownMenuItem(value: 'GOOSE', child: Text('GOOSE (8-1)', style: TextStyle(fontSize: 12))),
+                        ],
+                        onChanged: (val) {
+                          if (val != null) setState(() => _protocolFilter = val);
+                        },
+                      ),
+                    ),
+                  ),
                 ),
-                tooltip: _logger.isLoggingEnabled ? i18n.t('pauseCapture') : i18n.t('resumeCapture'),
-                onPressed: () {
-                  setState(() {
-                    _logger.isLoggingEnabled = !_logger.isLoggingEnabled;
-                  });
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.file_download_outlined),
-                tooltip: i18n.t('exportTraffic'),
-                onPressed: _exportLog,
-              ),
-              IconButton(
-                icon: const Icon(Icons.delete_sweep_outlined),
-                tooltip: i18n.t('clearLog'),
-                onPressed: () {
-                  setState(() {
-                    _logger.clear();
-                    _selectedEntry = null;
-                  });
-                },
-              ),
-            ],
+                const SizedBox(width: 8),
+                // Direction Filter
+                Container(
+                  height: 32,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF2D2D2D) : Colors.white,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: isDark ? Colors.grey[700]! : Colors.grey[350]!),
+                  ),
+                  child: Tooltip(
+                    message: 'Direction: $_directionFilter',
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _directionFilter,
+                        isDense: true,
+                        items: [
+                          DropdownMenuItem(value: 'ALL', child: Text(i18n.t('dirAll'), style: const TextStyle(fontSize: 12))),
+                          DropdownMenuItem(value: 'RX', child: Text(i18n.t('dirRxDesc'), style: const TextStyle(fontSize: 12))),
+                          DropdownMenuItem(value: 'TX', child: Text(i18n.t('dirTxDesc'), style: const TextStyle(fontSize: 12))),
+                        ],
+                        onChanged: (val) {
+                          if (val != null) setState(() => _directionFilter = val);
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Auto-scroll toggle
+                Tooltip(
+                  message: i18n.t('autoScroll'),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Checkbox(
+                        value: _autoScroll,
+                        visualDensity: VisualDensity.compact,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        onChanged: (val) => setState(() => _autoScroll = val ?? true),
+                      ),
+                      Text(i18n.t('autoScroll'), style: const TextStyle(fontSize: 12)),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // Logging Enable Toggle
+                IconButton(
+                  icon: Icon(
+                    _logger.isLoggingEnabled ? Icons.pause_circle_outline : Icons.play_circle_outline,
+                    color: _logger.isLoggingEnabled ? Colors.green : Colors.grey,
+                  ),
+                  tooltip: _logger.isLoggingEnabled ? i18n.t('pauseCapture') : i18n.t('resumeCapture'),
+                  constraints: const BoxConstraints(maxWidth: 32, maxHeight: 32),
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    setState(() {
+                      _logger.isLoggingEnabled = !_logger.isLoggingEnabled;
+                    });
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.file_download_outlined),
+                  tooltip: i18n.t('exportTraffic'),
+                  constraints: const BoxConstraints(maxWidth: 32, maxHeight: 32),
+                  padding: EdgeInsets.zero,
+                  onPressed: _exportLog,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete_sweep_outlined),
+                  tooltip: i18n.t('clearLog'),
+                  constraints: const BoxConstraints(maxWidth: 32, maxHeight: 32),
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    setState(() {
+                      _logger.clear();
+                      _selectedEntry = null;
+                    });
+                  },
+                ),
+              ],
+            ),
           ),
         ),
 
@@ -325,10 +372,10 @@ class _TrafficTabState extends State<TrafficTab> {
               Expanded(
                 flex: 5,
                 child: _selectedEntry == null
-                    ? const Center(
+                    ? Center(
                         child: Text(
                           i18n.t('clickTrafficHintClient'),
-                          style: TextStyle(color: Colors.grey, fontSize: 13),
+                          style: const TextStyle(color: Colors.grey, fontSize: 13),
                         ),
                       )
                     : Container(

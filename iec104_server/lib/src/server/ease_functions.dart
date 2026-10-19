@@ -1,17 +1,40 @@
 import 'dart:math';
+import '../i18n/app_i18n.dart';
 
 /// Auto-change Easing Function Types (matching industrial simulator behavior)
 enum EaseType {
-  sine('正弦波 (Sine Wave)'),
-  rampUp('递增 (Ramp Up)'),
-  rampDown('递减 (Ramp Down)'),
-  triangle('三角波 (Triangle)'),
-  squarePulse('方波 (Square Pulse)'),
-  randomWalk('随机波动 (Random Walk)'),
-  toggle('交替 (Toggle 0/1)');
+  sine('Sine Wave'),
+  rampUp('Ramp Up'),
+  rampDown('Ramp Down'),
+  triangle('Triangle Wave'),
+  squarePulse('Square Pulse'),
+  randomWalk('Random Walk'),
+  toggle('Toggle 0/1');
 
-  final String description;
-  const EaseType(this.description);
+  final String englishDescription;
+  const EaseType(this.englishDescription);
+
+  String get description {
+    final i18n = AppI18n.instance;
+    switch (this) {
+      case EaseType.sine:
+        return i18n.t('waveSine');
+      case EaseType.rampUp:
+        return i18n.t('waveRampUp');
+      case EaseType.rampDown:
+        return i18n.t('waveRampDown');
+      case EaseType.triangle:
+        return i18n.t('waveTriangle');
+      case EaseType.squarePulse:
+        return i18n.t('waveSquare');
+      case EaseType.randomWalk:
+        return i18n.t('waveRandom');
+      case EaseType.toggle:
+        return i18n.t('waveToggle');
+    }
+  }
+
+  String get label => description;
 }
 
 class EaseCalculator {

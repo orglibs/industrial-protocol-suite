@@ -47,10 +47,10 @@ class ModbusServerManager {
       }
 
       config.isRunning = true;
-      config.statusMessage = '监听中';
+      config.statusMessage = 'Listening';
     } catch (e) {
       config.isRunning = false;
-      config.statusMessage = '启动失败: $e';
+      config.statusMessage = 'Start failed: $e';
       rethrow;
     }
   }
@@ -83,7 +83,7 @@ class ModbusServerManager {
 
     config.isRunning = false;
     config.clientCount = 0;
-    config.statusMessage = '已停止';
+    config.statusMessage = 'Stopped';
   }
 
   /// Starts all connections
@@ -180,7 +180,7 @@ class ModbusServerManager {
         );
       },
       onError: (e) {
-        config.statusMessage = '服务异常: $e';
+        config.statusMessage = 'Server error: $e';
         config.isRunning = false;
         config.notifyUpdated();
       },

@@ -76,22 +76,25 @@ class _AddPointDialogState extends State<AddPointDialog> {
                 initialValue: _selectedType,
                 isExpanded: true,
                 decoration: InputDecoration(
-                  labelText: 'ASDU Type',
+                  labelText: AppI18n.instance.t('pointType'),
                   border: OutlineInputBorder(),
                 ),
-                items: const [
-                  DropdownMenuItem(value: AsduTypeId.mSpNa1, child: const Text('Type 1: M_SP_NA_1 (Single Point)')),
-                  DropdownMenuItem(value: AsduTypeId.mSpTb1, child: const Text('Type 30: M_SP_TB_1 (Single Point with Time)')),
-                  DropdownMenuItem(value: AsduTypeId.mDpNa1, child: const Text('Type 3: M_DP_NA_1 (Double Point)')),
-                  DropdownMenuItem(value: AsduTypeId.mDpTb1, child: const Text('Type 31: M_DP_TB_1 (Double Point with Time)')),
-                  DropdownMenuItem(value: AsduTypeId.mStNa1, child: const Text('Type 5: M_ST_NA_1 (Step Position)')),
-                  DropdownMenuItem(value: AsduTypeId.mBoNa1, child: const Text('Type 7: M_BO_NA_1 (Bitstring of 32 Bits)')),
-                  DropdownMenuItem(value: AsduTypeId.mMeNa1, child: const Text('Type 9: M_ME_NA_1 (Normalized Value)')),
-                  DropdownMenuItem(value: AsduTypeId.mMeNb1, child: const Text('Type 11: M_ME_NB_1 (Scaled Value)')),
-                  DropdownMenuItem(value: AsduTypeId.mMeNc1, child: const Text('Type 13: M_ME_NC_1 (Short Floating Point)')),
-                  DropdownMenuItem(value: AsduTypeId.mMeTf1, child: const Text('Type 36: M_ME_TF_1 (Float with Time)')),
-                  DropdownMenuItem(value: AsduTypeId.mItNa1, child: const Text('Type 15: M_IT_NA_1 (Integrated Totals)')),
-                ],
+                items: [
+                  AsduTypeId.mSpNa1,
+                  AsduTypeId.mSpTb1,
+                  AsduTypeId.mDpNa1,
+                  AsduTypeId.mDpTb1,
+                  AsduTypeId.mStNa1,
+                  AsduTypeId.mBoNa1,
+                  AsduTypeId.mMeNa1,
+                  AsduTypeId.mMeNb1,
+                  AsduTypeId.mMeNc1,
+                  AsduTypeId.mMeTf1,
+                  AsduTypeId.mItNa1,
+                ].map((t) => DropdownMenuItem(
+                  value: t,
+                  child: Text('Type ${t.id}: ${t.nameString} (${t.description})'),
+                )).toList(),
                 onChanged: (v) {
                   if (v != null) {
                     setState(() {

@@ -3,21 +3,21 @@ import 'dart:typed_data';
 
 /// Standard Modbus Function Codes
 enum ModbusFunctionCode {
-  readCoils(0x01, '01: 读线圈状态 (Read Coils)'),
-  readDiscreteInputs(0x02, '02: 读离散输入 (Read Discrete Inputs)'),
-  readHoldingRegisters(0x03, '03: 读保持寄存器 (Read Holding Registers)'),
-  readInputRegisters(0x04, '04: 读输入寄存器 (Read Input Registers)'),
-  writeSingleCoil(0x05, '05: 写单个线圈 (Write Single Coil)'),
-  writeSingleRegister(0x06, '06: 写单个保持寄存器 (Write Single Register)'),
-  readExceptionStatus(0x07, '07: 读异常状态 (Read Exception Status)'),
-  diagnostics(0x08, '08: 诊断测试 (Diagnostics)'),
-  getCommEventCounter(0x0B, '11: 获取通信事件计数器 (Get Comm Event Counter)'),
-  getCommEventLog(0x0C, '12: 获取通信事件记录 (Get Comm Event Log)'),
-  writeMultipleCoils(0x0F, '15: 写多个线圈 (Write Multiple Coils)'),
-  writeMultipleRegisters(0x10, '16: 写多个保持寄存器 (Write Multiple Registers)'),
-  reportSlaveId(0x11, '17: 报告从机标识 (Report Slave ID)'),
-  maskWriteRegister(0x16, '22: 屏蔽写寄存器 (Mask Write Register)'),
-  readWriteMultipleRegisters(0x17, '23: 读/写多个寄存器 (Read/Write Multiple Registers)');
+  readCoils(0x01, '01: Read Coils'),
+  readDiscreteInputs(0x02, '02: Read Discrete Inputs'),
+  readHoldingRegisters(0x03, '03: Read Holding Registers'),
+  readInputRegisters(0x04, '04: Read Input Registers'),
+  writeSingleCoil(0x05, '05: Write Single Coil'),
+  writeSingleRegister(0x06, '06: Write Single Register'),
+  readExceptionStatus(0x07, '07: Read Exception Status'),
+  diagnostics(0x08, '08: Diagnostics'),
+  getCommEventCounter(0x0B, '11: Get Comm Event Counter'),
+  getCommEventLog(0x0C, '12: Get Comm Event Log'),
+  writeMultipleCoils(0x0F, '15: Write Multiple Coils'),
+  writeMultipleRegisters(0x10, '16: Write Multiple Registers'),
+  reportSlaveId(0x11, '17: Report Slave ID'),
+  maskWriteRegister(0x16, '22: Mask Write Register'),
+  readWriteMultipleRegisters(0x17, '23: Read/Write Multiple Registers');
 
   final int code;
   final String label;
@@ -33,16 +33,16 @@ enum ModbusFunctionCode {
 
 /// Modbus Exception Codes (0x80 + Function Code)
 enum ModbusExceptionCode {
-  illegalFunction(0x01, '非法功能码 (Illegal Function)'),
-  illegalDataAddress(0x02, '非法数据地址 (Illegal Data Address)'),
-  illegalDataValue(0x03, '非法数据值 (Illegal Data Value)'),
-  slaveDeviceFailure(0x04, '从站设备故障 (Slave Device Failure)'),
-  acknowledge(0x05, '确认 (Acknowledge)'),
-  slaveDeviceBusy(0x06, '从机忙 (Slave Device Busy)'),
-  negativeAcknowledge(0x07, '否定应答 (Negative Acknowledge)'),
-  memoryParityError(0x08, '内存奇偶校验错误 (Memory Parity Error)'),
-  gatewayPathUnavailable(0x0A, '网关路径不可用 (Gateway Path Unavailable)'),
-  gatewayTargetFailed(0x0B, '网关目标设备未响应 (Gateway Target Device Failed to Respond)');
+  illegalFunction(0x01, 'Illegal Function'),
+  illegalDataAddress(0x02, 'Illegal Data Address'),
+  illegalDataValue(0x03, 'Illegal Data Value'),
+  slaveDeviceFailure(0x04, 'Slave Device Failure'),
+  acknowledge(0x05, 'Acknowledge'),
+  slaveDeviceBusy(0x06, 'Slave Device Busy'),
+  negativeAcknowledge(0x07, 'Negative Acknowledge'),
+  memoryParityError(0x08, 'Memory Parity Error'),
+  gatewayPathUnavailable(0x0A, 'Gateway Path Unavailable'),
+  gatewayTargetFailed(0x0B, 'Gateway Target Device Failed to Respond');
 
   final int code;
   final String description;

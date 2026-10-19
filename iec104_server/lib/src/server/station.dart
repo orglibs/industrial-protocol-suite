@@ -1,4 +1,5 @@
 import 'dart:math';
+import '../i18n/app_i18n.dart';
 import '../protocol/asdu.dart';
 import '../protocol/asdu_types.dart';
 import 'ease_functions.dart';
@@ -8,6 +9,7 @@ class StationPoint {
   final int ioa;
   final AsduTypeId typeId;
   String name;
+  String? nameKey;
   dynamic value;
   QualityDescriptor quality;
   DateTime lastUpdated;
@@ -24,6 +26,7 @@ class StationPoint {
     required this.ioa,
     required this.typeId,
     required this.name,
+    this.nameKey,
     required this.value,
     this.quality = QualityDescriptor.good,
     DateTime? lastUpdated,
@@ -35,11 +38,16 @@ class StationPoint {
   })  : lastUpdated = lastUpdated ?? DateTime.now(),
         _elapsedTime = 0.0;
 
+  String get displayName => (nameKey != null && nameKey!.isNotEmpty)
+      ? AppI18n.instance.t(nameKey!)
+      : name;
+
   String get displayValue => toInformationObject().displayValue;
 
   /// Clones this point
   StationPoint copyWith({
     String? name,
+    String? nameKey,
     dynamic value,
     QualityDescriptor? quality,
     bool? autoChangeEnabled,
@@ -52,6 +60,7 @@ class StationPoint {
       ioa: ioa,
       typeId: typeId,
       name: name ?? this.name,
+      nameKey: nameKey ?? this.nameKey,
       value: value ?? this.value,
       quality: quality ?? this.quality,
       lastUpdated: DateTime.now(),
@@ -222,6 +231,7 @@ class StationPoint {
         'ioa': ioa,
         'typeId': typeId.id,
         'name': name,
+        'nameKey': nameKey,
         'value': value,
         'quality': quality.toByte(),
         'autoChangeEnabled': autoChangeEnabled,
@@ -237,10 +247,34 @@ class StationPoint {
       (e) => e.name == json['easeType'],
       orElse: () => EaseType.sine,
     );
+    final ioa = json['ioa'] as int;
+    String? nameKey = json['nameKey'] as String?;
+    if (nameKey == null) {
+      if (ioa == 1) nameKey = 'point_breaker_101';
+      else if (ioa == 2) nameKey = 'point_disconnector_1011';
+      else if (ioa == 3) nameKey = 'point_earth_switch_101';
+      else if (ioa == 4) nameKey = 'point_station_alarm';
+      else if (ioa == 101) nameKey = 'point_breaker_dp';
+      else if (ioa == 102) nameKey = 'point_tap_changer_dp';
+      else if (ioa == 0x4001) nameKey = 'point_volt_a';
+      else if (ioa == 0x4002) nameKey = 'point_volt_b';
+      else if (ioa == 0x4003) nameKey = 'point_volt_c';
+      else if (ioa == 0x4004) nameKey = 'point_curr_a';
+      else if (ioa == 0x4005) nameKey = 'point_active_power';
+      else if (ioa == 0x4006) nameKey = 'point_grid_freq';
+      else if (ioa == 16400) nameKey = 'point_norm_load';
+      else if (ioa == 16401) nameKey = 'point_norm_temp';
+      else if (ioa == 16500) nameKey = 'point_oil_temp';
+      else if (ioa == 16501) nameKey = 'point_tap_pos';
+      else if (ioa == 0x6401) nameKey = 'point_energy_active_fwd';
+      else if (ioa == 0x6402) nameKey = 'point_energy_active_rev';
+    }
+
     return StationPoint(
-      ioa: json['ioa'] as int,
+      ioa: ioa,
       typeId: typeId,
       name: json['name'] as String? ?? 'Point',
+      nameKey: nameKey,
       value: json['value'],
       quality: QualityDescriptor.fromByte(json['quality'] as int? ?? 0),
       autoChangeEnabled: json['autoChangeEnabled'] as bool? ?? false,
@@ -256,14 +290,20 @@ class StationPoint {
 class Station {
   int commonAddress; // COA (1..65535, usually 1)
   String name;
+  String? nameKey;
   final Map<int, StationPoint> _points = {};
   void Function()? onDataChanged;
 
   Station({
     required this.commonAddress,
     required this.name,
+    this.nameKey,
     this.onDataChanged,
   });
+
+  String get displayName => (nameKey != null && nameKey!.isNotEmpty)
+      ? AppI18n.instance.t(nameKey!)
+      : name;
 
   Map<int, StationPoint> get points => Map.unmodifiable(_points);
   List<StationPoint> get pointList => _points.values.toList()..sort((a, b) => a.ioa.compareTo(b.ioa));
@@ -358,56 +398,56 @@ class Station {
 
   void applyTemplate(String templateKey) {
     if (templateKey == 'distribution') {
-      // 典型配网模板: 16 YX + 8 YC + 4 DP + 2 YM
+      // Distribution Substation Template: 16 YX + 8 YC + 4 DP + 2 YM
       batchGeneratePoints(
         typeId: AsduTypeId.mSpNa1,
         startIoa: 1,
         count: 16,
-        prefix: '配电开关分合位置',
+        prefix: 'Distribution Switch Position',
       );
       batchGeneratePoints(
         typeId: AsduTypeId.mDpNa1,
         startIoa: 1001,
         count: 4,
-        prefix: '出线隔离刀闸双位置',
+        prefix: 'Feeder Disconnector',
       );
       batchGeneratePoints(
         typeId: AsduTypeId.mMeNc1,
         startIoa: 16385,
         count: 8,
-        prefix: '出线遥测负荷电压电流',
+        prefix: 'Feeder Measurand',
       );
       batchGeneratePoints(
         typeId: AsduTypeId.mItNa1,
         startIoa: 25601,
         count: 2,
-        prefix: '关口进线电能量表',
+        prefix: 'Energy Meter',
       );
     } else if (templateKey == 'substation') {
-      // 典型变电站模板: 32 YX + 16 YC + 8 DP + 4 YM
+      // 110kV Substation Template: 32 YX + 16 YC + 8 DP + 4 YM
       batchGeneratePoints(
         typeId: AsduTypeId.mSpNa1,
         startIoa: 1,
         count: 32,
-        prefix: '站内断路器位置遥信',
+        prefix: 'Station Breaker',
       );
       batchGeneratePoints(
         typeId: AsduTypeId.mDpNa1,
         startIoa: 1001,
         count: 8,
-        prefix: '接地刀闸双点遥信',
+        prefix: 'Earth Switch',
       );
       batchGeneratePoints(
         typeId: AsduTypeId.mMeNc1,
         startIoa: 16385,
         count: 16,
-        prefix: '110kV母线电压频率遥测',
+        prefix: '110kV Bus Measurand',
       );
       batchGeneratePoints(
         typeId: AsduTypeId.mItNa1,
         startIoa: 25601,
         count: 4,
-        prefix: '主变侧关口电能量',
+        prefix: 'Transformer Energy Meter',
       );
     }
   }
@@ -419,54 +459,65 @@ class Station {
   /// - 2 Normalized Telemetry (遥测归一化)
   /// - 2 Scaled Telemetry (遥测标度化)
   /// - 2 Integrated Totals (遥脉电能量)
-  factory Station.createDefault({int commonAddress = 1, String name = '110kV 变电站 #1'}) {
-    final station = Station(commonAddress: commonAddress, name: name);
+  factory Station.createDefault({int commonAddress = 1, String name = '110kV Substation #1', String? nameKey}) {
+    final station = Station(
+      commonAddress: commonAddress,
+      name: name,
+      nameKey: nameKey ?? 'preset_station_110kv',
+    );
 
-    // 1. Single-point (遥信 M_SP_NA_1 / Type 1) - starting at IOA 1 (0x000001)
+    // 1. Single-point (M_SP_NA_1 / Type 1) - starting at IOA 1 (0x000001)
     station.addPoint(StationPoint(
       ioa: 1,
       typeId: AsduTypeId.mSpNa1,
-      name: '101断路器合闸状态 (Breaker 101)',
+      name: 'Breaker 101 Status',
+      nameKey: 'point_breaker_101',
       value: true,
     ));
     station.addPoint(StationPoint(
       ioa: 2,
       typeId: AsduTypeId.mSpNa1,
-      name: '1011隔离开关分合 (Disconnector 1011)',
+      name: 'Disconnector 1011 Status',
+      nameKey: 'point_disconnector_1011',
       value: true,
     ));
     station.addPoint(StationPoint(
       ioa: 3,
       typeId: AsduTypeId.mSpNa1,
-      name: '101接地刀闸状态 (Earth Switch 101)',
+      name: 'Earth Switch 101 Status',
+      nameKey: 'point_earth_switch_101',
       value: false,
     ));
     station.addPoint(StationPoint(
       ioa: 4,
       typeId: AsduTypeId.mSpNa1,
-      name: '全站事故总告警 (Station Alarm)',
+      name: 'Station General Alarm',
+      nameKey: 'point_station_alarm',
       value: false,
     ));
 
-    // 2. Double-point (双点遥信 M_DP_NA_1 / Type 3) - starting at IOA 101
+    // 2. Double-point (M_DP_NA_1 / Type 3) - starting at IOA 101
     station.addPoint(StationPoint(
       ioa: 101,
       typeId: AsduTypeId.mDpNa1,
-      name: '主变101开关双位置 (Breaker Double Point)',
-      value: 2, // 10 = 合/ON
+      name: 'Breaker 101 Double Point',
+      nameKey: 'point_breaker_dp',
+      value: 2, // 10 = ON
     ));
     station.addPoint(StationPoint(
       ioa: 102,
       typeId: AsduTypeId.mDpNa1,
-      name: '有载调压开关状态 (Tap Changer Double)',
+      name: 'Tap Changer Double Point',
+      nameKey: 'point_tap_changer_dp',
       value: 2,
     ));
 
-    // 3. Float Telemetry (遥测短浮点 M_ME_NC_1 / Type 13) - starting at IOA 16385 (0x4001)
+    // 3. Float Telemetry (M_ME_NC_1 / Type 13) - starting at IOA 16385 (0x4001)
     station.addPoint(StationPoint(
       ioa: 0x4001,
       typeId: AsduTypeId.mMeNc1,
-      name: 'A相电压 Ua (kV)',
+      name: 'Phase A Voltage Ua (kV)',
+      nameKey: 'point_volt_a',
       value: 10.45,
       autoChangeEnabled: true,
       easeType: EaseType.sine,
@@ -477,7 +528,8 @@ class Station {
     station.addPoint(StationPoint(
       ioa: 0x4002,
       typeId: AsduTypeId.mMeNc1,
-      name: 'B相电压 Ub (kV)',
+      name: 'Phase B Voltage Ub (kV)',
+      nameKey: 'point_volt_b',
       value: 10.48,
       autoChangeEnabled: true,
       easeType: EaseType.sine,
@@ -488,7 +540,8 @@ class Station {
     station.addPoint(StationPoint(
       ioa: 0x4003,
       typeId: AsduTypeId.mMeNc1,
-      name: 'C相电压 Uc (kV)',
+      name: 'Phase C Voltage Uc (kV)',
+      nameKey: 'point_volt_c',
       value: 10.42,
       autoChangeEnabled: true,
       easeType: EaseType.sine,
@@ -499,7 +552,8 @@ class Station {
     station.addPoint(StationPoint(
       ioa: 0x4004,
       typeId: AsduTypeId.mMeNc1,
-      name: 'A相电流 Ia (A)',
+      name: 'Phase A Current Ia (A)',
+      nameKey: 'point_curr_a',
       value: 320.5,
       autoChangeEnabled: true,
       easeType: EaseType.randomWalk,
@@ -510,7 +564,8 @@ class Station {
     station.addPoint(StationPoint(
       ioa: 0x4005,
       typeId: AsduTypeId.mMeNc1,
-      name: '有功功率 P (MW)',
+      name: 'Active Power P (MW)',
+      nameKey: 'point_active_power',
       value: 5.76,
       autoChangeEnabled: true,
       easeType: EaseType.rampUp,
@@ -521,7 +576,8 @@ class Station {
     station.addPoint(StationPoint(
       ioa: 0x4006,
       typeId: AsduTypeId.mMeNc1,
-      name: '电网频率 f (Hz)',
+      name: 'Grid Frequency f (Hz)',
+      nameKey: 'point_grid_freq',
       value: 50.02,
       autoChangeEnabled: true,
       easeType: EaseType.sine,
@@ -530,39 +586,44 @@ class Station {
       easePeriodSeconds: 10.0,
     ));
 
-    // 4. Normalized Telemetry (归一化 M_ME_NA_1 / Type 9) - starting at IOA 16400
+    // 4. Normalized Telemetry (M_ME_NA_1 / Type 9) - starting at IOA 16400
     station.addPoint(StationPoint(
       ioa: 16400,
       typeId: AsduTypeId.mMeNa1,
-      name: '母线负荷率 (Normalized Load)',
+      name: 'Bus Load Rate (Normalized)',
+      nameKey: 'point_norm_load',
       value: 0.65,
     ));
     station.addPoint(StationPoint(
       ioa: 16401,
       typeId: AsduTypeId.mMeNa1,
-      name: '变压器温升 (Normalized Temp)',
+      name: 'Transformer Temp Rise (Normalized)',
+      nameKey: 'point_norm_temp',
       value: 0.42,
     ));
 
-    // 5. Scaled Telemetry (标度化 M_ME_NB_1 / Type 11) - starting at IOA 16500
+    // 5. Scaled Telemetry (M_ME_NB_1 / Type 11) - starting at IOA 16500
     station.addPoint(StationPoint(
       ioa: 16500,
       typeId: AsduTypeId.mMeNb1,
-      name: '变压器油温 (°C)',
+      name: 'Transformer Oil Temp (°C)',
+      nameKey: 'point_oil_temp',
       value: 68,
     ));
     station.addPoint(StationPoint(
       ioa: 16501,
       typeId: AsduTypeId.mMeNb1,
-      name: '主变档位 (Tap Position)',
+      name: 'Tap Position',
+      nameKey: 'point_tap_pos',
       value: 5,
     ));
 
-    // 6. Integrated Totals (电能量遥脉 M_IT_NA_1 / Type 15) - starting at IOA 25601 (0x6401)
+    // 6. Integrated Totals (M_IT_NA_1 / Type 15) - starting at IOA 25601 (0x6401)
     station.addPoint(StationPoint(
       ioa: 0x6401,
       typeId: AsduTypeId.mItNa1,
-      name: '正向有功总电能 (Active Energy + kWh)',
+      name: 'Active Energy + (kWh)',
+      nameKey: 'point_energy_active_fwd',
       value: 125890,
       autoChangeEnabled: true,
       easePeriodSeconds: 5.0,
@@ -570,23 +631,235 @@ class Station {
     station.addPoint(StationPoint(
       ioa: 0x6402,
       typeId: AsduTypeId.mItNa1,
-      name: '反向有功总电能 (Active Energy - kWh)',
+      name: 'Active Energy - (kWh)',
+      nameKey: 'point_energy_active_rev',
       value: 4520,
     ));
 
     return station;
   }
 
+  factory Station.createDistributionStation({int commonAddress = 2, String name = '10kV Distribution Station #2', String? nameKey}) {
+    final station = Station(
+      commonAddress: commonAddress,
+      name: name,
+      nameKey: nameKey ?? 'preset_station_10kv',
+    );
+    station.addPoint(StationPoint(
+      ioa: 1,
+      typeId: AsduTypeId.mSpNa1,
+      name: 'Breaker 101 Status',
+      nameKey: 'point_breaker_101',
+      value: true,
+    ));
+    station.addPoint(StationPoint(
+      ioa: 2,
+      typeId: AsduTypeId.mSpNa1,
+      name: 'Disconnector 1011 Status',
+      nameKey: 'point_disconnector_1011',
+      value: true,
+    ));
+    station.addPoint(StationPoint(
+      ioa: 101,
+      typeId: AsduTypeId.mDpNa1,
+      name: 'Breaker 101 Double Point',
+      nameKey: 'point_breaker_dp',
+      value: 2,
+    ));
+    station.addPoint(StationPoint(
+      ioa: 0x4001,
+      typeId: AsduTypeId.mMeNc1,
+      name: 'Phase A Voltage Ua (kV)',
+      nameKey: 'point_volt_a',
+      value: 10.38,
+      autoChangeEnabled: true,
+      easeType: EaseType.sine,
+      easeMin: 10.1,
+      easeMax: 10.7,
+      easePeriodSeconds: 12.0,
+    ));
+    station.addPoint(StationPoint(
+      ioa: 0x4004,
+      typeId: AsduTypeId.mMeNc1,
+      name: 'Phase A Current Ia (A)',
+      nameKey: 'point_curr_a',
+      value: 185.2,
+      autoChangeEnabled: true,
+      easeType: EaseType.randomWalk,
+      easeMin: 150.0,
+      easeMax: 220.0,
+      easePeriodSeconds: 10.0,
+    ));
+    station.addPoint(StationPoint(
+      ioa: 0x6401,
+      typeId: AsduTypeId.mItNa1,
+      name: 'Active Energy + (kWh)',
+      nameKey: 'point_energy_active_fwd',
+      value: 68420,
+      autoChangeEnabled: true,
+      easePeriodSeconds: 6.0,
+    ));
+    return station;
+  }
+
+  factory Station.createSolarStation({int commonAddress = 3, String name = '35kV Solar Farm Station #3', String? nameKey}) {
+    final station = Station(
+      commonAddress: commonAddress,
+      name: name,
+      nameKey: nameKey ?? 'preset_station_solar',
+    );
+    station.addPoint(StationPoint(
+      ioa: 1,
+      typeId: AsduTypeId.mSpNa1,
+      name: 'PV Inverter Running Status',
+      nameKey: 'point_pv_inverter_run',
+      value: true,
+    ));
+    station.addPoint(StationPoint(
+      ioa: 2,
+      typeId: AsduTypeId.mSpNa1,
+      name: 'PV Grid Breaker Status',
+      nameKey: 'point_pv_grid_breaker',
+      value: true,
+    ));
+    station.addPoint(StationPoint(
+      ioa: 0x4001,
+      typeId: AsduTypeId.mMeNc1,
+      name: 'Solar Irradiance (W/m²)',
+      nameKey: 'point_pv_irradiance',
+      value: 860.0,
+      autoChangeEnabled: true,
+      easeType: EaseType.sine,
+      easeMin: 200.0,
+      easeMax: 1000.0,
+      easePeriodSeconds: 20.0,
+    ));
+    station.addPoint(StationPoint(
+      ioa: 0x4002,
+      typeId: AsduTypeId.mMeNc1,
+      name: 'PV Power Output (kW)',
+      nameKey: 'point_pv_power',
+      value: 465.5,
+      autoChangeEnabled: true,
+      easeType: EaseType.sine,
+      easeMin: 50.0,
+      easeMax: 500.0,
+      easePeriodSeconds: 20.0,
+    ));
+    station.addPoint(StationPoint(
+      ioa: 0x6401,
+      typeId: AsduTypeId.mItNa1,
+      name: 'PV Daily Yield (kWh)',
+      nameKey: 'point_pv_daily_yield',
+      value: 3250,
+      autoChangeEnabled: true,
+      easePeriodSeconds: 10.0,
+    ));
+    return station;
+  }
+
+  factory Station.createStorageStation({int commonAddress = 4, String name = 'Smart Energy Storage BMS #4', String? nameKey}) {
+    final station = Station(
+      commonAddress: commonAddress,
+      name: name,
+      nameKey: nameKey ?? 'preset_station_bms',
+    );
+    station.addPoint(StationPoint(
+      ioa: 1,
+      typeId: AsduTypeId.mSpNa1,
+      name: 'BMS Main Contactor Status',
+      nameKey: 'point_bms_cluster_switch',
+      value: true,
+    ));
+    station.addPoint(StationPoint(
+      ioa: 0x4001,
+      typeId: AsduTypeId.mMeNc1,
+      name: 'BMS State of Charge SOC (%)',
+      nameKey: 'point_bms_soc',
+      value: 78.5,
+      autoChangeEnabled: true,
+      easeType: EaseType.sine,
+      easeMin: 20.0,
+      easeMax: 95.0,
+      easePeriodSeconds: 30.0,
+    ));
+    station.addPoint(StationPoint(
+      ioa: 0x4002,
+      typeId: AsduTypeId.mMeNc1,
+      name: 'BMS State of Health SOH (%)',
+      nameKey: 'point_bms_soh',
+      value: 98.2,
+    ));
+    station.addPoint(StationPoint(
+      ioa: 0x4003,
+      typeId: AsduTypeId.mMeNc1,
+      name: 'BMS Charge/Discharge Power (kW)',
+      nameKey: 'point_bms_power',
+      value: 250.0,
+      autoChangeEnabled: true,
+      easeType: EaseType.sine,
+      easeMin: -500.0,
+      easeMax: 500.0,
+      easePeriodSeconds: 25.0,
+    ));
+    station.addPoint(StationPoint(
+      ioa: 0x4004,
+      typeId: AsduTypeId.mMeNc1,
+      name: 'BMS Cell Max Temperature (°C)',
+      nameKey: 'point_bms_cell_temp',
+      value: 28.5,
+      autoChangeEnabled: true,
+      easeType: EaseType.sine,
+      easeMin: 24.0,
+      easeMax: 34.0,
+      easePeriodSeconds: 15.0,
+    ));
+    station.addPoint(StationPoint(
+      ioa: 0x6401,
+      typeId: AsduTypeId.mItNa1,
+      name: 'BMS Total Charge (kWh)',
+      nameKey: 'point_bms_total_charge',
+      value: 45280,
+      autoChangeEnabled: true,
+      easePeriodSeconds: 8.0,
+    ));
+    station.addPoint(StationPoint(
+      ioa: 0x6402,
+      typeId: AsduTypeId.mItNa1,
+      name: 'BMS Total Discharge (kWh)',
+      nameKey: 'point_bms_total_discharge',
+      value: 41200,
+    ));
+    return station;
+  }
+
   Map<String, dynamic> toJson() => {
         'commonAddress': commonAddress,
         'name': name,
+        'nameKey': nameKey,
         'points': _points.values.map((p) => p.toJson()).toList(),
       };
 
   factory Station.fromJson(Map<String, dynamic> json) {
+    final commonAddress = json['commonAddress'] as int? ?? 1;
+    final name = json['name'] as String? ?? 'Station';
+    String? nameKey = json['nameKey'] as String?;
+    if (nameKey == null) {
+      if (name.contains('110kV') || commonAddress == 1) {
+        nameKey = 'preset_station_110kv';
+      } else if (name.contains('10kV') || commonAddress == 2) {
+        nameKey = 'preset_station_10kv';
+      } else if (name.contains('光伏') || name.contains('Solar') || commonAddress == 3) {
+        nameKey = 'preset_station_solar';
+      } else if (name.contains('储能') || name.contains('BMS') || commonAddress == 4) {
+        nameKey = 'preset_station_bms';
+      }
+    }
+
     final station = Station(
-      commonAddress: json['commonAddress'] as int? ?? 1,
-      name: json['name'] as String? ?? 'Station',
+      commonAddress: commonAddress,
+      name: name,
+      nameKey: nameKey,
     );
     final pts = json['points'] as List<dynamic>? ?? [];
     for (final p in pts) {

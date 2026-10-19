@@ -5,10 +5,12 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:iec61850_client/src/models/client_variable_model.dart';
 import 'package:iec61850_client/src/models/connection_config.dart';
+import 'package:iec61850_client/src/models/dictionary_service.dart';
 import 'package:iec61850_client/src/models/scl_models.dart';
 import 'package:iec61850_client/src/models/scl_parser.dart';
 import 'package:iec61850_client/src/protocol/goose_receiver.dart';
 import 'package:iec61850_client/src/protocol/iso_acse_mms.dart';
+import 'package:iec61850_client/src/i18n/app_i18n.dart';
 import 'package:iec61850_client/src/protocol/tpkt_cotp.dart';
 
 void main() {
@@ -242,6 +244,344 @@ void main() {
       expect(restored.localTsap, cfg.localTsap);
       expect(restored.remoteTsap, cfg.remoteTsap);
       expect(restored.autoConnect, isTrue);
+    });
+
+    test('ConnectionConfig demo data reactively updates displayName via nameKey', () {
+      final cfg = ConnectionConfig(
+        id: 'conn_default',
+        name: 'Local Test Server (127.0.0.1:102)',
+        nameKey: 'preset_iec61850_client_conn',
+      );
+
+      // Chinese
+      AppI18n.instance.setLanguage(AppLanguage.zhCN);
+      expect(cfg.displayName, contains('本地测试连接'));
+
+      // English
+      AppI18n.instance.setLanguage(AppLanguage.enUS);
+      expect(cfg.displayName, contains('Local Test Connection'));
+
+      // German
+      AppI18n.instance.setLanguage(AppLanguage.deDE);
+      expect(cfg.displayName, contains('Lokale Testverbindung'));
+
+      // Deserialization with fallback inference
+      final legacy = ConnectionConfig.fromJson({
+        'Id': 'conn_default',
+        'Name': 'Local Test Server (127.0.0.1:102)',
+        'Ip': '127.0.0.1',
+      });
+      expect(legacy.nameKey, equals('preset_iec61850_client_conn'));
+      expect(legacy.displayName, contains('Lokale Testverbindung'));
+    });
+
+    test('ConnectionConfig.createDefaultConnections returns 3 presets with multilingual support', () {
+      final defaults = ConnectionConfig.createDefaultConnections();
+      expect(defaults.length, 3);
+
+      final bay = defaults[0];
+      final xfmr = defaults[1];
+      final goose = defaults[2];
+
+      expect(bay.id, 'conn_bay_controller');
+      expect(bay.port, 102);
+      expect(xfmr.id, 'conn_transformer_ied');
+      expect(xfmr.port, 10102);
+      expect(goose.id, 'conn_goose_ied');
+      expect(goose.port, 20102);
+
+      // Chinese verification
+      AppI18n.instance.setLanguage(AppLanguage.zhCN);
+      expect(bay.displayName, contains('变电站间隔控制器'));
+      expect(xfmr.displayName, contains('主变测控保护终端'));
+      expect(goose.displayName, contains('智能配网GOOSE终端'));
+
+      // English verification
+      AppI18n.instance.setLanguage(AppLanguage.enUS);
+      expect(bay.displayName, contains('Substation Bay Controller'));
+      expect(xfmr.displayName, contains('Main Transformer Protection IED'));
+      expect(goose.displayName, contains('Distribution Automation GOOSE IED'));
+
+      // Japanese verification
+      AppI18n.instance.setLanguage(AppLanguage.jaJP);
+      expect(bay.displayName, contains('変電所ベイコントローラ'));
+      expect(xfmr.displayName, contains('主変圧器保護制御IED'));
+      expect(goose.displayName, contains('スマート配電GOOSE端末'));
+
+      // copyWith verification
+      final copied = bay.copyWith(name: 'Copied Bay', port: 10105);
+      expect(copied.name, 'Copied Bay');
+      expect(copied.port, 10105);
+      expect(copied.id, bay.id);
+      expect(copied.localTsap, bay.localTsap);
+    });
+  });
+
+  group('ClientVariableModel nameKey & Multilingual Tests', () {
+    test('ClientVariableModel displayName updates dynamically with language switch', () {
+      final v = ClientVariableModel(
+        reference: 'simpleIO/GenericIO/GGIO1.AnIn1.mag.f',
+        iedName: 'simpleIO',
+        ldInst: 'GenericIO',
+        lnName: 'GGIO1',
+        doName: 'AnIn1',
+        daName: 'mag.f',
+        fc: FunctionalConstraint.mx,
+        type: IecBasicType.float32,
+        nameKey: 'point_volt_a',
+      );
+
+      // Chinese
+      AppI18n.instance.setLanguage(AppLanguage.zhCN);
+      expect(v.displayName, contains('A相电压'));
+
+      // English
+      AppI18n.instance.setLanguage(AppLanguage.enUS);
+      expect(v.displayName, contains('Phase A Voltage'));
+
+      // German
+      AppI18n.instance.setLanguage(AppLanguage.deDE);
+      expect(v.displayName, contains('Phase A Spannung'));
+
+      // Japanese
+      AppI18n.instance.setLanguage(AppLanguage.jaJP);
+      expect(v.displayName, contains('A相電圧'));
+
+      // Russian
+      AppI18n.instance.setLanguage(AppLanguage.ruRU);
+      expect(v.displayName, contains('Напряжение фазы A'));
+    });
+
+    test('ClientVariableModel JSON serialization preserves Name and NameKey', () {
+      final v = ClientVariableModel(
+        reference: 'simpleIO/GenericIO/GGIO1.SPCSO1.stVal',
+        iedName: 'simpleIO',
+        ldInst: 'GenericIO',
+        lnName: 'GGIO1',
+        doName: 'SPCSO1',
+        daName: 'stVal',
+        fc: FunctionalConstraint.st,
+        type: IecBasicType.boolean,
+        name: 'Custom Switch 1',
+        nameKey: 'point_feeder_switch_1',
+      );
+
+      final json = v.toJson();
+      expect(json['Name'], equals('Custom Switch 1'));
+      expect(json['NameKey'], equals('point_feeder_switch_1'));
+
+      final restored = ClientVariableModel.fromJson(json);
+      expect(restored.name, equals('Custom Switch 1'));
+      expect(restored.nameKey, equals('point_feeder_switch_1'));
+
+      AppI18n.instance.setLanguage(AppLanguage.zhCN);
+      expect(restored.displayName, contains('1#进线开关'));
+    });
+
+    test('ClientVariableModel.fromJson automatically infers nameKey when omitted', () {
+      final jsonLegacy = {
+        'Reference': 'IED1PROT/PTRC1.Tr.general',
+        'IedName': 'IED1',
+        'LdInst': 'PROT',
+        'LnName': 'PTRC1',
+        'DoName': 'Tr',
+        'DaName': 'general',
+        'FC': 'ST',
+        'Type': 'boolean',
+      };
+
+      final restored = ClientVariableModel.fromJson(jsonLegacy);
+      expect(restored.nameKey, equals('point_protection_trip'));
+
+      AppI18n.instance.setLanguage(AppLanguage.zhCN);
+      expect(restored.displayName, contains('保护总动作跳闸'));
+
+      AppI18n.instance.setLanguage(AppLanguage.enUS);
+      expect(restored.displayName, contains('Protection Trip Action'));
+    });
+
+    test('SclParser parses sample ICDs with nameKey populated on sample variables', () {
+      final basicIoFile = File('assets/examples/server_example_basic_io.icd');
+      expect(basicIoFile.existsSync(), isTrue);
+
+      final result = SclParser.parse(basicIoFile.readAsStringSync());
+      expect(result.variables.isNotEmpty, isTrue);
+
+      // Check SPCSO1 has point_feeder_switch_1
+      final spcso1 = result.variables.firstWhere(
+        (v) => v.lnName == 'GGIO1' && v.doName == 'SPCSO1' && v.daName == 'stVal',
+      );
+      expect(spcso1.nameKey, equals('point_feeder_switch_1'));
+
+      // Check AnIn1 has point_volt_a
+      final anIn1 = result.variables.firstWhere(
+        (v) => v.lnName == 'GGIO1' && v.doName == 'AnIn1' && v.daName == 'mag.f',
+      );
+      expect(anIn1.nameKey, equals('point_volt_a'));
+
+      // Check AnIn4 has point_active_power
+      final anIn4 = result.variables.firstWhere(
+        (v) => v.lnName == 'GGIO1' && v.doName == 'AnIn4' && v.daName == 'mag.f',
+      );
+      expect(anIn4.nameKey, equals('point_active_power'));
+
+      // Verify dynamic multilingual translations
+      AppI18n.instance.setLanguage(AppLanguage.zhCN);
+      expect(spcso1.displayName, contains('1#进线开关'));
+      expect(anIn1.displayName, contains('A相电压'));
+      expect(anIn4.displayName, contains('有功功率'));
+
+      AppI18n.instance.setLanguage(AppLanguage.enUS);
+      expect(spcso1.displayName, contains('Feeder #1 Switch'));
+      expect(anIn1.displayName, contains('Phase A Voltage'));
+      expect(anIn4.displayName, contains('Active Power'));
+    });
+
+    test('SclParser parses GOOSE sample ICD with protection trip nameKey', () {
+      final gooseFile = File('assets/examples/server_example_goose.icd');
+      expect(gooseFile.existsSync(), isTrue);
+
+      final result = SclParser.parse(gooseFile.readAsStringSync());
+      final tripVar = result.variables.firstWhere(
+        (v) => v.lnName == 'PTRC1' && v.doName == 'Tr' && v.daName == 'general',
+      );
+      expect(tripVar.nameKey, equals('point_protection_trip'));
+
+      AppI18n.instance.setLanguage(AppLanguage.zhCN);
+      expect(tripVar.displayName, contains('保护总动作跳闸'));
+
+      AppI18n.instance.setLanguage(AppLanguage.enUS);
+      expect(tripVar.displayName, contains('Protection Trip Action'));
+    });
+  });
+
+  group('IEC 61850 Model Internationalization Tests', () {
+    test('DictionaryService and IecDesc switch description language with AppI18n', () {
+      final dict = DictionaryService.instance;
+      dict.loadSync();
+
+      // 1. Logical Node lookup (supports CSWI and indexed CSWI1)
+      AppI18n.instance.setLanguage(AppLanguage.zhCN);
+      final lnZh = dict.lookupLn('CSWI1');
+      expect(lnZh, isNotNull);
+      expect(lnZh, contains('开关控制'));
+
+      AppI18n.instance.setLanguage(AppLanguage.enUS);
+      final lnEn = dict.lookupLn('CSWI1');
+      expect(lnEn, isNotNull);
+      expect(lnEn, contains('Switch controller'));
+
+      // 2. Data Object lookup (supports SPCSO1 and indexed SPCSO2 normalization)
+      AppI18n.instance.setLanguage(AppLanguage.zhCN);
+      final doZh = dict.lookupDo('SPCSO2');
+      expect(doZh, isNotNull);
+      expect(doZh, contains('单点可控状态输出'));
+
+      AppI18n.instance.setLanguage(AppLanguage.enUS);
+      final doEn = dict.lookupDo('SPCSO2');
+      expect(doEn, isNotNull);
+      expect(doEn, contains('Single point'));
+      expect(doEn, contains('status output'));
+
+      // 3. CDC lookup
+      AppI18n.instance.setLanguage(AppLanguage.zhCN);
+      final cdcZh = dict.lookupCdc('MV');
+      expect(cdcZh, isNotNull);
+      expect(cdcZh, contains('测量值'));
+
+      AppI18n.instance.setLanguage(AppLanguage.enUS);
+      final cdcEn = dict.lookupCdc('MV');
+      expect(cdcEn, isNotNull);
+      expect(cdcEn?.toLowerCase(), contains('measured value'));
+    });
+
+    test('ClientVariableModel translates legacy Chinese name and desc dynamically across locales', () {
+      // Variable with Chinese name and NO explicit nameKey
+      final vSwitch = ClientVariableModel(
+        reference: 'IED1/CTRL/GGIO1.SPCSO1.stVal',
+        iedName: 'IED1',
+        ldInst: 'CTRL',
+        lnName: 'GGIO1',
+        doName: 'SPCSO1',
+        daName: 'stVal',
+        fc: FunctionalConstraint.st,
+        type: IecBasicType.boolean,
+        name: '1#进线开关',
+      );
+
+      // In Chinese, shows Chinese name
+      AppI18n.instance.setLanguage(AppLanguage.zhCN);
+      expect(vSwitch.displayName, contains('1#进线开关'));
+
+      // In English, translates Chinese name to English
+      AppI18n.instance.setLanguage(AppLanguage.enUS);
+      expect(vSwitch.displayName, contains('Feeder #1 Switch'));
+
+      // In Japanese, translates Chinese name to Japanese
+      AppI18n.instance.setLanguage(AppLanguage.jaJP);
+      expect(vSwitch.displayName, contains('1#フィーダ開閉器'));
+
+      // Variable with Chinese desc and NO name/nameKey
+      final vPower = ClientVariableModel(
+        reference: 'IED1/MEAS/MMXU1.TotW.mag.f',
+        iedName: 'IED1',
+        ldInst: 'MEAS',
+        lnName: 'MMXU1',
+        doName: 'TotW',
+        daName: 'mag.f',
+        fc: FunctionalConstraint.mx,
+        type: IecBasicType.float32,
+        desc: '有功功率',
+      );
+
+      AppI18n.instance.setLanguage(AppLanguage.zhCN);
+      expect(vPower.displayName, contains('有功功率'));
+      expect(vPower.displayDesc, contains('有功功率'));
+
+      AppI18n.instance.setLanguage(AppLanguage.enUS);
+      expect(vPower.displayName, contains('Active Power'));
+      expect(vPower.displayDesc, contains('Active Power'));
+    });
+
+    test('ConnectionConfig with legacy Chinese name translates across locales', () {
+      final conn = ConnectionConfig(
+        id: 'conn_custom_substation',
+        name: '变电站间隔控制器',
+      );
+
+      // In Chinese
+      AppI18n.instance.setLanguage(AppLanguage.zhCN);
+      expect(conn.displayName, contains('变电站间隔控制器'));
+
+      // In English
+      AppI18n.instance.setLanguage(AppLanguage.enUS);
+      expect(conn.displayName, contains('Substation Bay Controller'));
+
+      // In Japanese
+      AppI18n.instance.setLanguage(AppLanguage.jaJP);
+      expect(conn.displayName, contains('変電所ベイコントローラ'));
+
+      // In German
+      AppI18n.instance.setLanguage(AppLanguage.deDE);
+      expect(conn.displayName, contains('Umspannwerk-Feldleitgerät'));
+    });
+
+    test('SclLN and SclDOType displayDesc provide localized descriptions from DictionaryService', () {
+      final ln = SclLN(lnClass: 'MMXU', lnType: 'MMXU_Type');
+      final doElem = SclDOTypeElement(
+        name: 'TotW',
+        type: 'MV',
+        fc: FunctionalConstraint.mx,
+        bType: IecBasicType.structure,
+      );
+
+      AppI18n.instance.setLanguage(AppLanguage.zhCN);
+      expect(ln.displayDesc, contains('测量'));
+      expect(doElem.displayDesc, contains('总有功功率'));
+
+      AppI18n.instance.setLanguage(AppLanguage.enUS);
+      expect(ln.displayDesc, contains('Measurement'));
+      expect(doElem.displayDesc, contains('Total active power'));
     });
   });
 }

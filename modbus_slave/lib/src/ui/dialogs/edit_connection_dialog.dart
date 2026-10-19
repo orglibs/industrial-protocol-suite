@@ -31,7 +31,7 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
   void initState() {
     super.initState();
     final c = widget.initialConfig;
-    _nameController = TextEditingController(text: c?.name ?? 'Connection');
+    _nameController = TextEditingController(text: c?.displayName ?? 'Connection');
     _ipController = TextEditingController(text: c?.ip ?? '0.0.0.0');
     _portController = TextEditingController(text: (c?.port ?? 502).toString());
     _serialPortController = TextEditingController(text: c?.serialPortName ?? '/dev/ttyUSB0');
@@ -81,7 +81,12 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
             color: theme.colorScheme.primary,
           ),
           const SizedBox(width: 8),
-          Text(widget.initialConfig == null ? AppI18n.instance.t('newConnTitle') : AppI18n.instance.t('editConnTitle')),
+          Expanded(
+            child: Text(
+              widget.initialConfig == null ? AppI18n.instance.t('newConnTitle') : AppI18n.instance.t('editConnTitle'),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
       content: SizedBox(
@@ -95,21 +100,21 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
               children: [
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: AppI18n.instance.t('connAlias'),
                     hintText: AppI18n.instance.t('connAliasHint'),
-                    prefixIcon: Icon(Icons.label_outline),
-                    border: OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.label_outline),
+                    border: const OutlineInputBorder(),
                   ),
                   validator: (v) => (v == null || v.trim().isEmpty) ? AppI18n.instance.t('connAliasRequired') : null,
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<ModbusTransportMode>(
                   value: _mode,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: AppI18n.instance.t('protoType'),
-                    prefixIcon: Icon(Icons.swap_horiz),
-                    border: OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.swap_horiz),
+                    border: const OutlineInputBorder(),
                   ),
                   items: ModbusTransportMode.values.map((m) {
                     return DropdownMenuItem(value: m, child: Text(m.label));
@@ -127,10 +132,10 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                         flex: 3,
                         child: TextFormField(
                           controller: _ipController,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: '${AppI18n.instance.t('listenIp')} (0.0.0.0)',
-                            prefixIcon: Icon(Icons.computer),
-                            border: OutlineInputBorder(),
+                            prefixIcon: const Icon(Icons.computer),
+                            border: const OutlineInputBorder(),
                           ),
                           validator: (v) => (v == null || v.trim().isEmpty) ? AppI18n.instance.t('valRequired') : null,
                         ),
@@ -141,10 +146,10 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                         child: TextFormField(
                           controller: _portController,
                           keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: AppI18n.instance.t('listenPort'),
-                            prefixIcon: Icon(Icons.tag),
-                            border: OutlineInputBorder(),
+                            prefixIcon: const Icon(Icons.tag),
+                            border: const OutlineInputBorder(),
                           ),
                           validator: (v) {
                             final p = int.tryParse(v ?? '');
@@ -163,7 +168,7 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                           controller: _serialPortController,
                           decoration: InputDecoration(
                             labelText: AppI18n.instance.t('serialPort'),
-                            hintText: '/dev/ttyUSB0 | COM1',
+                            hintText: AppI18n.instance.t('serialPortHint'),
                             prefixIcon: const Icon(Icons.usb),
                             border: const OutlineInputBorder(),
                             suffixIcon: IconButton(
@@ -196,9 +201,9 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                       Expanded(
                         child: DropdownButtonFormField<int>(
                           value: _baudRate,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: AppI18n.instance.t('baudRate'),
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
                           ),
                           items: const [1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200]
                               .map((b) => DropdownMenuItem(value: b, child: Text('$b bps')))
@@ -210,9 +215,9 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                       Expanded(
                         child: DropdownButtonFormField<int>(
                           value: _dataBits,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: AppI18n.instance.t('dataBits'),
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
                           ),
                           items: const [7, 8]
                               .map((d) => DropdownMenuItem(value: d, child: Text('$d Bits')))
@@ -228,14 +233,14 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                       Expanded(
                         child: DropdownButtonFormField<int>(
                           value: _parity,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: AppI18n.instance.t('parity'),
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
                           ),
-                          items: const [
-                            DropdownMenuItem(value: 0, child: Text('None (0)')),
-                            DropdownMenuItem(value: 1, child: Text('Odd (1)')),
-                            DropdownMenuItem(value: 2, child: Text('Even (2)')),
+                          items: [
+                            DropdownMenuItem(value: 0, child: Text(AppI18n.instance.t('parityNone'))),
+                            DropdownMenuItem(value: 1, child: Text(AppI18n.instance.t('parityOdd'))),
+                            DropdownMenuItem(value: 2, child: Text(AppI18n.instance.t('parityEven'))),
                           ],
                           onChanged: (v) => setState(() => _parity = v ?? 0),
                         ),
@@ -244,9 +249,9 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                       Expanded(
                         child: DropdownButtonFormField<int>(
                           value: _stopBits,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: AppI18n.instance.t('stopBits'),
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
                           ),
                           items: const [1, 2]
                               .map((s) => DropdownMenuItem(value: s, child: Text('$s Bits')))
@@ -275,6 +280,7 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
               final port = int.tryParse(_portController.text.trim()) ?? 502;
               final config = widget.initialConfig ?? ConnectionConfig();
               config.name = _nameController.text.trim();
+              config.nameKey = null;
               config.mode = _mode;
               config.ip = _ipController.text.trim();
               config.port = port;

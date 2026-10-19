@@ -2,9 +2,9 @@ import 'dart:async';
 import 'package:intl/intl.dart';
 
 enum TrafficDirection {
-  rx('接收 (RX)', 0xFF4CAF50), // Green
-  tx('发送 (TX)', 0xFF2196F3), // Blue
-  err('错误 (ERR)', 0xFFF44336); // Red
+  rx('RX', 0xFF4CAF50), // Green
+  tx('TX', 0xFF2196F3), // Blue
+  err('ERR', 0xFFF44336); // Red
 
   final String label;
   final int colorArgb;
@@ -88,7 +88,7 @@ class TrafficLogger {
 
   String exportToText() {
     final buf = StringBuffer();
-    buf.writeln('序号\t时间\t方向\t连接\t从站ID\t功能码\t报文十六进制\t说明');
+    buf.writeln('Index\tTime\tDirection\tConnection\tSlaveID\tFunctionCode\tHex\tDescription');
     for (final e in _entries) {
       buf.writeln(
         '${e.index}\t${e.timeStr}\t${e.direction.name.toUpperCase()}\t${e.connectionName}\t${e.unitId}\t0x${e.functionCode.toRadixString(16).padLeft(2, "0")}\t${e.hexString}\t${e.description}',

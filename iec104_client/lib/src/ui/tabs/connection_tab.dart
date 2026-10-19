@@ -3,11 +3,28 @@ import 'package:flutter/material.dart';
 import '../../client/iec104_client.dart';
 import '../../client/traffic_logger.dart';
 import '../../i18n/app_i18n.dart';
+import '../../models/connection_config.dart';
+import '../dialogs/edit_connection_dialog.dart';
 
 class ConnectionTab extends StatefulWidget {
-  final Iec104Client client;
+  final List<Iec104ClientConnectionConfig> connections;
+  final Iec104ClientConnectionConfig activeConnection;
+  final ValueChanged<Iec104ClientConnectionConfig> onSelectConnection;
+  final VoidCallback onConfigChanged;
+  final VoidCallback onAddConnection;
+  final ValueChanged<Iec104ClientConnectionConfig> onDeleteConnection;
+  final Iec104Client? client;
 
-  const ConnectionTab({super.key, required this.client});
+  const ConnectionTab({
+    super.key,
+    required this.connections,
+    required this.activeConnection,
+    required this.onSelectConnection,
+    required this.onConfigChanged,
+    required this.onAddConnection,
+    required this.onDeleteConnection,
+    this.client,
+  });
 
   @override
   State<ConnectionTab> createState() => _ConnectionTabState();
@@ -34,10 +51,20 @@ class _ConnectionTabState extends State<ConnectionTab> {
   StreamSubscription<ClientConnectionState>? _stateSub;
   StreamSubscription<TrafficEntry>? _trafficSub;
 
+  Iec104Client get _currentClient => widget.activeConnection.client;
+
   @override
   void initState() {
     super.initState();
-    final c = widget.client;
+    _initControllers();
+    _subscribeClient();
+    _trafficSub = TrafficLogger.instance.stream.listen((_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  void _initControllers() {
+    final c = widget.activeConnection;
     _hostCtrl = TextEditingController(text: c.host);
     _portCtrl = TextEditingController(text: c.port.toString());
     _caCtrl = TextEditingController(text: c.defaultCa.toString());
@@ -51,13 +78,34 @@ class _ConnectionTabState extends State<ConnectionTab> {
     _giPeriodCtrl = TextEditingController(text: c.generalInterrogationPeriod.toString());
     _clockPeriodCtrl = TextEditingController(text: c.clockSyncPeriod.toString());
     _counterPeriodCtrl = TextEditingController(text: c.counterInterrogationPeriod.toString());
+  }
 
-    _stateSub = widget.client.stateStream.listen((_) {
+  void _subscribeClient() {
+    _stateSub?.cancel();
+    _stateSub = _currentClient.stateStream.listen((_) {
       if (mounted) setState(() {});
     });
-    _trafficSub = TrafficLogger.instance.stream.listen((_) {
-      if (mounted) setState(() {});
-    });
+  }
+
+  @override
+  void didUpdateWidget(covariant ConnectionTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.activeConnection != widget.activeConnection) {
+      final c = widget.activeConnection;
+      _hostCtrl.text = c.host;
+      _portCtrl.text = c.port.toString();
+      _caCtrl.text = c.defaultCa.toString();
+      _kCtrl.text = c.k.toString();
+      _wCtrl.text = c.w.toString();
+      _t0Ctrl.text = c.t0.toString();
+      _t1Ctrl.text = c.t1.toString();
+      _t2Ctrl.text = c.t2.toString();
+      _t3Ctrl.text = c.t3.toString();
+      _giPeriodCtrl.text = c.generalInterrogationPeriod.toString();
+      _clockPeriodCtrl.text = c.clockSyncPeriod.toString();
+      _counterPeriodCtrl.text = c.counterInterrogationPeriod.toString();
+      _subscribeClient();
+    }
   }
 
   @override
@@ -80,7 +128,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
   }
 
   void _applyParams() {
-    final c = widget.client;
+    final c = widget.activeConnection;
     c.host = _hostCtrl.text.trim();
     c.port = int.tryParse(_portCtrl.text.trim()) ?? 2404;
     c.defaultCa = int.tryParse(_caCtrl.text.trim()) ?? 1;
@@ -94,7 +142,63 @@ class _ConnectionTabState extends State<ConnectionTab> {
     c.generalInterrogationPeriod = int.tryParse(_giPeriodCtrl.text.trim()) ?? 0;
     c.clockSyncPeriod = int.tryParse(_clockPeriodCtrl.text.trim()) ?? 0;
     c.counterInterrogationPeriod = int.tryParse(_counterPeriodCtrl.text.trim()) ?? 0;
-    c.scheduleAutoSave();
+
+    c.syncConfigToClient();
+    c.notifyListeners();
+    widget.onConfigChanged();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppI18n.instance.t('configApplied'))),
+    );
+  }
+
+  void _editCurrentConnection() async {
+    final updated = await EditConnectionDialog.show(
+      context,
+      connection: widget.activeConnection,
+    );
+    if (updated != null) {
+      _hostCtrl.text = updated.host;
+      _portCtrl.text = updated.port.toString();
+      _caCtrl.text = updated.defaultCa.toString();
+      _kCtrl.text = updated.k.toString();
+      _wCtrl.text = updated.w.toString();
+      _t0Ctrl.text = updated.t0.toString();
+      _t1Ctrl.text = updated.t1.toString();
+      _t2Ctrl.text = updated.t2.toString();
+      _t3Ctrl.text = updated.t3.toString();
+      widget.onConfigChanged();
+      setState(() {});
+    }
+  }
+
+  void _deleteCurrentConnection() {
+    final i18n = AppI18n.instance;
+    if (widget.connections.length <= 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(i18n.t('deleteConn'))),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(i18n.t('deleteConn')),
+        content: Text('${i18n.t('deleteConn')} [${widget.activeConnection.displayName}]?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text(i18n.t('cancel'))),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              widget.onDeleteConnection(widget.activeConnection);
+            },
+            child: Text(i18n.t('delete')),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _runVerification() async {
@@ -105,7 +209,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
     });
 
     try {
-      final res = await widget.client.runAutomatedVerification();
+      final res = await _currentClient.runAutomatedVerification();
       if (mounted) {
         setState(() {
           _verifyResults = res;
@@ -139,7 +243,8 @@ class _ConnectionTabState extends State<ConnectionTab> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final i18n = AppI18n.instance;
-    final c = widget.client;
+    final conn = widget.activeConnection;
+    final c = _currentClient;
     final isConnected = c.state != ClientConnectionState.disconnected;
     final isActive = c.state == ClientConnectionState.active;
 
@@ -153,31 +258,178 @@ class _ConnectionTabState extends State<ConnectionTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Connection Status Card
+          // 1. Connection Header & Multi-Connection Selector Card
           Card(
             elevation: 2,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Top Row: Connection dropdown + Add/Edit/Delete + Status
+                  Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 12,
+                    runSpacing: 10,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.hub, color: theme.colorScheme.primary, size: 28),
+                          const SizedBox(width: 8),
+                          Text('${i18n.t('connAlias')}: ',
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          const SizedBox(width: 6),
+                          ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 380),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: theme.dividerColor),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<Iec104ClientConnectionConfig>(
+                                  isExpanded: true,
+                                  value: widget.connections.contains(conn) ? conn : widget.connections.firstOrNull,
+                                  items: widget.connections.map((item) {
+                                    final text = '${item.displayName} (${item.host}:${item.port})';
+                                    return DropdownMenuItem(
+                                      value: item,
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.dns,
+                                            size: 16,
+                                            color: theme.colorScheme.primary,
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Expanded(
+                                            child: Text(
+                                              text,
+                                              style: const TextStyle(fontWeight: FontWeight.bold),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }).toList(),
+                                  onChanged: (newConn) {
+                                    if (newConn != null && newConn != conn) {
+                                      widget.onSelectConnection(newConn);
+                                    }
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      // Actions on connections
+                      Wrap(
+                        spacing: 8,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          // Status Badge
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: badgeColor.withAlpha(38),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: badgeColor),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    color: badgeColor,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  _getStateLabel(c.state, i18n),
+                                  style: TextStyle(color: badgeColor, fontWeight: FontWeight.bold, fontSize: 12),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Connect / Disconnect button
+                          if (!isConnected)
+                            FilledButton.icon(
+                              icon: const Icon(Icons.link),
+                              label: Text(i18n.t('connect')),
+                              onPressed: () async {
+                                _applyParams();
+                                try {
+                                  await c.connect();
+                                  setState(() {});
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('${i18n.t('connectFailed')}: $e')),
+                                    );
+                                  }
+                                }
+                              },
+                            )
+                          else
+                            ElevatedButton.icon(
+                              icon: const Icon(Icons.link_off),
+                              label: Text(i18n.t('disconnect')),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red.shade700,
+                                foregroundColor: Colors.white,
+                              ),
+                              onPressed: () async {
+                                await c.disconnect();
+                                setState(() {});
+                              },
+                            ),
+
+                          // Edit Connection
+                          IconButton.outlined(
+                            icon: const Icon(Icons.edit_outlined, size: 18),
+                            tooltip: i18n.t('editConnTitle'),
+                            onPressed: _editCurrentConnection,
+                          ),
+
+                          // Add Connection
+                          IconButton.outlined(
+                            icon: const Icon(Icons.add, size: 18),
+                            tooltip: i18n.t('newConn'),
+                            onPressed: widget.onAddConnection,
+                          ),
+
+                          // Delete Connection
+                          IconButton.outlined(
+                            icon: const Icon(Icons.delete_outline, size: 18, color: Colors.red),
+                            tooltip: i18n.t('deleteConn'),
+                            onPressed: widget.connections.length > 1 ? _deleteCurrentConnection : null,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+
+                  const Divider(height: 24),
+
+                  // Protocol Controls Row
                   Row(
                     children: [
-                      Container(
-                        width: 14,
-                        height: 14,
-                        decoration: BoxDecoration(
-                          color: badgeColor,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
                       Text(
-                        '${i18n.t('connectionStatus')}: ${_getStateLabel(c.state, i18n)}',
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        'N(S): ${c.sendSeq} | N(R): ${c.recvSeq} | ${i18n.t('unconfirmed')}: ${c.unconfirmedRecvCount}',
+                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                       ),
-                      const Spacer(),
-                      Text('N(S): ${c.sendSeq} | N(R): ${c.recvSeq} | ${i18n.t('unconfirmed')}: ${c.unconfirmedRecvCount}'),
                       if (c.isWebVirtualMode) ...[
                         const SizedBox(width: 12),
                         Container(
@@ -187,47 +439,17 @@ class _ConnectionTabState extends State<ConnectionTab> {
                             borderRadius: BorderRadius.circular(4),
                             border: Border.all(color: Colors.amber.shade700),
                           ),
-                          child: Text(i18n.t('webVirtualMode'), style: const TextStyle(color: Colors.brown, fontSize: 12)),
+                          child: Text(i18n.t('webVirtualMode'),
+                              style: const TextStyle(color: Colors.brown, fontSize: 12)),
                         ),
                       ],
                     ],
                   ),
-                  const Divider(height: 24),
+                  const SizedBox(height: 12),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
                     children: [
-                      if (!isConnected)
-                        FilledButton.icon(
-                          icon: const Icon(Icons.link),
-                          label: Text(i18n.t('connect')),
-                          onPressed: () async {
-                            _applyParams();
-                            try {
-                              await c.connect();
-                              setState(() {});
-                            } catch (e) {
-                              if (mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('${i18n.t('connectFailed')}: $e')),
-                                );
-                              }
-                            }
-                          },
-                        )
-                      else
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.link_off),
-                          label: Text(i18n.t('disconnect')),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red.shade700,
-                            foregroundColor: Colors.white,
-                          ),
-                          onPressed: () async {
-                            await c.disconnect();
-                            setState(() {});
-                          },
-                        ),
                       OutlinedButton.icon(
                         icon: const Icon(Icons.play_circle_outline),
                         label: Text(i18n.t('startdtAct')),
@@ -250,7 +472,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   Wrap(
                     spacing: 8,
                     children: [
@@ -278,15 +500,27 @@ class _ConnectionTabState extends State<ConnectionTab> {
 
           const SizedBox(height: 16),
 
-          // Network Parameters Card
+          // 2. Network Parameters Card
           Card(
             elevation: 2,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(i18n.t('connAndParam'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(i18n.t('connAndParam'),
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      FilledButton.icon(
+                        icon: const Icon(Icons.save, size: 16),
+                        label: Text(i18n.t('applyAndSave')),
+                        onPressed: _applyParams,
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 16),
                   Row(
                     children: [
@@ -330,49 +564,56 @@ class _ConnectionTabState extends State<ConnectionTab> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  const Text('IEC 60870-5-104 Timers & Parameters', style: TextStyle(fontWeight: FontWeight.w600)),
+                  const Text('IEC 60870-5-104 Timers & Parameters',
+                      style: TextStyle(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 8),
                   Row(
                     children: [
                       Expanded(
                         child: TextField(
                           controller: _kCtrl,
-                          decoration: InputDecoration(labelText: 'k', border: const OutlineInputBorder(), helperText: i18n.t('kValue')),
+                          decoration: InputDecoration(
+                              labelText: 'k', border: const OutlineInputBorder(), helperText: i18n.t('kValue')),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
                           controller: _wCtrl,
-                          decoration: InputDecoration(labelText: 'w', border: const OutlineInputBorder(), helperText: i18n.t('wValue')),
+                          decoration: InputDecoration(
+                              labelText: 'w', border: const OutlineInputBorder(), helperText: i18n.t('wValue')),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
                           controller: _t0Ctrl,
-                          decoration: const InputDecoration(labelText: 't0 (s)', border: OutlineInputBorder(), helperText: 'Connect Timeout'),
+                          decoration: const InputDecoration(
+                              labelText: 't0 (s)', border: OutlineInputBorder(), helperText: 'Connect Timeout'),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
                           controller: _t1Ctrl,
-                          decoration: InputDecoration(labelText: 't1 (s)', border: const OutlineInputBorder(), helperText: i18n.t('t1Timeout')),
+                          decoration: InputDecoration(
+                              labelText: 't1 (s)', border: const OutlineInputBorder(), helperText: i18n.t('t1Timeout')),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
                           controller: _t2Ctrl,
-                          decoration: const InputDecoration(labelText: 't2 (s)', border: OutlineInputBorder(), helperText: 'Ack Timeout'),
+                          decoration: const InputDecoration(
+                              labelText: 't2 (s)', border: OutlineInputBorder(), helperText: 'Ack Timeout'),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
                           controller: _t3Ctrl,
-                          decoration: InputDecoration(labelText: 't3 (s)', border: const OutlineInputBorder(), helperText: i18n.t('testfrInterval')),
+                          decoration: InputDecoration(
+                              labelText: 't3 (s)', border: const OutlineInputBorder(), helperText: i18n.t('testfrInterval')),
                         ),
                       ),
                     ],
@@ -384,25 +625,39 @@ class _ConnectionTabState extends State<ConnectionTab> {
 
           const SizedBox(height: 16),
 
-          // Automation Settings
+          // 3. Automation Settings Card
           Card(
             elevation: 2,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Automation & Periodic Tasks', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const Text('Automation & Periodic Tasks',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
                   SwitchListTile(
                     title: Text(i18n.t('autoStartdt')),
-                    value: c.autoStartDt,
-                    onChanged: (val) => setState(() => c.autoStartDt = val),
+                    value: conn.autoStartDt,
+                    onChanged: (val) {
+                      setState(() {
+                        conn.autoStartDt = val;
+                        conn.client.autoStartDt = val;
+                      });
+                      widget.onConfigChanged();
+                    },
                   ),
                   SwitchListTile(
                     title: Text(i18n.t('autoGeneralInterrogation')),
-                    value: c.autoGeneralInterrogation,
-                    onChanged: (val) => setState(() => c.autoGeneralInterrogation = val),
+                    value: conn.autoGeneralInterrogation,
+                    onChanged: (val) {
+                      setState(() {
+                        conn.autoGeneralInterrogation = val;
+                        conn.client.autoGeneralInterrogation = val;
+                      });
+                      widget.onConfigChanged();
+                    },
                   ),
                   const SizedBox(height: 8),
                   Row(
@@ -448,7 +703,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
 
           const SizedBox(height: 16),
 
-          // Automated Verification Card
+          // 4. Automated Verification Card
           Card(
             elevation: 1,
             color: theme.colorScheme.primaryContainer.withAlpha(40),
@@ -467,12 +722,16 @@ class _ConnectionTabState extends State<ConnectionTab> {
                       const SizedBox(width: 8),
                       Text(
                         'IEC 104 Client Self-Test',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: theme.colorScheme.primary),
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold, color: theme.colorScheme.primary),
                       ),
                       const Spacer(),
                       FilledButton.icon(
                         icon: _isVerifying
-                            ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                             : const Icon(Icons.play_arrow),
                         label: Text(_isVerifying ? 'Verifying...' : 'Run Self-Test'),
                         onPressed: _isVerifying ? null : _runVerification,
@@ -480,7 +739,8 @@ class _ConnectionTabState extends State<ConnectionTab> {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  const Text('Automated sequence: Connect -> STARTDT -> GI -> Clock Sync -> Telecontrol -> Counter -> Read -> S-Ack -> TestFR -> Disconnect.'),
+                  const Text(
+                      'Automated sequence: Connect -> STARTDT -> GI -> Clock Sync -> Telecontrol -> Counter -> Read -> S-Ack -> TestFR -> Disconnect.'),
                   if (_verifyResults != null) ...[
                     const Divider(height: 24),
                     for (final r in _verifyResults!)
@@ -490,16 +750,22 @@ class _ConnectionTabState extends State<ConnectionTab> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Icon(
-                              (r.contains('FAIL') || r.contains('Error') || r.contains('\u5931\u8d25')) ? Icons.cancel : Icons.check_circle,
+                              (r.contains('FAIL') || r.contains('Error') || r.contains('\u5931\u8d25'))
+                                  ? Icons.cancel
+                                  : Icons.check_circle,
                               size: 18,
-                              color: (r.contains('FAIL') || r.contains('Error') || r.contains('\u5931\u8d25')) ? Colors.red : Colors.green,
+                              color: (r.contains('FAIL') || r.contains('Error') || r.contains('\u5931\u8d25'))
+                                  ? Colors.red
+                                  : Colors.green,
                             ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 r,
                                 style: TextStyle(
-                                  color: (r.contains('FAIL') || r.contains('Error') || r.contains('\u5931\u8d25')) ? Colors.red.shade900 : Colors.green.shade900,
+                                  color: (r.contains('FAIL') || r.contains('Error') || r.contains('\u5931\u8d25'))
+                                      ? Colors.red.shade900
+                                      : Colors.green.shade900,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),

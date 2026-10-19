@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-/// Modbus Slave (从站 / 服务端仿真器) 工业级矢量图标
+/// Modbus Slave (从站 / 服务端仿真器 MSE) 极简工业级矢量图标
 ///
-/// 符合 24x24 工业图标网格规范，基于工业微控制器/从机芯片与标志性 "S" 响应路径设计。
-/// 支持任意缩放、自定义颜色与线宽，零第三方依赖。
+/// 遵循 24x24 极简矢量图标设计规范，基于工业从机芯片与标志性 "S" 寄存器响应路径设计。
+/// 支持任意缩放、自定义颜色与线宽，零第三方外部依赖。
 class ModbusSlaveIcon extends StatelessWidget {
   final double size;
   final Color? color;
@@ -46,43 +46,32 @@ class _ModbusSlaveIconPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 
-    // 1. 中央从机芯片/模块外壳 (4..20, 4..20)
+    // 1. 工业芯片封装主体
     final chipRRect = RRect.fromRectAndRadius(
       Rect.fromLTWH(4 * s, 4 * s, 16 * s, 16 * s),
-      Radius.circular(2.5 * s),
+      Radius.circular(3 * s),
     );
     canvas.drawRRect(chipRRect, strokePaint);
 
-    // 2. 顶部总线接线引脚 (Top Pins)
-    canvas.drawLine(Offset(7 * s, 2 * s), Offset(7 * s, 4 * s), strokePaint);
-    canvas.drawLine(Offset(12 * s, 2 * s), Offset(12 * s, 4 * s), strokePaint);
-    canvas.drawLine(Offset(17 * s, 2 * s), Offset(17 * s, 4 * s), strokePaint);
+    // 2. 顶部总线引脚
+    canvas.drawLine(Offset(7 * s, 1.5 * s), Offset(7 * s, 4 * s), strokePaint);
+    canvas.drawLine(Offset(12 * s, 1.5 * s), Offset(12 * s, 4 * s), strokePaint);
+    canvas.drawLine(Offset(17 * s, 1.5 * s), Offset(17 * s, 4 * s), strokePaint);
 
-    // 3. 底部总线接线引脚 (Bottom Pins)
-    canvas.drawLine(Offset(7 * s, 20 * s), Offset(7 * s, 22 * s), strokePaint);
-    canvas.drawLine(Offset(12 * s, 20 * s), Offset(12 * s, 22 * s), strokePaint);
-    canvas.drawLine(Offset(17 * s, 20 * s), Offset(17 * s, 22 * s), strokePaint);
+    // 3. 底部总线引脚
+    canvas.drawLine(Offset(7 * s, 20 * s), Offset(7 * s, 22.5 * s), strokePaint);
+    canvas.drawLine(Offset(12 * s, 20 * s), Offset(12 * s, 22.5 * s), strokePaint);
+    canvas.drawLine(Offset(17 * s, 20 * s), Offset(17 * s, 22.5 * s), strokePaint);
 
-    // 4. 中央标志性 Modbus "S" 从站响应拓扑路径
-    final path = Path()
+    // 4. 从机标志性 "S" 寄存器响应数据流路径
+    final sPath = Path()
       ..moveTo(15 * s, 8.5 * s)
-      ..cubicTo(14.5 * s, 7.5 * s, 13.5 * s, 7.0 * s, 12.5 * s, 7.0 * s)
-      ..lineTo(11.5 * s, 7.0 * s)
-      ..arcToPoint(
-        Offset(11.5 * s, 11.0 * s),
-        radius: Radius.circular(2.0 * s),
-        clockwise: false,
-      )
-      ..lineTo(12.5 * s, 11.0 * s)
-      ..arcToPoint(
-        Offset(12.5 * s, 15.0 * s),
-        radius: Radius.circular(2.0 * s),
-        clockwise: true,
-      )
-      ..lineTo(11.5 * s, 15.0 * s)
-      ..cubicTo(10.5 * s, 15.0 * s, 9.5 * s, 14.5 * s, 9.0 * s, 13.5 * s);
-
-    canvas.drawPath(path, strokePaint);
+      ..cubicTo(14 * s, 7.5 * s, 12 * s, 7.0 * s, 11 * s, 7.0 * s)
+      ..cubicTo(9.5 * s, 7.0 * s, 9 * s, 8.0 * s, 9 * s, 9.0 * s)
+      ..cubicTo(9 * s, 11.0 * s, 15 * s, 10.5 * s, 15 * s, 13.0 * s)
+      ..cubicTo(15 * s, 14.5 * s, 13.5 * s, 15.0 * s, 12 * s, 15.0 * s)
+      ..cubicTo(10 * s, 15.0 * s, 9.5 * s, 14.0 * s, 9 * s, 13.5 * s);
+    canvas.drawPath(sPath, strokePaint);
   }
 
   @override

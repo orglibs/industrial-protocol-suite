@@ -3,13 +3,15 @@ import '../../i18n/app_i18n.dart';
 import '../../models/server_config.dart';
 
 class EditServerDialog extends StatefulWidget {
-  final ServerConfig config;
+  final ServerConfig? config;
   final void Function(ServerConfig newConfig) onSaved;
+  final VoidCallback? onDelete;
 
   const EditServerDialog({
     super.key,
-    required this.config,
+    this.config,
     required this.onSaved,
+    this.onDelete,
   });
 
   @override
@@ -25,10 +27,11 @@ class _EditServerDialogState extends State<EditServerDialog> {
   @override
   void initState() {
     super.initState();
-    _nameCtrl = TextEditingController(text: widget.config.name);
-    _ipCtrl = TextEditingController(text: widget.config.ip);
-    _portCtrl = TextEditingController(text: widget.config.port.toString());
-    _dirCtrl = TextEditingController(text: widget.config.fileTransferDirectory);
+    final c = widget.config;
+    _nameCtrl = TextEditingController(text: c != null ? c.displayName : 'IEC 61850 MMS Server');
+    _ipCtrl = TextEditingController(text: c?.ip ?? '0.0.0.0');
+    _portCtrl = TextEditingController(text: (c?.port ?? 102).toString());
+    _dirCtrl = TextEditingController(text: c?.fileTransferDirectory ?? '');
   }
 
   @override
@@ -41,24 +44,29 @@ class _EditServerDialogState extends State<EditServerDialog> {
   }
 
   void _save() {
-    widget.config.name = _nameCtrl.text.trim();
-    widget.config.ip = _ipCtrl.text.trim();
-    widget.config.port = int.tryParse(_portCtrl.text.trim()) ?? 102;
-    widget.config.fileTransferDirectory = _dirCtrl.text.trim();
-    widget.onSaved(widget.config);
+    final cfg = widget.config ?? ServerConfig();
+    cfg.nameKey = null;
+    cfg.name = _nameCtrl.text.trim();
+    cfg.ip = _ipCtrl.text.trim();
+    cfg.port = int.tryParse(_portCtrl.text.trim()) ?? 102;
+    if (_dirCtrl.text.trim().isNotEmpty) {
+      cfg.fileTransferDirectory = _dirCtrl.text.trim();
+    }
+    widget.onSaved(cfg);
     Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
     final i18n = AppI18n.instance;
+    final isNew = widget.config == null;
 
     return AlertDialog(
       title: Row(
         children: [
-          const Icon(Icons.settings),
+          Icon(isNew ? Icons.add_circle_outline : Icons.settings),
           const SizedBox(width: 8),
-          Text(i18n.t('editServerTitle')),
+          Text(isNew ? i18n.t('newConn') : i18n.t('editServerTitle')),
         ],
       ),
       content: SizedBox(
@@ -141,6 +149,17 @@ class _EditServerDialogState extends State<EditServerDialog> {
         ),
       ),
       actions: [
+        if (widget.onDelete != null)
+          TextButton.icon(
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            icon: const Icon(Icons.delete_outline, size: 18),
+            label: Text(i18n.t('deleteConn')),
+            onPressed: () {
+              Navigator.of(context).pop();
+              widget.onDelete?.call();
+            },
+          ),
+        const Spacer(),
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
           child: Text(i18n.t('cancel')),

@@ -1,179 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <!-- Background Gradient: Deep Titanium Slate & Cyan Shadow -->
-    <linearGradient id="bg61850Server" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0A141A" />
-      <stop offset="50%" stop-color="#0E232B" />
-      <stop offset="100%" stop-color="#050C10" />
+    <!-- Background Gradient (Deep Industrial Dark Slate) -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#081217" />
+      <stop offset="50%" stop-color="#0D222A" />
+      <stop offset="100%" stop-color="#050D11" />
     </linearGradient>
 
-    <!-- Center Radial Glow (Relay Gold & Cyan Halo) -->
-    <radialGradient id="glowServerRadial" cx="50%" cy="44%" r="55%">
-      <stop offset="0%" stop-color="#06B6D4" stop-opacity="0.32" />
-      <stop offset="45%" stop-color="#F59E0B" stop-opacity="0.14" />
+    <!-- Radial Ambient Spotlight -->
+    <radialGradient id="spotlight" cx="50%" cy="38%" r="62%">
+      <stop offset="0%" stop-color="#06B6D4" stop-opacity="0.28" />
+      <stop offset="55%" stop-color="#F59E0B" stop-opacity="0.1" />
       <stop offset="100%" stop-color="#000000" stop-opacity="0" />
     </radialGradient>
 
-    <!-- Outer Bezel: Cyber Cyan -> Teal -> Relay Gold -->
-    <linearGradient id="bezelServerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#06B6D4" />
-      <stop offset="50%" stop-color="#14B8A6" />
-      <stop offset="100%" stop-color="#F59E0B" />
+    <!-- Outer Squircle Bezel Chamfer Border -->
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22D3EE" stop-opacity="0.65" />
+      <stop offset="50%" stop-color="#334155" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#06B6D4" stop-opacity="0.55" />
     </linearGradient>
 
-    <!-- IED Metal Chassis Gradient -->
-    <linearGradient id="iedChassisGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#172A36" />
-      <stop offset="60%" stop-color="#101F29" />
-      <stop offset="100%" stop-color="#09141B" />
+    <!-- Enlarged Abbreviation Text Gradient -->
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ECFEFF" />
+      <stop offset="55%" stop-color="#A5F3FC" />
+      <stop offset="100%" stop-color="#22D3EE" />
     </linearGradient>
 
-    <!-- Screen Matrix Gradient -->
-    <linearGradient id="iedCrtGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#051C1D" />
-      <stop offset="100%" stop-color="#020E0F" />
+    <!-- Role Badge Background Gradient -->
+    <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06B6D4" stop-opacity="0.22" />
+      <stop offset="100%" stop-color="#06B6D4" stop-opacity="0.14" />
     </linearGradient>
 
-    <!-- Optical Fiber Port Gradient -->
-    <linearGradient id="optPortGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#38BDF8" />
-      <stop offset="100%" stop-color="#0284C7" />
-    </linearGradient>
-
-    <!-- Filters -->
-    <filter id="shadowServer" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#06B6D4" flood-opacity="0.32" />
-    </filter>
-
-    <filter id="glowCyanServer" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="4" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-    </filter>
-
-    <filter id="glowGold" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="5" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    <!-- Luminous Drop Shadow -->
+    <filter id="heroGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="14" flood-color="#06B6D4" flood-opacity="0.32" />
     </filter>
   </defs>
 
-  <!-- Squircle Base Canvas -->
-  <rect width="512" height="512" rx="116" fill="url(#bg61850Server)" />
+  <!-- Base Squircle Container -->
+  <rect width="512" height="512" rx="116" fill="url(#bgGrad)" />
+  <rect width="512" height="512" rx="116" fill="url(#spotlight)" />
 
-  <!-- Process Bus Substation Grid Lines -->
-  <g stroke="#06B6D4" stroke-width="1" stroke-opacity="0.06">
-    <line x1="64" y1="0" x2="64" y2="512" />
-    <line x1="128" y1="0" x2="128" y2="512" />
-    <line x1="192" y1="0" x2="192" y2="512" />
-    <line x1="256" y1="0" x2="256" y2="512" stroke-opacity="0.14" stroke-dasharray="6 4" />
-    <line x1="320" y1="0" x2="320" y2="512" />
-    <line x1="384" y1="0" x2="384" y2="512" />
-    <line x1="448" y1="0" x2="448" y2="512" />
-    <line x1="0" y1="64" x2="512" y2="64" />
-    <line x1="0" y1="128" x2="512" y2="128" />
-    <line x1="0" y1="192" x2="512" y2="192" />
-    <line x1="0" y1="256" x2="512" y2="256" stroke-opacity="0.14" stroke-dasharray="6 4" />
-    <line x1="0" y1="320" x2="512" y2="320" />
-    <line x1="0" y1="384" x2="512" y2="384" />
-    <line x1="0" y1="448" x2="512" y2="448" />
+  <!-- Outer Bezel Inset Border -->
+  <rect x="2" y="2" width="508" height="508" rx="114" fill="none" stroke="url(#borderGrad)" stroke-width="2.5" />
+
+  <!-- Top Protocol Context Pill Badge -->
+  <g transform="translate(256, 66)">
+    <rect x="-84" y="-13" width="168" height="26" rx="13" fill="#0B1017" stroke="#06B6D4" stroke-width="1.2" stroke-opacity="0.45" />
+    <circle cx="-62" cy="0" r="3.5" fill="#10B981" />
+    <text x="6" y="4" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#A5F3FC" letter-spacing="1.5" text-anchor="middle">IEC 61850</text>
   </g>
 
-  <!-- Central Radial Ambience -->
-  <rect width="512" height="512" rx="116" fill="url(#glowServerRadial)" />
+  <!-- Upper-Center Emblem: Redesigned UI Icon Vector Motif -->
+  <g transform="translate(256, 172)" filter="url(#heroGlow)">
 
-  <!-- Premium Metallic Bezel Contour -->
-  <rect x="2" y="2" width="508" height="508" rx="114" fill="none" stroke="url(#bezelServerGrad)" stroke-width="3" stroke-opacity="0.48" />
-
-  <!-- Top Pill Badge: IEC 61850 VIRTUAL IED (Aligned & centered) -->
-  <g transform="translate(256, 68)">
-    <rect x="-115" y="-14" width="230" height="28" rx="14" fill="#092026" stroke="#06B6D4" stroke-width="1.5" />
-    <circle cx="-95" cy="0" r="4" fill="#22D3EE" filter="url(#glowCyanServer)" />
-    <text x="6" y="4.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#67E8F9" letter-spacing="2" text-anchor="middle">IEC 61850 VIRTUAL IED</text>
+    <!-- Top Dual Optical Fiber LC Connectors -->
+    <line x1="-28" y1="-38" x2="-28" y2="-22" stroke="#22D3EE" stroke-width="4.5" stroke-linecap="round" />
+    <line x1="-12" y1="-38" x2="-12" y2="-22" stroke="#22D3EE" stroke-width="4.5" stroke-linecap="round" />
+    <!-- 19-inch IED Rack Chassis -->
+    <rect x="-60" y="-22" width="120" height="74" rx="12" fill="#0C2027" stroke="#22D3EE" stroke-width="4.5" />
+    <line x1="-60" y1="0" x2="60" y2="0" stroke="#164E63" stroke-width="3" />
+    <!-- Status LED -->
+    <circle cx="42" cy="-11" r="5" fill="#10B981" />
+    <!-- GOOSE Fast Breaker Trip Pulse (Square Step Wave) -->
+    <path d="M -44 26 L -20 26 L -20 8 L 8 8 L 8 26 L 44 26" fill="none" stroke="#F59E0B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
   </g>
 
-  <!-- Main Illustration: Virtual IED Protection Relay & Process Bus -->
-  <g filter="url(#shadowServer)" transform="translate(0, 4)">
-    
-    <!-- High-Speed GOOSE Retransmission Fast-Burst Arcs -->
-    <path d="M 124 162 A 150 150 0 0 1 388 162" fill="none" stroke="#F59E0B" stroke-width="3" stroke-dasharray="8 8" stroke-linecap="round" opacity="0.6" />
-    <path d="M 158 186 A 110 110 0 0 1 354 186" fill="none" stroke="#06B6D4" stroke-width="4" stroke-linecap="round" opacity="0.9" filter="url(#glowCyanServer)" />
-    <path d="M 194 210 A 70 70 0 0 1 318 210" fill="none" stroke="#67E8F9" stroke-width="4.5" stroke-linecap="round" />
-
-    <!-- Virtual IED Protection & Control Rack Unit (19" Enclosure) -->
-    <g transform="translate(256, 280)">
-      
-      <!-- Top Dual Optical Fiber Port Transceiver Block -->
-      <g transform="translate(0, -112)">
-        <rect x="-112" y="0" width="224" height="18" rx="4" fill="#081820" stroke="#0891B2" stroke-width="1.5" />
-        <!-- Optical Transceiver Ports (TX/RX Fiber LC Connectors) -->
-        <rect x="-96" y="-8" width="14" height="12" rx="2" fill="url(#optPortGrad)" />
-        <rect x="-68" y="-8" width="14" height="12" rx="2" fill="url(#optPortGrad)" />
-        <!-- Amber Active Laser Ports (Process Bus GOOSE) -->
-        <rect x="-18" y="-8" width="14" height="12" rx="2" fill="#F59E0B" filter="url(#glowGold)" />
-        <rect x="14" y="-8" width="14" height="12" rx="2" fill="#F59E0B" filter="url(#glowGold)" />
-        <!-- Station Bus MMS Ports -->
-        <rect x="64" y="-8" width="14" height="12" rx="2" fill="url(#optPortGrad)" />
-        <rect x="92" y="-8" width="14" height="12" rx="2" fill="url(#optPortGrad)" />
-      </g>
-
-      <!-- Main Heavy Metal Enclosure -->
-      <rect x="-132" y="-96" width="264" height="178" rx="16" fill="url(#iedChassisGrad)" stroke="#06B6D4" stroke-width="3" />
-
-      <!-- Left & Right Rack Ears with Hex Mount Screws -->
-      <line x1="-132" y1="-96" x2="-132" y2="82" stroke="#0891B2" stroke-width="1.5" />
-      <line x1="132" y1="-96" x2="132" y2="82" stroke="#0891B2" stroke-width="1.5" />
-      <circle cx="-124" cy="-80" r="3.2" fill="#0E7490" />
-      <circle cx="-124" cy="66" r="3.2" fill="#0E7490" />
-      <circle cx="124" cy="-80" r="3.2" fill="#0E7490" />
-      <circle cx="124" cy="66" r="3.2" fill="#0E7490" />
-
-      <!-- Panel Header Bar -->
-      <line x1="-118" y1="-56" x2="118" y2="-56" stroke="#1E293B" stroke-width="2" />
-
-      <!-- Running & Protection Status LEDs -->
-      <circle cx="-102" cy="-76" r="4.5" fill="#10B981" />
-      <text x="-92" y="-72.5" font-family="monospace" font-size="9.5" font-weight="800" fill="#34D399">RUN</text>
-      
-      <circle cx="-50" cy="-76" r="4.5" fill="#F59E0B" />
-      <text x="-40" y="-72.5" font-family="monospace" font-size="9.5" font-weight="800" fill="#FBBF24">TRIP</text>
-
-      <circle cx="2" cy="-76" r="4.5" fill="#22D3EE" />
-      <text x="12" y="-72.5" font-family="monospace" font-size="9.5" font-weight="800" fill="#67E8F9">GOOSE</text>
-
-      <!-- Port 102 Badge -->
-      <rect x="58" y="-86" width="56" height="20" rx="5" fill="#082A33" stroke="#06B6D4" stroke-width="1.2" />
-      <text x="86" y="-72.5" font-family="monospace" font-size="10" font-weight="700" fill="#67E8F9" letter-spacing="0.5" text-anchor="middle">:102</text>
-
-      <!-- Central Display Area: IED Object Model & MMXU / XCBR Waveforms -->
-      <rect x="-114" y="-44" width="228" height="112" rx="10" fill="url(#iedCrtGrad)" stroke="#0891B2" stroke-width="2" />
-
-      <!-- Matrix Oscilloscope Grid Lines -->
-      <line x1="-114" y1="-7" x2="114" y2="-7" stroke="#064E3B" stroke-width="1" stroke-dasharray="3 3" opacity="0.6" />
-      <line x1="-114" y1="30" x2="114" y2="30" stroke="#064E3B" stroke-width="1" stroke-dasharray="3 3" opacity="0.6" />
-      <line x1="0" y1="-44" x2="0" y2="68" stroke="#064E3B" stroke-width="1" stroke-dasharray="3 3" opacity="0.6" />
-
-      <!-- Logical Node Status Overlay -->
-      <text x="-96" y="-28" font-family="monospace" font-size="9" font-weight="700" fill="#22D3EE" opacity="0.9">LN: MMXU</text>
-      <text x="24" y="-28" font-family="monospace" font-size="9" font-weight="700" fill="#FBBF24" opacity="0.9">LN: XCBR</text>
-      <text x="-96" y="55" font-family="monospace" font-size="9" font-weight="700" fill="#22D3EE" opacity="0.9">BRCB: ACTIVE</text>
-      <text x="24" y="55" font-family="monospace" font-size="9" font-weight="700" fill="#FBBF24" opacity="0.9">stVal: TRIP_OK</text>
-
-      <!-- 3-Phase MMXU Analog Measurement Wave (Phase A Cyan) -->
-      <path d="M -94 12 C -78 -16, -58 40, -42 12 C -26 -16, -6 40, 10 12 C 26 -16, 46 40, 62 12 L 86 12" fill="none" stroke="#22D3EE" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" filter="url(#glowCyanServer)" />
-      
-      <!-- GOOSE Circuit Breaker Trip Pulse (Fast Step Wave: Amber) -->
-      <path d="M -36 26 L 6 26 L 6 -2 L 54 -2 L 54 26 L 94 26" fill="none" stroke="#F59E0B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#glowGold)" />
-
-      <!-- Active Sampling Nodes -->
-      <circle cx="6" cy="-2" r="3.5" fill="#FFFFFF" />
-      <circle cx="-58" cy="12" r="3.2" fill="#22D3EE" />
-      <circle cx="54" cy="-2" r="3.5" fill="#FBBF24" />
-    </g>
+  <!-- Center Hero: Magnified Protocol Abbreviation -->
+  <g transform="translate(256, 350)">
+    <text x="0" y="0" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="96" font-weight="900" fill="url(#textGrad)" letter-spacing="3" text-anchor="middle" filter="url(#heroGlow)">61850</text>
   </g>
 
-  <!-- Typography & Subtitle Branding -->
-  <g transform="translate(256, 442)">
-    <text x="0" y="0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="34" font-weight="900" fill="#F8FAFC" letter-spacing="8" text-anchor="middle">IEC 61850</text>
-    <text x="0" y="24" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#06B6D4" letter-spacing="4" text-anchor="middle">SERVER · VIRTUAL IED</text>
+  <!-- Bottom Role Capsule Badge: SERVER / CLIENT / SLAVE / MASTER -->
+  <g transform="translate(256, 434)">
+    <rect x="-105" y="-21" width="210" height="42" rx="21" fill="url(#badgeGrad)" stroke="#22D3EE" stroke-width="1.8" stroke-opacity="0.75" />
+    <!-- Role Status Dot with Pulse -->
+    <circle cx="-76" cy="0" r="5" fill="#10B981" />
+    <circle cx="-76" cy="0" r="2.5" fill="#FFFFFF" />
+    <!-- Primary Role Title -->
+    <text x="6" y="5.5" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="900" fill="#FFFFFF" letter-spacing="4" text-anchor="middle">SERVER</text>
+    <!-- Secondary Descriptive Subtitle -->
+    <text x="0" y="27" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="700" fill="#94A3B8" letter-spacing="2" text-anchor="middle">IED · MMS &amp; GOOSE SERVER</text>
   </g>
 </svg>

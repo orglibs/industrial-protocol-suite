@@ -148,6 +148,7 @@ class GoosePublisherItem {
 class GoosePublisherService {
   static final GoosePublisherService instance = GoosePublisherService._();
   GoosePublisherService._();
+  GoosePublisherService();
 
   final List<GoosePublisherItem> _items = [];
   final List<void Function()> _listeners = [];

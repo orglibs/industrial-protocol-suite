@@ -23,7 +23,7 @@ class _EditGroupDialogState extends State<EditGroupDialog> {
   void initState() {
     super.initState();
     final g = widget.initialGroup;
-    _nameController = TextEditingController(text: g?.groupName ?? 'Group');
+    _nameController = TextEditingController(text: g?.displayGroupName ?? 'Group');
     _startAddressController = TextEditingController(text: (g?.startAddress ?? 0).toString());
     _quantityController = TextEditingController(text: (g?.quantity ?? 10).toString());
 
@@ -49,7 +49,12 @@ class _EditGroupDialogState extends State<EditGroupDialog> {
         children: [
           Icon(Icons.folder_copy_outlined, color: theme.colorScheme.primary),
           const SizedBox(width: 8),
-          Text(widget.initialGroup == null ? AppI18n.instance.t('newGroupTitle') : AppI18n.instance.t('editGroupTitle')),
+          Expanded(
+            child: Text(
+              widget.initialGroup == null ? AppI18n.instance.t('newGroupTitle') : AppI18n.instance.t('editGroupTitle'),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
       content: SizedBox(
@@ -62,21 +67,21 @@ class _EditGroupDialogState extends State<EditGroupDialog> {
             children: [
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: AppI18n.instance.t('groupName'),
-                  hintText: 'e.g. Analog Inputs',
-                  prefixIcon: Icon(Icons.label_outline),
-                  border: OutlineInputBorder(),
+                  hintText: AppI18n.instance.t('groupNameHint'),
+                  prefixIcon: const Icon(Icons.label_outline),
+                  border: const OutlineInputBorder(),
                 ),
                 validator: (v) => (v == null || v.trim().isEmpty) ? AppI18n.instance.t('groupNameRequired') : null,
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<ModbusRegisterType>(
                 value: _type,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: AppI18n.instance.t('regType'),
-                  prefixIcon: Icon(Icons.category_outlined),
-                  border: OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.category_outlined),
+                  border: const OutlineInputBorder(),
                 ),
                 items: ModbusRegisterType.values.map((t) {
                   return DropdownMenuItem(value: t, child: Text(t.label));
@@ -90,10 +95,10 @@ class _EditGroupDialogState extends State<EditGroupDialog> {
                     child: TextFormField(
                       controller: _startAddressController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: AppI18n.instance.t('startAddr'),
-                        prefixIcon: Icon(Icons.pin_outlined),
-                        border: OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.pin_outlined),
+                        border: const OutlineInputBorder(),
                       ),
                       validator: (v) {
                         final a = int.tryParse(v ?? '');
@@ -107,10 +112,10 @@ class _EditGroupDialogState extends State<EditGroupDialog> {
                     child: TextFormField(
                       controller: _quantityController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: AppI18n.instance.t('regQty'),
-                        prefixIcon: Icon(Icons.format_list_numbered),
-                        border: OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.format_list_numbered),
+                        border: const OutlineInputBorder(),
                       ),
                       validator: (v) {
                         final q = int.tryParse(v ?? '');
@@ -150,6 +155,7 @@ class _EditGroupDialogState extends State<EditGroupDialog> {
                   );
 
               group.groupName = _nameController.text.trim();
+              group.groupNameKey = null;
               group.registerType = _type;
               group.startAddress = startAddr;
               group.quantity = qty;

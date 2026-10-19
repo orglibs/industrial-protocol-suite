@@ -1,154 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <!-- Background Gradient -->
-    <linearGradient id="bgMaster" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#061226" />
-      <stop offset="45%" stop-color="#0A1D3D" />
-      <stop offset="100%" stop-color="#040915" />
+    <!-- Background Gradient (Deep Industrial Dark Slate) -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090F1C" />
+      <stop offset="50%" stop-color="#0E172A" />
+      <stop offset="100%" stop-color="#060B14" />
     </linearGradient>
 
-    <!-- Radial Center Glow -->
-    <radialGradient id="centerGlowMaster" cx="50%" cy="44%" r="52%">
-      <stop offset="0%" stop-color="#0284C7" stop-opacity="0.38" />
-      <stop offset="50%" stop-color="#0369A1" stop-opacity="0.12" />
-      <stop offset="100%" stop-color="#0284C7" stop-opacity="0" />
+    <!-- Radial Ambient Spotlight -->
+    <radialGradient id="spotlight" cx="50%" cy="38%" r="62%">
+      <stop offset="0%" stop-color="#0284C7" stop-opacity="0.28" />
+      <stop offset="55%" stop-color="#38BDF8" stop-opacity="0.12" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
     </radialGradient>
 
-    <!-- Tech Cyan Accent Gradient -->
-    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#0284C7" />
-      <stop offset="50%" stop-color="#38BDF8" />
-      <stop offset="100%" stop-color="#0EA5E9" />
+    <!-- Outer Squircle Bezel Chamfer Border -->
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.65" />
+      <stop offset="50%" stop-color="#334155" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#0284C7" stop-opacity="0.55" />
     </linearGradient>
 
-    <!-- Core Orb Gradient -->
-    <radialGradient id="coreOrbGrad" cx="38%" cy="35%" r="65%">
-      <stop offset="0%" stop-color="#FFFFFF" />
-      <stop offset="30%" stop-color="#7DD3FC" />
-      <stop offset="70%" stop-color="#0284C7" />
-      <stop offset="100%" stop-color="#034570" />
-    </radialGradient>
-
-    <!-- Mast Vertical Gradient -->
-    <linearGradient id="mastGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#7DD3FC" />
-      <stop offset="50%" stop-color="#0284C7" />
-      <stop offset="100%" stop-color="#0369A1" />
+    <!-- Enlarged Abbreviation Text Gradient -->
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F0F9FF" />
+      <stop offset="55%" stop-color="#BAE6FD" />
+      <stop offset="100%" stop-color="#38BDF8" />
     </linearGradient>
 
-    <!-- Console Screen Gradient -->
-    <linearGradient id="screenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#0B162B" />
-      <stop offset="100%" stop-color="#040914" />
+    <!-- Role Badge Background Gradient -->
+    <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284C7" stop-opacity="0.22" />
+      <stop offset="100%" stop-color="#0284C7" stop-opacity="0.14" />
     </linearGradient>
 
-    <!-- Drop Shadows and Glows -->
-    <filter id="shadowMaster" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#0284C7" flood-opacity="0.4" />
-    </filter>
-
-    <filter id="glowWave" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="4.5" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-    </filter>
-
-    <filter id="coreGlow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="7" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    <!-- Luminous Drop Shadow -->
+    <filter id="heroGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="14" flood-color="#0284C7" flood-opacity="0.32" />
     </filter>
   </defs>
 
   <!-- Base Squircle Container -->
-  <rect width="512" height="512" rx="116" fill="url(#bgMaster)" />
-  
-  <!-- Subtle Industrial Grid Lines -->
-  <g stroke="#38BDF8" stroke-width="1" stroke-opacity="0.07">
-    <line x1="64" y1="0" x2="64" y2="512" />
-    <line x1="128" y1="0" x2="128" y2="512" />
-    <line x1="192" y1="0" x2="192" y2="512" />
-    <line x1="256" y1="0" x2="256" y2="512" stroke-opacity="0.14" stroke-dasharray="6 4" />
-    <line x1="320" y1="0" x2="320" y2="512" />
-    <line x1="384" y1="0" x2="384" y2="512" />
-    <line x1="448" y1="0" x2="448" y2="512" />
-    <line x1="0" y1="64" x2="512" y2="64" />
-    <line x1="0" y1="128" x2="512" y2="128" />
-    <line x1="0" y1="192" x2="512" y2="192" />
-    <line x1="0" y1="256" x2="512" y2="256" stroke-opacity="0.14" stroke-dasharray="6 4" />
-    <line x1="0" y1="320" x2="512" y2="320" />
-    <line x1="0" y1="384" x2="512" y2="384" />
-    <line x1="0" y1="448" x2="512" y2="448" />
+  <rect width="512" height="512" rx="116" fill="url(#bgGrad)" />
+  <rect width="512" height="512" rx="116" fill="url(#spotlight)" />
+
+  <!-- Outer Bezel Inset Border -->
+  <rect x="2" y="2" width="508" height="508" rx="114" fill="none" stroke="url(#borderGrad)" stroke-width="2.5" />
+
+  <!-- Top Protocol Context Pill Badge -->
+  <g transform="translate(256, 66)">
+    <rect x="-84" y="-13" width="168" height="26" rx="13" fill="#0B1017" stroke="#0284C7" stroke-width="1.2" stroke-opacity="0.45" />
+    <circle cx="-62" cy="0" r="3.5" fill="#38BDF8" />
+    <text x="6" y="4" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#BAE6FD" letter-spacing="1.5" text-anchor="middle">IEC 60870-5-104</text>
   </g>
 
-  <!-- Ambient Light Sphere -->
-  <rect width="512" height="512" rx="116" fill="url(#centerGlowMaster)" />
+  <!-- Upper-Center Emblem: Redesigned UI Icon Vector Motif -->
+  <g transform="translate(256, 172)" filter="url(#heroGlow)">
 
-  <!-- Outer Squircle Bezel Border -->
-  <rect x="2" y="2" width="508" height="508" rx="114" fill="none" stroke="url(#cyanGrad)" stroke-width="3" stroke-opacity="0.45" />
-
-  <!-- Protocol Header Badge -->
-  <g transform="translate(256, 68)">
-    <rect x="-88" y="-14" width="176" height="28" rx="14" fill="#0C2038" stroke="#0284C7" stroke-width="1.5" />
-    <circle cx="-66" cy="0" r="4" fill="#38BDF8" />
-    <text x="7" y="4.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#7DD3FC" letter-spacing="2" text-anchor="middle">IEC 60870-5-104</text>
+    <!-- SCADA Workstation Monitor -->
+    <rect x="-62" y="-36" width="124" height="76" rx="12" fill="#0C1B2F" stroke="#38BDF8" stroke-width="4.5" />
+    <!-- Stand Base & Column -->
+    <line x1="-28" y1="52" x2="28" y2="52" stroke="#38BDF8" stroke-width="4.5" stroke-linecap="round" />
+    <line x1="0" y1="40" x2="0" y2="52" stroke="#38BDF8" stroke-width="4.5" stroke-linecap="round" />
+    <!-- Interrogation Center Beacon -->
+    <circle cx="0" cy="14" r="5" fill="#38BDF8" />
+    <!-- Interrogation Query Waves Inside Screen -->
+    <path d="M -22 -6 A 28 28 0 0 1 22 -6" fill="none" stroke="#7DD3FC" stroke-width="3.5" stroke-linecap="round" />
+    <path d="M -36 -18 A 45 45 0 0 1 36 -18" fill="none" stroke="#BAE6FD" stroke-width="3.5" stroke-linecap="round" />
   </g>
 
-  <!-- Main Illustration Group -->
-  <g filter="url(#shadowMaster)" transform="translate(0, -6)">
-    <!-- Command Waves (Radiating Interrogation & Telecontrol Waves) -->
-    <!-- Wave 3: Outer Interrogation Wave (Dashed) -->
-    <path d="M 120 162 A 152 152 0 0 1 392 162" fill="none" stroke="#0284C7" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="8 8" opacity="0.55" />
-    <!-- Wave 2: Middle Concentric Wave -->
-    <path d="M 156 186 A 112 112 0 0 1 356 186" fill="none" stroke="#38BDF8" stroke-width="4.5" stroke-linecap="round" opacity="0.9" filter="url(#glowWave)" />
-    <!-- Wave 1: Core Command Wave -->
-    <path d="M 194 212 A 70 70 0 0 1 318 212" fill="none" stroke="#BAE6FD" stroke-width="5.5" stroke-linecap="round" />
-
-    <!-- Central Telecontrol Mast -->
-    <line x1="256" y1="236" x2="256" y2="296" stroke="url(#mastGrad)" stroke-width="8" stroke-linecap="round" />
-    <!-- Mast Collar at Roof -->
-    <rect x="246" y="292" width="20" height="6" rx="2" fill="#0284C7" />
-
-    <!-- Mast Support Diagonal Struts -->
-    <line x1="256" y1="262" x2="204" y2="296" stroke="#0369A1" stroke-width="4" stroke-linecap="round" opacity="0.75" />
-    <line x1="256" y1="262" x2="308" y2="296" stroke="#0369A1" stroke-width="4" stroke-linecap="round" opacity="0.75" />
-    <circle cx="204" cy="296" r="3" fill="#38BDF8" />
-    <circle cx="308" cy="296" r="3" fill="#38BDF8" />
-
-    <!-- Dispatch Central Transmitter Core Node -->
-    <circle cx="256" cy="236" r="23" fill="url(#coreOrbGrad)" stroke="#E0F2FE" stroke-width="3.5" filter="url(#coreGlow)" />
-    <!-- Central Lightning Spark (Energy / Telecontrol command pulse) -->
-    <path d="M 257 221 L 249 235 L 256 235 L 255 249 L 264 234 L 257 234 Z" fill="#FFFFFF" />
-
-    <!-- SCADA Dispatch Console Unit (Master Base) -->
-    <g transform="translate(256, 336)">
-      <!-- Console Base Housing -->
-      <path d="M -136 24 L -116 -40 L 116 -40 L 136 24 Z" fill="#0A182E" stroke="#0284C7" stroke-width="2.5" />
-      
-      <!-- Console Display Screen -->
-      <rect x="-106" y="-32" width="212" height="48" rx="8" fill="url(#screenGrad)" stroke="#38BDF8" stroke-width="2" />
-      
-      <!-- Screen Grid Background -->
-      <line x1="-106" y1="-8" x2="106" y2="-8" stroke="#0284C7" stroke-width="1" stroke-opacity="0.25" stroke-dasharray="3 3" />
-      <line x1="0" y1="-32" x2="0" y2="16" stroke="#0284C7" stroke-width="1" stroke-opacity="0.2" stroke-dasharray="3 3" />
-      
-      <!-- Telemetry Active Curve (YC & Telecontrol feedback) -->
-      <path d="M -90 -8 L -60 -8 L -48 -22 L -34 6 L -20 -16 L -6 -2 L 14 -8 L 44 -8 L 54 -18 L 66 2 L 90 -8" fill="none" stroke="#38BDF8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-
-      <!-- Left Status LEDs -->
-      <circle cx="-118" cy="-8" r="4.5" fill="#10B981" />
-      <circle cx="-118" cy="8" r="4.5" fill="#38BDF8" />
-
-      <!-- Right Status LEDs -->
-      <circle cx="118" cy="-8" r="4.5" fill="#F59E0B" />
-      <circle cx="118" cy="8" r="4.5" fill="#0284C7" />
-    </g>
+  <!-- Center Hero: Magnified Protocol Abbreviation -->
+  <g transform="translate(256, 350)">
+    <text x="0" y="0" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="122" font-weight="900" fill="url(#textGrad)" letter-spacing="4" text-anchor="middle" filter="url(#heroGlow)">104</text>
   </g>
 
-  <!-- Typography & Subtitle Branding -->
-  <g transform="translate(256, 436)">
-    <!-- Main Title -->
-    <text x="0" y="0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="34" font-weight="900" fill="#F8FAFC" letter-spacing="8" text-anchor="middle">MASTER</text>
-    <!-- Subtitle Badge -->
-    <text x="0" y="24" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#38BDF8" letter-spacing="4" text-anchor="middle">CLIENT · DISPATCH SIMULATOR</text>
+  <!-- Bottom Role Capsule Badge: SERVER / CLIENT / SLAVE / MASTER -->
+  <g transform="translate(256, 434)">
+    <rect x="-105" y="-21" width="210" height="42" rx="21" fill="url(#badgeGrad)" stroke="#38BDF8" stroke-width="1.8" stroke-opacity="0.75" />
+    <!-- Role Status Dot with Pulse -->
+    <circle cx="-76" cy="0" r="5" fill="#38BDF8" />
+    <circle cx="-76" cy="0" r="2.5" fill="#FFFFFF" />
+    <!-- Primary Role Title -->
+    <text x="6" y="5.5" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="900" fill="#FFFFFF" letter-spacing="4" text-anchor="middle">CLIENT</text>
+    <!-- Secondary Descriptive Subtitle -->
+    <text x="0" y="27" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="700" fill="#94A3B8" letter-spacing="2" text-anchor="middle">MASTER · DISPATCH CONSOLE</text>
   </g>
 </svg>

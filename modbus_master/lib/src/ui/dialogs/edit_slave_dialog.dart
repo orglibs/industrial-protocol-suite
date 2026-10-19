@@ -31,7 +31,7 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
   void initState() {
     super.initState();
     final s = widget.slave;
-    _nameCtrl = TextEditingController(text: s?.name ?? 'Slave${DateTime.now().millisecondsSinceEpoch % 100}');
+    _nameCtrl = TextEditingController(text: s?.displayName ?? 'Slave${DateTime.now().millisecondsSinceEpoch % 100}');
     _idCtrl = TextEditingController(text: (s?.slaveId ?? 1).toString());
     _scanRateCtrl = TextEditingController(text: (s?.scanRate ?? 1000).toString());
     _addressType = s?.registerAddressesType ?? 0;
@@ -54,12 +54,15 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
 
     if (id < 1 || id > 247) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Slave ID: 1-247')),
+        SnackBar(content: Text('${AppI18n.instance.t('slaveId')}: 1-247')),
       );
       return;
     }
 
     if (widget.slave != null) {
+      if (widget.slave!.nameKey != null && name != AppI18n.instance.t(widget.slave!.nameKey!)) {
+        widget.slave!.nameKey = null;
+      }
       widget.slave!.name = name;
       widget.slave!.slaveId = id;
       widget.slave!.scanRate = rate;
@@ -93,54 +96,54 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
             children: [
               TextField(
                 controller: _nameCtrl,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: AppI18n.instance.t('slaveAlias'),
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.devices_other),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.devices_other),
                 ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: _idCtrl,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: AppI18n.instance.t('slaveId'),
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.pin),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.pin),
                 ),
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: _scanRateCtrl,
-                decoration: const InputDecoration(
-                  labelText: AppI18n.instance.t('respDelay'),
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.timer),
+                decoration: InputDecoration(
+                  labelText: AppI18n.instance.t('refreshRate'),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.timer),
                 ),
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<int>(
                 initialValue: _addressType,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: AppI18n.instance.t('addrBase'),
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.format_list_numbered),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.format_list_numbered),
                 ),
-                items: const [
-                  DropdownMenuItem(value: 0, child: Text('0-based (00000 - 09999)')),
-                  DropdownMenuItem(value: 1, child: Text('1-based (00001 - 10000)')),
-                  DropdownMenuItem(value: 2, child: Text('PLC Modicon (0x/1x/3x/40001+)')),
+                items: [
+                  DropdownMenuItem(value: 0, child: Text(AppI18n.instance.t('addrMode0'))),
+                  DropdownMenuItem(value: 1, child: Text(AppI18n.instance.t('addrMode1'))),
+                  DropdownMenuItem(value: 2, child: Text(AppI18n.instance.t('addrModeModicon'))),
                 ],
                 onChanged: (v) => setState(() => _addressType = v ?? 0),
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<ModbusByteOrder>(
                 initialValue: _byteOrder,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: AppI18n.instance.t('byteOrder'),
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.swap_horiz),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.swap_horiz),
                 ),
                 items: ModbusByteOrder.values.map((order) {
                   return DropdownMenuItem(value: order, child: Text(order.label));

@@ -1,3 +1,4 @@
+import '../i18n/app_i18n.dart';
 import '../protocol/modbus_data_types.dart';
 import '../protocol/modbus_pdu.dart';
 import 'register_group.dart';
@@ -5,6 +6,7 @@ import 'register_model.dart';
 
 class SlaveModel {
   String name;
+  String? nameKey;
   int slaveId;
   int registerAddressesType; // 0: 0-based (0..9999), 1: 1-based (1..10000), 2: PLC standard (40001..)
   int responseDelay; // Response delay in milliseconds (MSE feature)
@@ -13,12 +15,17 @@ class SlaveModel {
 
   SlaveModel({
     required this.name,
+    this.nameKey,
     this.slaveId = 1,
     this.registerAddressesType = 0,
     this.responseDelay = 0,
     this.byteOrder = ModbusByteOrder.abcd,
     List<RegisterGroupModel>? groups,
   }) : groups = groups ?? [];
+
+  String get displayName => (nameKey != null && nameKey!.isNotEmpty)
+      ? AppI18n.instance.t(nameKey!)
+      : name;
 
   /// Format an address according to slave's address mode
   String formatAddress(int baseAddress, ModbusRegisterType type) {
@@ -184,6 +191,7 @@ class SlaveModel {
   /// Clone this slave
   SlaveModel copyWith({
     String? name,
+    String? nameKey,
     int? slaveId,
     int? registerAddressesType,
     int? responseDelay,
@@ -191,6 +199,7 @@ class SlaveModel {
   }) {
     return SlaveModel(
       name: name ?? this.name,
+      nameKey: nameKey ?? this.nameKey,
       slaveId: slaveId ?? this.slaveId,
       registerAddressesType: registerAddressesType ?? this.registerAddressesType,
       responseDelay: responseDelay ?? this.responseDelay,
@@ -201,6 +210,7 @@ class SlaveModel {
 
   Map<String, dynamic> toJson() => {
     'Name': name,
+    'NameKey': nameKey,
     'SlaveId': slaveId,
     'RegisterAddressesType': registerAddressesType,
     'ResponseDelay': responseDelay,
@@ -214,9 +224,23 @@ class SlaveModel {
       byteOrderIdx = 0;
     }
 
+    final name = json['Name'] as String? ?? 'Slave1';
+    String? nameKey = json['NameKey'] as String?;
+    final slaveId = json['SlaveId'] as int? ?? 1;
+    if (nameKey == null) {
+      if (slaveId == 1 && (name.contains('Transformer') || name.contains('主变'))) {
+        nameKey = 'preset_slave_transformer';
+      } else if (slaveId == 2 && (name.contains('Serial') || name.contains('串口'))) {
+        nameKey = 'preset_slave_serial';
+      } else if (slaveId == 3 && (name.contains('Gateway') || name.contains('网关'))) {
+        nameKey = 'preset_slave_gateway';
+      }
+    }
+
     final slave = SlaveModel(
-      name: json['Name'] as String? ?? 'Slave1',
-      slaveId: json['SlaveId'] as int? ?? 1,
+      name: name,
+      nameKey: nameKey,
+      slaveId: slaveId,
       registerAddressesType: json['RegisterAddressesType'] as int? ?? 0,
       responseDelay: json['ResponseDelay'] as int? ?? 0,
       byteOrder: ModbusByteOrder.values[byteOrderIdx],

@@ -47,7 +47,7 @@ class _ReportsTabState extends State<ReportsTab> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (engine == null) {
-      return const Center(
+      return Center(
         child: Text(i18n.t('selectConnFirstReports'), style: const TextStyle(color: Colors.grey, fontSize: 16)),
       );
     }
@@ -92,11 +92,11 @@ class _ReportsTabState extends State<ReportsTab> {
                 ),
                 Expanded(
                   child: rcbs.isEmpty
-                      ? const Center(
+                      ? Center(
                           child: Text(
                             i18n.t('noRcbConnHint'),
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.grey, height: 1.5),
+                            style: const TextStyle(color: Colors.grey, height: 1.5),
                           ),
                         )
                       : ListView.separated(
@@ -214,8 +214,8 @@ class _ReportsTabState extends State<ReportsTab> {
                                                       ScaffoldMessenger.of(context).showSnackBar(
                                                         SnackBar(
                                                           content: Text(ok
-                                                              ? '已发送总召唤 (GI) 到 ${rcb.name}'
-                                                              : '总召唤发送失败，请检查连接状态'),
+                                                              ? AppI18n.instance.tf('giSentSuccess', {'name': rcb.name})
+                                                              : AppI18n.instance.t('giSentFailed')),
                                                           duration: const Duration(seconds: 2),
                                                         ),
                                                       );
@@ -286,9 +286,9 @@ class _ReportsTabState extends State<ReportsTab> {
                               style: TextStyle(color: isDark ? Colors.grey[500] : Colors.grey[600]),
                             ),
                             const SizedBox(height: 6),
-                            const Text(
+                            Text(
                               i18n.t('noReportEventsHint'),
-                              style: TextStyle(fontSize: 12, color: Colors.grey),
+                              style: const TextStyle(fontSize: 12, color: Colors.grey),
                             ),
                           ],
                         ),
@@ -350,9 +350,9 @@ class _ReportsTabState extends State<ReportsTab> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      const Text(
+                                      Text(
                                         i18n.t('changeDetails'),
-                                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                                       ),
                                       const SizedBox(height: 6),
                                       if (event.details.isEmpty)
@@ -393,6 +393,7 @@ class _ReportsTabState extends State<ReportsTab> {
   }
 
   Widget _buildSelectedRcbDetails(SclReportControl rcb, bool isDark) {
+    final i18n = AppI18n.instance;
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(

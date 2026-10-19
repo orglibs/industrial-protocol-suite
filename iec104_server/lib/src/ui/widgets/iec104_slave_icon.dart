@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-/// IEC 60870-5-104 Slave Station (从站 / 厂站 RTU) 工业级矢量图标
+/// IEC 60870-5-104 Server Station (从站 / RTU 厂站) 极简工业级矢量图标
 ///
-/// 符合 24x24 工业图标网格规范，支持任意缩放、自定义颜色与线宽。
+/// 遵循 24x24 极简矢量图标设计规范，呈现向上广播发射遥测数据的 RTU 终端机箱。
+/// 支持任意缩放、自定义颜色与线宽，零第三方外部依赖。
 class Iec104SlaveIcon extends StatelessWidget {
   final double size;
   final Color? color;
@@ -49,36 +50,32 @@ class _Iec104SlaveIconPainter extends CustomPainter {
       ..color = color
       ..style = PaintingStyle.fill;
 
-    // 1. RTU 工业机箱外框 (4..20, 3..21)
-    final boxRRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(4 * s, 3 * s, 16 * s, 18 * s),
-      Radius.circular(2.5 * s),
+    // 1. RTU 工业机箱外框 (3..21, 10..21)
+    final rtuRect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(3 * s, 10 * s, 18 * s, 11 * s),
+      Radius.circular(2 * s),
     );
-    canvas.drawRRect(boxRRect, strokePaint);
+    canvas.drawRRect(rtuRect, strokePaint);
 
-    // 2. 左右机柜安装挂耳 (Mounting Ears)
-    canvas.drawLine(Offset(2 * s, 7 * s), Offset(4 * s, 7 * s), strokePaint);
-    canvas.drawLine(Offset(2 * s, 17 * s), Offset(4 * s, 17 * s), strokePaint);
-    canvas.drawLine(Offset(20 * s, 7 * s), Offset(22 * s, 7 * s), strokePaint);
-    canvas.drawLine(Offset(20 * s, 17 * s), Offset(22 * s, 17 * s), strokePaint);
+    // 2. 状态指示 LED
+    canvas.drawCircle(Offset(7 * s, 15.5 * s), 1.0 * s, fillPaint);
 
-    // 3. 面板水平分界线
-    canvas.drawLine(Offset(4 * s, 9 * s), Offset(20 * s, 9 * s), strokePaint);
+    // 3. 突发事件遥测采样波形
+    final wavePath = Path()
+      ..moveTo(11 * s, 15.5 * s)
+      ..lineTo(12.5 * s, 15.5 * s)
+      ..lineTo(14 * s, 13 * s)
+      ..lineTo(15.5 * s, 17 * s)
+      ..lineTo(17 * s, 15 * s)
+      ..lineTo(18.5 * s, 15.5 * s);
+    canvas.drawPath(wavePath, strokePaint);
 
-    // 4. 顶部指示灯与通信状态条
-    canvas.drawCircle(Offset(7.5 * s, 6 * s), 1.0 * s, fillPaint);
-    canvas.drawCircle(Offset(11 * s, 6 * s), 1.0 * s, fillPaint);
-    canvas.drawLine(Offset(14.5 * s, 6 * s), Offset(17 * s, 6 * s), strokePaint);
+    // 4. 向上发射的遥测广播无线波束 (Concentric Telemetry Waves)
+    final outerRect = Rect.fromCircle(center: Offset(12 * s, 10 * s), radius: 5.5 * s);
+    canvas.drawArc(outerRect, -3.14159265 * 0.85, 3.14159265 * 0.7, false, strokePaint);
 
-    // 5. 突发事件遥测采样波形 (Spontaneous Waveform: COT=3)
-    final path = Path()
-      ..moveTo(7 * s, 14.5 * s)
-      ..lineTo(9 * s, 14.5 * s)
-      ..lineTo(11 * s, 11 * s)
-      ..lineTo(13 * s, 16 * s)
-      ..lineTo(15 * s, 13 * s)
-      ..lineTo(17 * s, 14.5 * s);
-    canvas.drawPath(path, strokePaint);
+    final innerRect = Rect.fromCircle(center: Offset(12 * s, 10 * s), radius: 2.8 * s);
+    canvas.drawArc(innerRect, -3.14159265 * 0.82, 3.14159265 * 0.64, false, strokePaint);
   }
 
   @override

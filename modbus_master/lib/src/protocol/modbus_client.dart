@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
+import '../i18n/app_i18n.dart';
 import '../models/connection_config.dart';
 import '../services/traffic_logger.dart';
 import '../services/virtual_slave.dart';
@@ -10,13 +11,23 @@ import 'modbus_pdu.dart';
 import 'serial_port_adapter.dart';
 
 enum ModbusConnectionState {
-  disconnected('未连接'),
-  connecting('连接中...'),
-  connected('已连接'),
-  error('通信故障');
+  disconnected,
+  connecting,
+  connected,
+  error;
 
-  final String label;
-  const ModbusConnectionState(this.label);
+  String get label {
+    switch (this) {
+      case ModbusConnectionState.disconnected:
+        return AppI18n.instance.t('disconnected');
+      case ModbusConnectionState.connecting:
+        return AppI18n.instance.t('connecting');
+      case ModbusConnectionState.connected:
+        return AppI18n.instance.t('connected');
+      case ModbusConnectionState.error:
+        return AppI18n.instance.t('connError');
+    }
+  }
 }
 
 class ModbusClient {
@@ -78,7 +89,7 @@ class ModbusClient {
       final port = serialPortName?.trim();
       if (port == null || port.isEmpty) {
         _setState(ModbusConnectionState.error);
-        throw Exception('请指定串口设备名称 (例如: /dev/ttyUSB0 或 COM1)');
+        throw Exception(AppI18n.instance.t('errSpecifySerialPort'));
       }
 
       frameType = ModbusFrameType.rtu;
@@ -214,7 +225,7 @@ class ModbusClient {
 
     final fcCode = pdu[0];
     final fc = ModbusFunctionCode.fromCode(fcCode);
-    final summary = '${fc?.label ?? "FC 0x${fcCode.toRadixString(16)}"} (从机ID: $unitId)';
+    final summary = '${fc?.label ?? "FC 0x${fcCode.toRadixString(16)}"} (${AppI18n.instance.t("unitIdLabel")}: $unitId)';
 
     final peerDesc = transportMode == ModbusTransportMode.serialRtu
         ? '$serialPortName @ $baudRate bps [ID:$unitId]'
@@ -225,7 +236,7 @@ class ModbusClient {
       sourceOrTarget: peerDesc,
       rawBytes: rawBytes,
       summary: summary,
-      protocolDetail: '发送请求: PDU长度=${pdu.length}字节, 帧格式=${frameType.name}',
+      protocolDetail: '${AppI18n.instance.t("sendRequest")}: PDU=${pdu.length} ${AppI18n.instance.t("bytesUnit")}, ${frameType.name}',
     );
 
     // If virtual mode, process internally with realistic delay
@@ -240,8 +251,8 @@ class ModbusClient {
         direction: TrafficDirection.rx,
         sourceOrTarget: peerDesc,
         rawBytes: respRaw,
-        summary: isErr ? '从站异常应答: Code=${respAdu.pdu.length > 1 ? respAdu.pdu[1] : "?"}' : '应答成功: PDU长度=${respAdu.pdu.length}',
-        protocolDetail: '虚拟从站本地响应',
+        summary: isErr ? 'Exception Code: ${respAdu.pdu.length > 1 ? respAdu.pdu[1] : "?"}' : '${AppI18n.instance.t("statusOk")}: PDU=${respAdu.pdu.length}',
+        protocolDetail: AppI18n.instance.t('virtualSlaveLocalResp'),
         isError: isErr,
         elapsedMs: stopwatch.elapsedMilliseconds,
       );
@@ -259,12 +270,12 @@ class ModbusClient {
     try {
       if (transportMode == ModbusTransportMode.serialRtu) {
         if (_serialAdapter == null || !_serialAdapter!.isOpen) {
-          throw StateError('串口未连接或已关闭');
+          throw StateError(AppI18n.instance.t('errSerialNotOpen'));
         }
         _serialAdapter!.write(rawBytes);
       } else {
         if (_socket == null) {
-          throw StateError('TCP Socket 未连接');
+          throw StateError(AppI18n.instance.t('errTcpNotConnected'));
         }
         _socket!.add(rawBytes);
         await _socket!.flush();
@@ -282,8 +293,8 @@ class ModbusClient {
         direction: TrafficDirection.rx,
         sourceOrTarget: peerDesc,
         rawBytes: respPdu,
-        summary: isErr ? '异常应答 (Exception)' : '正常应答 (OK)',
-        protocolDetail: '耗时: ${stopwatch.elapsedMilliseconds} ms',
+        summary: isErr ? 'Exception Response' : AppI18n.instance.t('statusOk'),
+        protocolDetail: '${AppI18n.instance.t("timeElapsed")}: ${stopwatch.elapsedMilliseconds} ms',
         isError: isErr,
         elapsedMs: stopwatch.elapsedMilliseconds,
       );
@@ -298,8 +309,8 @@ class ModbusClient {
         direction: TrafficDirection.rx,
         sourceOrTarget: peerDesc,
         rawBytes: Uint8List(0),
-        summary: '通信超时或异常: $e',
-        protocolDetail: '请求失败',
+        summary: '${AppI18n.instance.t("commTimeoutOrError")}: $e',
+        protocolDetail: AppI18n.instance.t('reqFailed'),
         isError: true,
         elapsedMs: stopwatch.elapsedMilliseconds,
       );

@@ -35,11 +35,11 @@ class _EditRegisterDialogState extends State<EditRegisterDialog> {
   void initState() {
     super.initState();
     final r = widget.register;
-    _aliasController = TextEditingController(text: r.alias ?? '');
+    _aliasController = TextEditingController(text: r.displayAlias ?? '');
     _valueController = TextEditingController(
       text: r.getDisplayValue(widget.byteOrder, widget.neighborWords),
     );
-    _commentController = TextEditingController(text: r.comment ?? '');
+    _commentController = TextEditingController(text: r.displayComment ?? '');
     _format = r.valueFormat;
     _compositeType = r.compositeType;
   }
@@ -62,7 +62,12 @@ class _EditRegisterDialogState extends State<EditRegisterDialog> {
         children: [
           Icon(Icons.edit_note, color: theme.colorScheme.primary),
           const SizedBox(width: 8),
-          Text('${AppI18n.instance.t('configRegTitle')} [${widget.formattedAddress}]'),
+          Expanded(
+            child: Text(
+              '${AppI18n.instance.t('configRegTitle')} [${widget.formattedAddress}]',
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
       content: SizedBox(
@@ -79,10 +84,10 @@ class _EditRegisterDialogState extends State<EditRegisterDialog> {
                     Expanded(
                       child: TextFormField(
                         controller: _aliasController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: AppI18n.instance.t('colAlias'),
-                          hintText: 'e.g. Phase A Voltage',
-                          border: OutlineInputBorder(),
+                          hintText: AppI18n.instance.t('colAliasHint'),
+                          border: const OutlineInputBorder(),
                         ),
                       ),
                     ),
@@ -90,9 +95,9 @@ class _EditRegisterDialogState extends State<EditRegisterDialog> {
                     Expanded(
                       child: TextFormField(
                         controller: _valueController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: AppI18n.instance.t('currValue'),
-                          border: OutlineInputBorder(),
+                          border: const OutlineInputBorder(),
                         ),
                         validator: (v) {
                           if (v == null || v.trim().isEmpty) return AppI18n.instance.t('valRequired');
@@ -111,9 +116,9 @@ class _EditRegisterDialogState extends State<EditRegisterDialog> {
                 const SizedBox(height: 16),
                 DropdownButtonFormField<RegisterDataFormat>(
                   value: _format,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: AppI18n.instance.t('dataFormat'),
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                   ),
                   items: RegisterDataFormat.values.map((f) {
                     return DropdownMenuItem(value: f, child: Text(f.label));
@@ -130,11 +135,11 @@ class _EditRegisterDialogState extends State<EditRegisterDialog> {
                 const SizedBox(height: 16),
                 DropdownButtonFormField<int>(
                   value: _compositeType,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: AppI18n.instance.t('colComposite'),
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                   ),
-                  items: const [
+                  items: [
                     DropdownMenuItem(value: 0, child: Text(AppI18n.instance.t('singleWord'))),
                     DropdownMenuItem(value: 1, child: Text(AppI18n.instance.t('doubleWord'))),
                     DropdownMenuItem(value: 2, child: Text(AppI18n.instance.t('quadWord'))),
@@ -145,9 +150,9 @@ class _EditRegisterDialogState extends State<EditRegisterDialog> {
                 TextFormField(
                   controller: _commentController,
                   maxLines: 2,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: AppI18n.instance.t('colComment'),
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -206,7 +211,9 @@ class _EditRegisterDialogState extends State<EditRegisterDialog> {
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               r.alias = _aliasController.text.trim().isEmpty ? null : _aliasController.text.trim();
+              r.aliasKey = null;
               r.comment = _commentController.text.trim().isEmpty ? null : _commentController.text.trim();
+              r.commentKey = null;
               r.valueFormat = _format;
               r.compositeType = _compositeType;
               r.parseAndSetDisplayValue(_valueController.text.trim(), widget.byteOrder);

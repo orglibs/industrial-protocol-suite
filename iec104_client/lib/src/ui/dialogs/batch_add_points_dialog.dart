@@ -96,19 +96,22 @@ class _BatchAddPointsDialogState extends State<BatchAddPointsDialog> {
                 DropdownButtonFormField<AsduTypeId>(
                   initialValue: _selectedType,
                   isExpanded: true,
-                  decoration: const InputDecoration(
-                    labelText: 'ASDU Type',
-                    prefixIcon: Icon(Icons.category),
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: i18n.t('pointType'),
+                    prefixIcon: const Icon(Icons.category),
+                    border: const OutlineInputBorder(),
                   ),
-                  items: const [
-                    DropdownMenuItem(value: AsduTypeId.mSpNa1, child: Text('Type 1: M_SP_NA_1 (Single Point)')),
-                    DropdownMenuItem(value: AsduTypeId.mDpNa1, child: Text('Type 3: M_DP_NA_1 (Double Point)')),
-                    DropdownMenuItem(value: AsduTypeId.mMeNc1, child: Text('Type 13: M_ME_NC_1 (Short Float)')),
-                    DropdownMenuItem(value: AsduTypeId.mMeNa1, child: Text('Type 9: M_ME_NA_1 (Normalized)')),
-                    DropdownMenuItem(value: AsduTypeId.mMeNb1, child: Text('Type 11: M_ME_NB_1 (Scaled)')),
-                    DropdownMenuItem(value: AsduTypeId.mItNa1, child: Text('Type 15: M_IT_NA_1 (Energy Counter)')),
-                  ],
+                  items: [
+                    AsduTypeId.mSpNa1,
+                    AsduTypeId.mDpNa1,
+                    AsduTypeId.mMeNc1,
+                    AsduTypeId.mMeNa1,
+                    AsduTypeId.mMeNb1,
+                    AsduTypeId.mItNa1,
+                  ].map((t) => DropdownMenuItem(
+                    value: t,
+                    child: Text('Type ${t.id}: ${t.nameString} (${t.description})'),
+                  )).toList(),
                   onChanged: _onTypeChanged,
                 ),
                 const SizedBox(height: 16),

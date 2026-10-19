@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:iec104_client/src/client/iec104_client.dart';
 import 'package:iec104_client/src/client/station_data.dart';
 import 'package:iec104_client/src/client/workspace_storage.dart';
+import 'package:iec104_client/src/i18n/app_i18n.dart';
 import 'package:iec104_client/src/protocol/asdu.dart';
 
 void main() {
@@ -110,6 +111,40 @@ void main() {
       ));
 
       expect(autoSaved, isTrue);
+    });
+
+    test('Demo data points and stations support reactive i18n via nameKey', () {
+      final client = Iec104Client();
+      final st = client.getStation(1);
+      final p1 = st.getPoint(1);
+      expect(p1, isNotNull);
+
+      // Chinese
+      AppI18n.instance.setLanguage(AppLanguage.zhCN);
+      expect(st.displayName, anyOf(contains('变电站'), contains('开闭所')));
+      expect(p1!.displayName, contains('断路器'));
+
+      // English
+      AppI18n.instance.setLanguage(AppLanguage.enUS);
+      expect(st.displayName, anyOf(contains('Substation'), contains('Station')));
+      expect(p1.displayName, contains('Breaker'));
+
+      // German
+      AppI18n.instance.setLanguage(AppLanguage.deDE);
+      expect(st.displayName, anyOf(contains('Umspannwerk'), contains('Schaltstation'), contains('Station')));
+
+      // Inferred nameKey on legacy json without nameKey (current language is German)
+      final legacyPoint = ClientPointModel.fromJson(1, {
+        'ioa': 1,
+        'typeId': AsduTypeId.mSpNa1.id,
+        'name': 'Old Breaker Name',
+      });
+      expect(legacyPoint.nameKey, equals('point_breaker_101'));
+      expect(legacyPoint.displayName, contains('Leistungsschalter'));
+
+      // Switch back to English
+      AppI18n.instance.setLanguage(AppLanguage.enUS);
+      expect(legacyPoint.displayName, contains('Breaker'));
     });
   });
 }

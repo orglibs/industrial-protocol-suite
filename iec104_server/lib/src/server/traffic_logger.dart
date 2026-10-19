@@ -1,13 +1,18 @@
 import 'dart:async';
 import 'dart:typed_data';
+import '../i18n/app_i18n.dart';
 import '../protocol/parser.dart';
 
 enum TrafficDirection {
-  rx('收 [RX]'),
-  tx('发 [TX]');
+  rx('RX'),
+  tx('TX');
 
-  final String label;
-  const TrafficDirection(this.label);
+  final String englishLabel;
+  const TrafficDirection(this.englishLabel);
+
+  String get label => this == TrafficDirection.rx
+      ? AppI18n.instance.t('dirRxDesc')
+      : AppI18n.instance.t('dirTxDesc');
 }
 
 class TrafficEntry {

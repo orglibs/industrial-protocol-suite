@@ -3,6 +3,8 @@ import 'src/i18n/app_i18n.dart';
 import 'src/ui/home_screen.dart';
 import 'src/ui/widgets/window_title_bar.dart';
 
+import 'src/models/server_config.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await WindowManagerHelper.initialize();
@@ -10,7 +12,9 @@ void main() async {
 }
 
 class Iec61850App extends StatefulWidget {
-  const Iec61850App({super.key});
+  final List<ServerConfig>? initialConnections;
+
+  const Iec61850App({super.key, this.initialConnections});
 
   @override
   State<Iec61850App> createState() => _Iec61850AppState();
@@ -76,6 +80,7 @@ class _Iec61850AppState extends State<Iec61850App> {
       home: Directionality(
         textDirection: i18n.currentLanguage.isRtl ? TextDirection.rtl : TextDirection.ltr,
         child: HomeScreen(
+          initialConnections: widget.initialConnections,
           onToggleTheme: _toggleTheme,
           isDarkMode: _themeMode == ThemeMode.dark,
           onLanguageChanged: _onLanguageChanged,

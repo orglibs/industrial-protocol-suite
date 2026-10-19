@@ -1,23 +1,32 @@
+import '../i18n/app_i18n.dart';
+import 'dictionary_service.dart';
+
 /// Functional Constraints defined in IEC 61850-7-2
 enum FunctionalConstraint {
-  st('ST', '状态信息 (Status)'),
-  mx('MX', '测量值 (Measurand)'),
-  co('CO', '控制 (Control)'),
-  sp('SP', '定值 (Set Point)'),
-  sv('SV', '取代 (Substitution)'),
-  cf('CF', '配置 (Configuration)'),
-  dc('DC', '描述 (Description)'),
-  sg('SG', '定值区 (Setting Group)'),
-  se('SE', '定值区编辑 (Setting Group Editable)'),
-  sr('SR', '服务响应 (Service Response)'),
-  or('OR', '操作接收 (Operate Received)'),
-  bl('BL', '闭锁 (Blocking)'),
-  ex('EX', '扩展 (Extended)'),
-  unknown('XX', '未知约束 (Unknown)');
+  st('ST', 'Status (ST)'),
+  mx('MX', 'Measurand (MX)'),
+  co('CO', 'Control (CO)'),
+  sp('SP', 'Set Point (SP)'),
+  sv('SV', 'Substitution (SV)'),
+  cf('CF', 'Configuration (CF)'),
+  dc('DC', 'Description (DC)'),
+  sg('SG', 'Setting Group (SG)'),
+  se('SE', 'Setting Group Editable (SE)'),
+  sr('SR', 'Service Response (SR)'),
+  or('OR', 'Operate Received (OR)'),
+  bl('BL', 'Blocking (BL)'),
+  ex('EX', 'Extended (EX)'),
+  unknown('XX', 'Unknown Constraint');
 
   final String code;
-  final String desc;
-  const FunctionalConstraint(this.code, this.desc);
+  final String englishDesc;
+  const FunctionalConstraint(this.code, this.englishDesc);
+
+  String get desc {
+    final key = 'fc_${code.toLowerCase()}';
+    final translated = AppI18n.instance.t(key);
+    return translated.isNotEmpty && translated != key ? translated : englishDesc;
+  }
 
   static FunctionalConstraint fromCode(String code) {
     final upper = code.trim().toUpperCase();
@@ -318,6 +327,10 @@ class SclLN {
         svControls = svControls ?? [];
 
   String get lnName => '$prefix$lnClass$inst';
+  String? get displayDesc {
+    if (desc != null && desc!.isNotEmpty) return desc;
+    return DictionaryService.instance.lookupLn(lnClass);
+  }
 }
 
 /// SCL Logical Device (LDevice)
@@ -363,6 +376,11 @@ class SclDOTypeElement {
     this.desc,
     this.val,
   });
+
+  String? get displayDesc {
+    if (desc != null && desc!.isNotEmpty) return desc;
+    return DictionaryService.instance.lookupDo(name);
+  }
 }
 
 class SclDOType {
@@ -377,6 +395,11 @@ class SclDOType {
     this.desc,
     List<SclDOTypeElement>? daList,
   }) : daList = daList ?? [];
+
+  String? get displayDesc {
+    if (desc != null && desc!.isNotEmpty) return desc;
+    return DictionaryService.instance.lookupCdc(cdc);
+  }
 }
 
 class SclLNodeTypeElement {
@@ -389,6 +412,11 @@ class SclLNodeTypeElement {
     required this.type,
     this.desc,
   });
+
+  String? get displayDesc {
+    if (desc != null && desc!.isNotEmpty) return desc;
+    return DictionaryService.instance.lookupDo(name);
+  }
 }
 
 class SclLNodeType {
@@ -403,6 +431,11 @@ class SclLNodeType {
     this.desc,
     List<SclLNodeTypeElement>? doList,
   }) : doList = doList ?? [];
+
+  String? get displayDesc {
+    if (desc != null && desc!.isNotEmpty) return desc;
+    return DictionaryService.instance.lookupLn(lnClass);
+  }
 }
 
 class SclDATypeElement {
@@ -419,6 +452,10 @@ class SclDATypeElement {
     this.type,
     this.val,
   });
+
+  String? get displayDesc {
+    return DictionaryService.instance.lookupDa(name);
+  }
 }
 
 class SclDAType {

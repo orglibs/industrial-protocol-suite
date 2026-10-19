@@ -76,7 +76,7 @@ class _EditPointDialogState extends State<EditPointDialog> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('${i18n.t('filterStation')}: CA = ${widget.station.commonAddress} (${widget.station.name})'),
+                Text('${i18n.t('filterStation')}: CA = ${widget.station.commonAddress} (${widget.station.displayName})'),
                 const SizedBox(height: 4),
                 Text('${i18n.t('ioa')}: ${p.ioa} (0x${p.ioa.toRadixString(16).toUpperCase()})'),
                 const SizedBox(height: 4),
@@ -132,6 +132,7 @@ class _EditPointDialogState extends State<EditPointDialog> {
             FilledButton(
               onPressed: () {
                 if (_formKey.currentState?.validate() ?? false) {
+                  p.nameKey = null;
                   p.name = _nameCtrl.text.trim();
                   p.update(_parseValue(), p.quality);
                   widget.station.onDataChanged?.call();

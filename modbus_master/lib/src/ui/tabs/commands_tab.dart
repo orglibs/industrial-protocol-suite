@@ -110,7 +110,7 @@ class _CommandsTabState extends State<CommandsTab> {
           await widget.client.writeSingleCoil(unitId: unitId, address: addr, value: _coilBoolVal);
           sw.stop();
           resultStr = "[FC05 Write Single Coil OK]\n";
-          resultStr += "Unit: $unitId, Addr: $addr, Val: ${_coilBoolVal ? \"ON\" : \"OFF\"}";
+          resultStr += "Unit: $unitId, Addr: $addr, Val: ${_coilBoolVal ? 'ON' : 'OFF'}";
           break;
 
         case 6: // FC 06: Write Single Register
@@ -129,7 +129,7 @@ class _CommandsTabState extends State<CommandsTab> {
           sw.stop();
           resultStr = "[FC15 Write Multiple Coils OK]\n";
           resultStr += "Unit: $unitId, Addr: $addr, Qty: ${bools.length}\n";
-          resultStr += "Values: ${bools.map((b) => b ? 1 : 0).join(\", \")}";
+          resultStr += "Values: ${bools.map((b) => b ? 1 : 0).join(', ')}";
           break;
 
         case 16: // FC 16: Write Multiple Registers
@@ -140,7 +140,7 @@ class _CommandsTabState extends State<CommandsTab> {
           sw.stop();
           resultStr = "[FC16 Write Multiple Registers OK]\n";
           resultStr += "Unit: $unitId, Addr: $addr, Qty: ${vals.length}\n";
-          resultStr += "Values: ${vals.join(\", \")}";
+          resultStr += "Values: ${vals.join(', ')}";
           break;
 
         case 22: // FC 22: Mask Write Register
@@ -156,8 +156,8 @@ class _CommandsTabState extends State<CommandsTab> {
           sw.stop();
           resultStr = "[FC22 Mask Write Register OK]\n";
           resultStr += "Unit: $unitId, Addr: $addr\n";
-          resultStr += "AND: 0x${andMask.toRadixString(16).padLeft(4, \"0\").toUpperCase()}\n";
-          resultStr += "OR: 0x${orMask.toRadixString(16).padLeft(4, \"0\").toUpperCase()}";
+          resultStr += "AND: 0x${andMask.toRadixString(16).padLeft(4, '0').toUpperCase()}\n";
+          resultStr += "OR: 0x${orMask.toRadixString(16).padLeft(4, '0').toUpperCase()}";
           break;
 
         case 17: // FC 17: Report Slave ID
@@ -209,22 +209,22 @@ class _CommandsTabState extends State<CommandsTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(AppI18n.instance.t('protoType'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(AppI18n.instance.t('funcCode'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
                     children: [
-                      _fcChoice(1, 'FC01 Read Coils'),
-                      _fcChoice(2, 'FC02 Read Discrete Inputs'),
-                      _fcChoice(3, 'FC03 Read Holding Registers'),
-                      _fcChoice(4, 'FC04 Read Input Registers'),
-                      _fcChoice(5, 'FC05 Write Single Coil'),
-                      _fcChoice(6, 'FC06 Write Single Register'),
-                      _fcChoice(15, 'FC15 Write Multiple Coils'),
-                      _fcChoice(16, 'FC16 Write Multiple Registers'),
-                      _fcChoice(22, 'FC22 Mask Write Register'),
-                      _fcChoice(17, 'FC17 Report Server ID'),
+                      _fcChoice(1, AppI18n.instance.t('readCoils')),
+                      _fcChoice(2, AppI18n.instance.t('readDiscreteInputs')),
+                      _fcChoice(3, AppI18n.instance.t('readHoldingRegisters')),
+                      _fcChoice(4, AppI18n.instance.t('readInputRegisters')),
+                      _fcChoice(5, AppI18n.instance.t('writeSingleCoil')),
+                      _fcChoice(6, AppI18n.instance.t('writeSingleRegister')),
+                      _fcChoice(15, AppI18n.instance.t('writeMultipleCoils')),
+                      _fcChoice(16, AppI18n.instance.t('writeMultipleRegisters')),
+                      _fcChoice(22, AppI18n.instance.t('maskWriteRegister')),
+                      _fcChoice(17, AppI18n.instance.t('reportSlaveId')),
                     ],
                   ),
                 ],
@@ -281,13 +281,13 @@ class _CommandsTabState extends State<CommandsTab> {
                           children: [
                             Text('${AppI18n.instance.t('status')}: '),
                             ChoiceChip(
-                              label: const Text('ON (1)'),
+                              label: Text('${AppI18n.instance.t('on')} (1)'),
                               selected: _coilBoolVal,
                               onSelected: (_) => setState(() => _coilBoolVal = true),
                             ),
                             const SizedBox(width: 8),
                             ChoiceChip(
-                              label: const Text('OFF (0)'),
+                              label: Text('${AppI18n.instance.t('off')} (0)'),
                               selected: !_coilBoolVal,
                               onSelected: (_) => setState(() => _coilBoolVal = false),
                             ),
@@ -317,14 +317,20 @@ class _CommandsTabState extends State<CommandsTab> {
                           width: 160,
                           child: TextField(
                             controller: _andMaskCtrl,
-                            decoration: const InputDecoration(labelText: 'AND Mask (0xFFFF)', border: OutlineInputBorder()),
+                            decoration: InputDecoration(
+                              labelText: '${AppI18n.instance.t('andMask')} (0xFFFF)',
+                              border: const OutlineInputBorder(),
+                            ),
                           ),
                         ),
                         SizedBox(
                           width: 160,
                           child: TextField(
                             controller: _orMaskCtrl,
-                            decoration: const InputDecoration(labelText: 'OR Mask (0x0001)', border: OutlineInputBorder()),
+                            decoration: InputDecoration(
+                              labelText: '${AppI18n.instance.t('orMask')} (0x0001)',
+                              border: const OutlineInputBorder(),
+                            ),
                           ),
                         ),
                       ],
@@ -335,7 +341,7 @@ class _CommandsTabState extends State<CommandsTab> {
                         icon: _isExecuting
                             ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                             : const Icon(Icons.send),
-                        label: Text(AppI18n.instance.t('operation')),
+                        label: Text(_isExecuting ? AppI18n.instance.t('executing') : AppI18n.instance.t('executeCommand')),
                         onPressed: _isExecuting ? null : _executeCommand,
                       ),
                     ],

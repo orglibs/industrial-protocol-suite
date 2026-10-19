@@ -1,9 +1,9 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-/// IEC 60870-5-104 Master Station (主站 / 调度中心) 工业级矢量图标
+/// IEC 60870-5-104 Master Station (主站 / 调度中心) 极简工业级矢量图标
 ///
-/// 符合 24x24 工业图标网格规范，支持任意缩放、自定义颜色与线宽。
+/// 遵循 24x24 极简矢量图标设计规范，呈现带有全站总召唤与下发遥控指令的 SCADA 调度监控台。
+/// 支持任意缩放、自定义颜色与线宽，零第三方外部依赖。
 class Iec104MasterIcon extends StatelessWidget {
   final double size;
   final Color? color;
@@ -18,7 +18,7 @@ class Iec104MasterIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconColor = color ?? IconTheme.of(context).color ?? Colors.blueAccent;
+    final iconColor = color ?? IconTheme.of(context).color ?? const Color(0xFF0284C7);
 
     return CustomPaint(
       size: Size(size, size),
@@ -51,26 +51,25 @@ class _Iec104MasterIconPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     // 1. SCADA 调度监控屏幕
-    final screenRRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(2 * s, 3 * s, 20 * s, 14 * s),
-      Radius.circular(2.5 * s),
+    final screenRect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(3 * s, 3 * s, 18 * s, 13 * s),
+      Radius.circular(2 * s),
     );
-    canvas.drawRRect(screenRRect, strokePaint);
+    canvas.drawRRect(screenRect, strokePaint);
 
-    // 2. 调度控制台底座与立柱
+    // 2. 调度工作台底座与立柱
     canvas.drawLine(Offset(8 * s, 21 * s), Offset(16 * s, 21 * s), strokePaint);
-    canvas.drawLine(Offset(12 * s, 17 * s), Offset(12 * s, 21 * s), strokePaint);
+    canvas.drawLine(Offset(12 * s, 16 * s), Offset(12 * s, 21 * s), strokePaint);
 
-    // 3. 中央调度发射核心点
-    canvas.drawCircle(Offset(12 * s, 12 * s), 1.2 * s, fillPaint);
+    // 3. 调度总召发射信标中心点
+    canvas.drawCircle(Offset(12 * s, 11.5 * s), 1.2 * s, fillPaint);
 
-    // 4. 内层遥控波束 (Inner Command Wave)
-    final innerRect = Rect.fromCircle(center: Offset(12 * s, 12 * s), radius: 3.5 * s);
-    canvas.drawArc(innerRect, -math.pi * 0.85, math.pi * 0.7, false, strokePaint);
+    // 4. 屏内总召与遥控扫描波束
+    final innerRect = Rect.fromCircle(center: Offset(12 * s, 11.5 * s), radius: 3.5 * s);
+    canvas.drawArc(innerRect, -3.14159265 * 0.85, 3.14159265 * 0.7, false, strokePaint);
 
-    // 5. 外层总召广播波束 (Outer Interrogation Wave)
-    final outerRect = Rect.fromCircle(center: Offset(12 * s, 12 * s), radius: 6.5 * s);
-    canvas.drawArc(outerRect, -math.pi * 0.82, math.pi * 0.64, false, strokePaint);
+    final outerRect = Rect.fromCircle(center: Offset(12 * s, 11.5 * s), radius: 6.0 * s);
+    canvas.drawArc(outerRect, -3.14159265 * 0.82, 3.14159265 * 0.64, false, strokePaint);
   }
 
   @override

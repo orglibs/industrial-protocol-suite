@@ -9,7 +9,7 @@ class SimulationConfigDialog extends StatefulWidget {
   const SimulationConfigDialog({
     super.key,
     required this.initialConfig,
-    this.title,
+    required this.title,
   });
 
   @override
@@ -70,7 +70,7 @@ class _SimulationConfigDialogState extends State<SimulationConfigDialog> {
         children: [
           Icon(Icons.waves, color: theme.colorScheme.primary),
           const SizedBox(width: 8),
-          Expanded(child: Text(widget.title)),
+          Expanded(child: Text(widget.title, overflow: TextOverflow.ellipsis)),
         ],
       ),
       content: SizedBox(
@@ -89,10 +89,10 @@ class _SimulationConfigDialogState extends State<SimulationConfigDialog> {
               const SizedBox(height: 12),
               DropdownButtonFormField<EaseWaveType>(
                 value: _waveType,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: AppI18n.instance.t('waveType'),
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.show_chart),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.show_chart),
                 ),
                 items: EaseWaveType.values.where((w) => w != EaseWaveType.none).map((w) {
                   return DropdownMenuItem(value: w, child: Text(w.label));
@@ -106,9 +106,9 @@ class _SimulationConfigDialogState extends State<SimulationConfigDialog> {
                     child: TextField(
                       controller: _minController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: AppI18n.instance.t('waveMin'),
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                       ),
                       onChanged: (_) => setState(() {}),
                     ),
@@ -118,9 +118,9 @@ class _SimulationConfigDialogState extends State<SimulationConfigDialog> {
                     child: TextField(
                       controller: _maxController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: AppI18n.instance.t('waveMax'),
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                       ),
                       onChanged: (_) => setState(() {}),
                     ),
@@ -134,10 +134,10 @@ class _SimulationConfigDialogState extends State<SimulationConfigDialog> {
                     child: TextField(
                       controller: _durationController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: AppI18n.instance.t('wavePeriod'),
                         suffixText: 'ms',
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                       ),
                       onChanged: (_) => setState(() {}),
                     ),
@@ -147,9 +147,9 @@ class _SimulationConfigDialogState extends State<SimulationConfigDialog> {
                     child: TextField(
                       controller: _stepController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: AppI18n.instance.t('waveStep'),
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                       ),
                       onChanged: (_) => setState(() {}),
                     ),

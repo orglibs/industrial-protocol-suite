@@ -54,14 +54,17 @@ class _BatchInitDialogState extends State<BatchInitDialog> {
                   labelText: AppI18n.instance.t('pointType'),
                   border: OutlineInputBorder(),
                 ),
-                items: const [
-                  DropdownMenuItem(value: AsduTypeId.mSpNa1, child: const Text('Type 1: M_SP_NA_1 (Single Point)')),
-                  DropdownMenuItem(value: AsduTypeId.mDpNa1, child: const Text('Type 3: M_DP_NA_1 (Double Point)')),
-                  DropdownMenuItem(value: AsduTypeId.mMeNc1, child: const Text('Type 13: M_ME_NC_1 (Short Float)')),
-                  DropdownMenuItem(value: AsduTypeId.mMeNa1, child: const Text('Type 9: M_ME_NA_1 (Normalized)')),
-                  DropdownMenuItem(value: AsduTypeId.mMeNb1, child: const Text('Type 11: M_ME_NB_1 (Scaled)')),
-                  DropdownMenuItem(value: AsduTypeId.mItNa1, child: const Text('Type 15: M_IT_NA_1 (Totals)')),
-                ],
+                items: [
+                  AsduTypeId.mSpNa1,
+                  AsduTypeId.mDpNa1,
+                  AsduTypeId.mMeNc1,
+                  AsduTypeId.mMeNa1,
+                  AsduTypeId.mMeNb1,
+                  AsduTypeId.mItNa1,
+                ].map((t) => DropdownMenuItem(
+                  value: t,
+                  child: Text('Type ${t.id}: ${t.nameString} (${t.description})'),
+                )).toList(),
                 onChanged: (v) {
                   if (v != null) {
                     setState(() {
@@ -115,7 +118,7 @@ class _BatchInitDialogState extends State<BatchInitDialog> {
               TextFormField(
                 controller: _prefixController,
                 decoration: InputDecoration(
-                  labelText: 'Prefix',
+                  labelText: AppI18n.instance.t('namePrefix'),
                   border: OutlineInputBorder(),
                 ),
                 validator: (v) => (v == null || v.trim().isEmpty) ? AppI18n.instance.t('valRequired') : null,

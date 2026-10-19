@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 
-/// IEC 61850 Server / Virtual IED (智能变电站微机保护测控装置 / 服务端) 工业级矢量图标
+/// IEC 61850 Server / Virtual IED (智能变电站微机保护测控装置 / 服务端) 极简工业级矢量图标
 ///
-/// 严格遵循 24x24 工业图标网格与 Lucide 矢量规范。
-/// 呈现 19 英寸机架式微机保护测控装置 (IED)，顶部具有双重化过程层/站控层光纤收发器，
-/// 下部配备毫秒级断路器分合闸跳闸方波脉冲 (GOOSE Trip Pulse)。
-/// 支持任意缩放、自定义颜色、双色重音 (如 Cyan 机箱 + Amber 跳闸脉冲) 与线宽调节，零外部依赖。
+/// 遵循 24x24 极简矢量图标设计规范，呈现 19 英寸机架式 IED，配备过程层光纤接口与断路器跳闸方波脉冲 (GOOSE Trip)。
+/// 支持任意缩放、自定义颜色、可选双色重音与线宽调节，零第三方外部依赖。
 class Iec61850ServerIcon extends StatelessWidget {
   final double size;
   final Color? color;
@@ -65,34 +63,34 @@ class _Iec61850ServerIconPainter extends CustomPainter {
       ..strokeJoin = StrokeJoin.round;
 
     final fillPaint = Paint()
-      ..color = accentColor
+      ..color = color
       ..style = PaintingStyle.fill;
 
-    // 1. 19 英寸 IED 机架外壳 (3..21, 4..20)
+    // 1. 顶部双重化光纤以太网收发器接口
+    canvas.drawLine(Offset(7 * s, 2 * s), Offset(7 * s, 5 * s), strokePaint);
+    canvas.drawLine(Offset(11 * s, 2 * s), Offset(11 * s, 5 * s), strokePaint);
+
+    // 2. 19 英寸 IED 机箱外框 (3..21, 5..20)
     final chassisRRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(3 * s, 4 * s, 18 * s, 16 * s),
-      Radius.circular(2.2 * s),
+      Rect.fromLTWH(3 * s, 5 * s, 18 * s, 15 * s),
+      Radius.circular(2 * s),
     );
     canvas.drawRRect(chassisRRect, strokePaint);
 
-    // 2. 面板水平分界线
+    // 3. 面板水平分界线
     canvas.drawLine(Offset(3 * s, 10 * s), Offset(21 * s, 10 * s), strokePaint);
 
-    // 3. 顶部双重化光纤以太网收发器接口 (LC Duplex Optical Transceivers)
-    canvas.drawLine(Offset(7 * s, 2 * s), Offset(7 * s, 4 * s), strokePaint);
-    canvas.drawLine(Offset(11 * s, 2 * s), Offset(11 * s, 4 * s), strokePaint);
+    // 4. 面板运行状态 LED
+    canvas.drawCircle(Offset(17 * s, 7.5 * s), 1.0 * s, fillPaint);
 
-    // 4. 面板运行状态 LED 指示灯
-    canvas.drawCircle(Offset(16.5 * s, 7 * s), 1.0 * s, fillPaint);
-
-    // 5. 毫秒级断路器跳闸方波脉冲 (GOOSE XCBR Trip Pulse Waveform)
+    // 5. 毫秒级断路器跳闸方波脉冲 (GOOSE XCBR Trip Pulse)
     final tripPath = Path()
-      ..moveTo(6 * s, 16 * s)
-      ..lineTo(9.5 * s, 16 * s)
-      ..lineTo(9.5 * s, 12 * s)
-      ..lineTo(14 * s, 12 * s)
-      ..lineTo(14 * s, 16 * s)
-      ..lineTo(18 * s, 16 * s);
+      ..moveTo(6 * s, 15.5 * s)
+      ..lineTo(9 * s, 15.5 * s)
+      ..lineTo(9 * s, 12 * s)
+      ..lineTo(13 * s, 12 * s)
+      ..lineTo(13 * s, 15.5 * s)
+      ..lineTo(18 * s, 15.5 * s);
     canvas.drawPath(tripPath, accentStrokePaint);
   }
 

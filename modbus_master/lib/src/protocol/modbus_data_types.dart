@@ -1,31 +1,64 @@
 import 'dart:typed_data';
+import '../i18n/app_i18n.dart';
 
 /// Modbus 32-bit and 64-bit Byte Order / Endianness
 enum ModbusByteOrder {
-  abcd('ABCD (高字优先/大端 Big-Endian)'),
-  cdab('CDAB (低字优先/字交换 Little-Endian Word Swap)'),
-  badc('BADC (字节交换 Byte Swap)'),
-  dcba('DCBA (低字优先/小端 Little-Endian)');
+  abcd,
+  cdab,
+  badc,
+  dcba;
 
-  final String label;
-  const ModbusByteOrder(this.label);
+  String get label {
+    switch (this) {
+      case ModbusByteOrder.abcd:
+        return AppI18n.instance.t('orderAbcd');
+      case ModbusByteOrder.cdab:
+        return AppI18n.instance.t('orderCdab');
+      case ModbusByteOrder.badc:
+        return AppI18n.instance.t('orderBadc');
+      case ModbusByteOrder.dcba:
+        return AppI18n.instance.t('orderDcba');
+    }
+  }
 }
 
 /// Register Data Display Formats
 enum RegisterDataFormat {
-  hex16('16位 十六进制 (Hex 16)'),
-  bin16('16位 二进制 (Bin 16)'),
-  signed16('16位 有符号整数 (Int16)'),
-  unsigned16('16位 无符号整数 (UInt16)'),
-  signed32('32位 有符号整数 (Int32)'),
-  unsigned32('32位 无符号整数 (UInt32)'),
-  float32('32位 单精度浮点 (Float)'),
-  signed64('64位 有符号整数 (Int64)'),
-  double64('64位 双精度浮点 (Double)'),
-  asciiString('ASCII 字符串');
+  hex16,
+  bin16,
+  signed16,
+  unsigned16,
+  signed32,
+  unsigned32,
+  float32,
+  signed64,
+  double64,
+  asciiString;
 
-  final String label;
-  const RegisterDataFormat(this.label);
+  String get label {
+    switch (this) {
+      case RegisterDataFormat.hex16:
+        return AppI18n.instance.t('fmtHex16');
+      case RegisterDataFormat.bin16:
+        return AppI18n.instance.t('fmtBin16');
+      case RegisterDataFormat.signed16:
+        return AppI18n.instance.t('fmtSigned16');
+      case RegisterDataFormat.unsigned16:
+        return AppI18n.instance.t('fmtUnsigned16');
+      case RegisterDataFormat.signed32:
+        return AppI18n.instance.t('fmtSigned32');
+      case RegisterDataFormat.unsigned32:
+        return AppI18n.instance.t('fmtUnsigned32');
+      case RegisterDataFormat.float32:
+        return AppI18n.instance.t('fmtFloat32');
+      case RegisterDataFormat.signed64:
+        return AppI18n.instance.t('fmtSigned64');
+      case RegisterDataFormat.double64:
+        return AppI18n.instance.t('fmtDouble64');
+      case RegisterDataFormat.asciiString:
+        return AppI18n.instance.t('fmtAscii');
+    }
+  }
 }
 
 class ModbusDataConverter {

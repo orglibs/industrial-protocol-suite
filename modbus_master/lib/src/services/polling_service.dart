@@ -4,6 +4,7 @@ import '../models/register_group.dart';
 import '../models/slave_model.dart';
 import '../protocol/modbus_client.dart';
 import '../protocol/modbus_frame.dart';
+import '../i18n/app_i18n.dart';
 
 class PollingService {
   final ModbusClient client;
@@ -94,7 +95,7 @@ class PollingService {
           );
           sw.stop();
           group.updateValues(bits.map((b) => b ? 1 : 0).toList());
-          group.lastScanStatus = '成功 (OK)';
+          group.lastScanStatus = AppI18n.instance.t('statusOk');
           group.successCount++;
           group.lastLatencyMs = sw.elapsedMilliseconds;
           break;
@@ -107,7 +108,7 @@ class PollingService {
           );
           sw.stop();
           group.updateValues(bits.map((b) => b ? 1 : 0).toList());
-          group.lastScanStatus = '成功 (OK)';
+          group.lastScanStatus = AppI18n.instance.t('statusOk');
           group.successCount++;
           group.lastLatencyMs = sw.elapsedMilliseconds;
           break;
@@ -120,7 +121,7 @@ class PollingService {
           );
           sw.stop();
           group.updateValues(words);
-          group.lastScanStatus = '成功 (OK)';
+          group.lastScanStatus = AppI18n.instance.t('statusOk');
           group.successCount++;
           group.lastLatencyMs = sw.elapsedMilliseconds;
           break;
@@ -133,14 +134,14 @@ class PollingService {
           );
           sw.stop();
           group.updateValues(words);
-          group.lastScanStatus = '成功 (OK)';
+          group.lastScanStatus = AppI18n.instance.t('statusOk');
           group.successCount++;
           group.lastLatencyMs = sw.elapsedMilliseconds;
           break;
       }
     } catch (e) {
       sw.stop();
-      group.lastScanStatus = '错误: $e';
+      group.lastScanStatus = '${AppI18n.instance.t("errorPrefix")}: $e';
       group.errorCount++;
       group.lastLatencyMs = sw.elapsedMilliseconds;
     } finally {

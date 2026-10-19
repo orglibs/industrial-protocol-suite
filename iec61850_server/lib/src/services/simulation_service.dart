@@ -4,6 +4,7 @@ import '../models/server_variable_model.dart';
 class SimulationService {
   static final SimulationService instance = SimulationService._();
   SimulationService._();
+  SimulationService();
 
   Timer? _timer;
   final List<ServerVariableModel> _variables = [];

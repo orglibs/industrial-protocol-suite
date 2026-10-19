@@ -7,7 +7,7 @@ import 'package:iec61850_server/src/models/scl_parser.dart';
 import 'package:iec61850_server/src/models/server_config.dart';
 import 'package:iec61850_server/src/models/server_variable_model.dart';
 import 'package:iec61850_server/src/models/simulation_config.dart';
-import 'package:iec61850_server/src/protocol/goose_publisher.dart';
+import 'package:iec61850_server/src/i18n/app_i18n.dart';
 import 'package:iec61850_server/src/protocol/iec61850_server_engine.dart';
 import 'package:iec61850_server/src/protocol/iso_acse_mms.dart';
 import 'package:iec61850_server/src/protocol/tpkt_cotp.dart';
@@ -180,6 +180,34 @@ void main() {
       final found = engine.findVariable(testVar.shortRef);
       expect(found, isNotNull);
       expect(found!.reference, equals(testVar.reference));
+    });
+
+    test('ServerConfig demo data reactively updates displayName via nameKey', () {
+      final cfg = ServerConfig(
+        name: 'IEC 61850 MMS Default Server (Port 102)',
+        nameKey: 'preset_iec61850_server_default',
+      );
+
+      // Chinese
+      AppI18n.instance.setLanguage(AppLanguage.zhCN);
+      expect(cfg.displayName, contains('默认服务端'));
+
+      // English
+      AppI18n.instance.setLanguage(AppLanguage.enUS);
+      expect(cfg.displayName, contains('Default Server'));
+
+      // German
+      AppI18n.instance.setLanguage(AppLanguage.deDE);
+      expect(cfg.displayName, contains('Standard-Server'));
+
+      // Deserialization with fallback inference
+      final legacy = ServerConfig.fromJson({
+        'Name': 'IEC 61850 MMS Default Server (Port 102)',
+        'Ip': '0.0.0.0',
+        'Port': 102,
+      });
+      expect(legacy.nameKey, equals('preset_iec61850_server_default'));
+      expect(legacy.displayName, contains('Standard-Server'));
     });
   });
 }

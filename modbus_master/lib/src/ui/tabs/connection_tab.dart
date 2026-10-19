@@ -44,7 +44,11 @@ class _ConnectionTabState extends State<ConnectionTab> {
   List<String> _availablePorts = [];
   static const List<int> _baudRates = [1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200];
   static const List<int> _dataBitsList = [8, 7];
-  static const Map<int, String> _parityLabels = {0: 'None (0)', 1: 'Odd (1)', 2: 'Even (2)'};
+  Map<int, String> get _parityLabels => {
+    0: AppI18n.instance.t('parityNone'),
+    1: AppI18n.instance.t('parityOdd'),
+    2: AppI18n.instance.t('parityEven'),
+  };
   static const List<int> _stopBitsList = [1, 2];
 
   @override
@@ -106,10 +110,10 @@ class _ConnectionTabState extends State<ConnectionTab> {
             TextField(
               controller: textCtrl,
               autofocus: true,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: AppI18n.instance.t('serialPort'),
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.usb),
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.usb),
               ),
             ),
           ],
@@ -209,7 +213,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(AppI18n.instance.t('deleteConn')),
-        content: Text('${AppI18n.instance.t('deleteConn')} [${widget.activeConnection.name}]?'),
+        content: Text('${AppI18n.instance.t('deleteConn')} [${widget.activeConnection.displayName}]?'),
         actions: [
           TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text(AppI18n.instance.t('cancel'))),
           ElevatedButton(
@@ -253,7 +257,8 @@ class _ConnectionTabState extends State<ConnectionTab> {
 
     final json = slave.toJson();
     final copied = SlaveModel.fromJson(json);
-    copied.name = '${slave.name}_Copy';
+    copied.name = '${slave.displayName}_Copy';
+    copied.nameKey = null;
     copied.slaveId = nextId;
 
     setState(() {
@@ -261,7 +266,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
     });
     widget.onConfigChanged();
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('${AppI18n.instance.t('copySlave')}: ${copied.name}')),
+      SnackBar(content: Text('${AppI18n.instance.t('copySlave')}: ${copied.displayName}')),
     );
   }
 
@@ -270,7 +275,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(AppI18n.instance.t('deleteSlave')),
-        content: Text('${AppI18n.instance.t('deleteSlave')} [${slave.name}]?'),
+        content: Text('${AppI18n.instance.t('deleteSlave')} [${slave.displayName}]?'),
         actions: [
           TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text(AppI18n.instance.t('cancel'))),
           ElevatedButton(
@@ -375,7 +380,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
                                           color: theme.colorScheme.primary,
                                         ),
                                         const SizedBox(width: 6),
-                                        Text('${c.name} ($desc)', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                        Text('${c.displayName} ($desc)', style: const TextStyle(fontWeight: FontWeight.bold)),
                                       ],
                                     ),
                                   );
@@ -488,10 +493,10 @@ class _ConnectionTabState extends State<ConnectionTab> {
                           key: ValueKey(widget.activeConnection.mode),
                           isExpanded: true,
                           initialValue: widget.activeConnection.mode,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: AppI18n.instance.t('protoType'),
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.settings_ethernet),
+                            border: const OutlineInputBorder(),
+                            prefixIcon: const Icon(Icons.settings_ethernet),
                           ),
                           items: ModbusTransportMode.values.map((m) {
                             return DropdownMenuItem(
@@ -540,10 +545,10 @@ class _ConnectionTabState extends State<ConnectionTab> {
                                 initialValue: _availablePorts.contains(widget.activeConnection.serialPortName)
                                     ? widget.activeConnection.serialPortName
                                     : (_availablePorts.isNotEmpty ? _availablePorts.first : null),
-                                decoration: const InputDecoration(
+                                decoration: InputDecoration(
                                   labelText: AppI18n.instance.t('serialPort'),
-                                  border: OutlineInputBorder(),
-                                  prefixIcon: Icon(Icons.usb),
+                                  border: const OutlineInputBorder(),
+                                  prefixIcon: const Icon(Icons.usb),
                                 ),
                                 items: _availablePorts.map((p) => DropdownMenuItem(
                                   value: p,
@@ -584,9 +589,9 @@ class _ConnectionTabState extends State<ConnectionTab> {
                             initialValue: _baudRates.contains(widget.activeConnection.baudRate)
                                 ? widget.activeConnection.baudRate
                                 : 9600,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: AppI18n.instance.t('baudRate'),
-                              border: OutlineInputBorder(),
+                              border: const OutlineInputBorder(),
                             ),
                             items: _baudRates.map((b) => DropdownMenuItem(
                               value: b,
@@ -614,9 +619,9 @@ class _ConnectionTabState extends State<ConnectionTab> {
                             initialValue: _dataBitsList.contains(widget.activeConnection.dataBits)
                                 ? widget.activeConnection.dataBits
                                 : 8,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: AppI18n.instance.t('dataBits'),
-                              border: OutlineInputBorder(),
+                              border: const OutlineInputBorder(),
                             ),
                             items: _dataBitsList.map((d) => DropdownMenuItem(
                               value: d,
@@ -644,9 +649,9 @@ class _ConnectionTabState extends State<ConnectionTab> {
                             initialValue: _parityLabels.containsKey(widget.activeConnection.parity)
                                 ? widget.activeConnection.parity
                                 : 0,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: AppI18n.instance.t('parity'),
-                              border: OutlineInputBorder(),
+                              border: const OutlineInputBorder(),
                             ),
                             items: _parityLabels.entries.map((e) => DropdownMenuItem(
                               value: e.key,
@@ -674,9 +679,9 @@ class _ConnectionTabState extends State<ConnectionTab> {
                             initialValue: _stopBitsList.contains(widget.activeConnection.stopBits)
                                 ? widget.activeConnection.stopBits
                                 : 1,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: AppI18n.instance.t('stopBits'),
-                              border: OutlineInputBorder(),
+                              border: const OutlineInputBorder(),
                             ),
                             items: _stopBitsList.map((s) => DropdownMenuItem(
                               value: s,
@@ -704,10 +709,10 @@ class _ConnectionTabState extends State<ConnectionTab> {
                           child: TextField(
                             controller: _ipCtrl,
                             enabled: !isConnected,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: AppI18n.instance.t('listenIp'),
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.dns),
+                              border: const OutlineInputBorder(),
+                              prefixIcon: const Icon(Icons.dns),
                             ),
                           ),
                         ),
@@ -716,10 +721,10 @@ class _ConnectionTabState extends State<ConnectionTab> {
                           child: TextField(
                             controller: _portCtrl,
                             enabled: !isConnected,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: AppI18n.instance.t('listenPort'),
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.numbers),
+                              border: const OutlineInputBorder(),
+                              prefixIcon: const Icon(Icons.numbers),
                             ),
                             keyboardType: TextInputType.number,
                           ),
@@ -751,10 +756,10 @@ class _ConnectionTabState extends State<ConnectionTab> {
                         child: TextField(
                           controller: _timeoutCtrl,
                           enabled: !isConnected,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: AppI18n.instance.t('respDelay'),
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.timer),
+                            border: const OutlineInputBorder(),
+                            prefixIcon: const Icon(Icons.timer),
                           ),
                           keyboardType: TextInputType.number,
                         ),
@@ -781,7 +786,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
                   const Icon(Icons.account_tree, color: Colors.blueGrey, size: 24),
                   const SizedBox(width: 8),
                   Text(
-                    '[${widget.activeConnection.name}] ${AppI18n.instance.t('slavesList')}',
+                    '[${widget.activeConnection.displayName}] ${AppI18n.instance.t('slavesList')}',
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(width: 8),
@@ -861,7 +866,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    '${slave.name} [ID: ${slave.slaveId}]',
+                                    '${slave.displayName} [ID: ${slave.slaveId}]',
                                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                   ),
                                   const SizedBox(height: 2),
@@ -930,7 +935,7 @@ class _ConnectionTabState extends State<ConnectionTab> {
                                         : Icons.table_chart),
                                 color: Colors.teal,
                               ),
-                              title: Text(group.groupName, style: const TextStyle(fontWeight: FontWeight.w600)),
+                              title: Text(group.displayGroupName, style: const TextStyle(fontWeight: FontWeight.w600)),
                               subtitle: Text(
                                 '${group.registerType.label} | ${AppI18n.instance.t('startAddr')}: ${group.startAddress} | ${AppI18n.instance.t('pointsCount')}: ${group.quantity}',
                                 style: const TextStyle(fontSize: 12),

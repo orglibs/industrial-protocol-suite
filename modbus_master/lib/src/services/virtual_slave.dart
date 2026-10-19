@@ -16,7 +16,7 @@ class VirtualModbusSlave {
 
   double _simTime = 0.0;
 
-  VirtualModbusSlave({this.slaveId = 1, this.name = '虚拟从站设备 #1'}) {
+  VirtualModbusSlave({this.slaveId = 1, this.name = 'Virtual Slave #1'}) {
     _initDefaultData();
   }
 

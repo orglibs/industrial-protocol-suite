@@ -142,26 +142,26 @@ class _ToolsTabState extends State<ToolsTab> {
             selectedIndex: _selectedSubTool,
             onDestinationSelected: (idx) => setState(() => _selectedSubTool = idx),
             labelType: NavigationRailLabelType.all,
-            destinations: const [
+            destinations: [
               NavigationRailDestination(
-                icon: Icon(Icons.calculate_outlined),
-                selectedIcon: Icon(Icons.calculate),
-                label: Text(AppI18n.instance.t('numByteConvert')),
+                icon: const Icon(Icons.calculate_outlined),
+                selectedIcon: const Icon(Icons.calculate),
+                label: Text(AppI18n.instance.t('numByteConvert'), textAlign: TextAlign.center),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.verified_outlined),
-                selectedIcon: Icon(Icons.verified),
-                label: Text(AppI18n.instance.t('checkAlgo')),
+                icon: const Icon(Icons.verified_outlined),
+                selectedIcon: const Icon(Icons.verified),
+                label: Text(AppI18n.instance.t('checkAlgo'), textAlign: TextAlign.center),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.text_fields_outlined),
-                selectedIcon: Icon(Icons.text_fields),
-                label: Text(AppI18n.instance.t('charCodec')),
+                icon: const Icon(Icons.text_fields_outlined),
+                selectedIcon: const Icon(Icons.text_fields),
+                label: Text(AppI18n.instance.t('charCodec'), textAlign: TextAlign.center),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.usb_outlined),
-                selectedIcon: Icon(Icons.usb),
-                label: Text(AppI18n.instance.t('serialDetect')),
+                icon: const Icon(Icons.usb_outlined),
+                selectedIcon: const Icon(Icons.usb),
+                label: Text(AppI18n.instance.t('serialDetect'), textAlign: TextAlign.center),
               ),
             ],
           ),
@@ -202,14 +202,14 @@ class _ToolsTabState extends State<ToolsTab> {
                 child: DropdownButtonFormField<RegisterDataFormat>(
                   value: _numFormat,
                   decoration: InputDecoration(labelText: AppI18n.instance.t('dataFormat'), border: const OutlineInputBorder()),
-                  items: const [
-                    DropdownMenuItem(value: RegisterDataFormat.float32, child: Text('Float32 (32-bit)')),
-                    DropdownMenuItem(value: RegisterDataFormat.double64, child: Text('Double64 (64-bit)')),
-                    DropdownMenuItem(value: RegisterDataFormat.signed32, child: Text('Int32 (32-bit)')),
-                    DropdownMenuItem(value: RegisterDataFormat.unsigned32, child: Text('UInt32 (32-bit)')),
-                    DropdownMenuItem(value: RegisterDataFormat.signed16, child: Text('Int16 (16-bit)')),
-                    DropdownMenuItem(value: RegisterDataFormat.unsigned16, child: Text('UInt16 (16-bit)')),
-                  ],
+                  items: [
+                    RegisterDataFormat.float32,
+                    RegisterDataFormat.double64,
+                    RegisterDataFormat.signed32,
+                    RegisterDataFormat.unsigned32,
+                    RegisterDataFormat.signed16,
+                    RegisterDataFormat.unsigned16,
+                  ].map((fmt) => DropdownMenuItem(value: fmt, child: Text(fmt.label))).toList(),
                   onChanged: (v) {
                     if (v != null) {
                       setState(() => _numFormat = v);
@@ -252,9 +252,9 @@ class _ToolsTabState extends State<ToolsTab> {
                       Expanded(
                         child: TextFormField(
                           initialValue: _numInput,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: AppI18n.instance.t('inputNum'),
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
                           ),
                           onChanged: (v) {
                             _numInput = v;
@@ -271,9 +271,12 @@ class _ToolsTabState extends State<ToolsTab> {
                             borderRadius: BorderRadius.circular(4),
                             border: Border.all(color: theme.dividerColor),
                           ),
-                          child: Text(
-                            'Hex: $_bytesOutputHex',
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'monospace'),
+                          child: Directionality(
+                            textDirection: TextDirection.ltr,
+                            child: SelectableText(
+                              'Hex: $_bytesOutputHex',
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'monospace'),
+                            ),
                           ),
                         ),
                       ),
@@ -297,9 +300,9 @@ class _ToolsTabState extends State<ToolsTab> {
                       Expanded(
                         child: TextFormField(
                           initialValue: _bytesInputHex,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: AppI18n.instance.t('inputHex'),
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
                           ),
                           onChanged: (v) {
                             _bytesInputHex = v;
@@ -316,9 +319,12 @@ class _ToolsTabState extends State<ToolsTab> {
                             borderRadius: BorderRadius.circular(4),
                             border: Border.all(color: theme.dividerColor),
                           ),
-                          child: Text(
-                            '${AppI18n.instance.t('currValue')}: $_numberOutput',
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'monospace'),
+                          child: Directionality(
+                            textDirection: TextDirection.ltr,
+                            child: SelectableText(
+                              '${AppI18n.instance.t('currValue')}: $_numberOutput',
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'monospace'),
+                            ),
                           ),
                         ),
                       ),
@@ -346,10 +352,10 @@ class _ToolsTabState extends State<ToolsTab> {
           TextField(
             controller: _crcInputController,
             maxLines: 3,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: AppI18n.instance.t('inputHex'),
               hintText: '01 03 00 00 00 0A',
-              border: OutlineInputBorder(),
+              border: const OutlineInputBorder(),
             ),
             onChanged: (_) => _calcCrc(),
           ),
@@ -361,27 +367,36 @@ class _ToolsTabState extends State<ToolsTab> {
                 children: [
                   ListTile(
                     title: const Text('Modbus CRC-16 (0xA001)'),
-                    subtitle: Text(
-                      _crc16Result.isEmpty ? AppI18n.instance.t('waitingInput') : _crc16Result,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, fontFamily: 'monospace'),
+                    subtitle: Directionality(
+                      textDirection: TextDirection.ltr,
+                      child: SelectableText(
+                        _crc16Result.isEmpty ? AppI18n.instance.t('waitingInput') : _crc16Result,
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, fontFamily: 'monospace'),
+                      ),
                     ),
                     trailing: const Icon(Icons.check_circle_outline, color: Colors.green),
                   ),
                   const Divider(),
                   ListTile(
                     title: const Text('Modbus ASCII LRC'),
-                    subtitle: Text(
-                      _lrcResult.isEmpty ? AppI18n.instance.t('waitingInput') : _lrcResult,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, fontFamily: 'monospace'),
+                    subtitle: Directionality(
+                      textDirection: TextDirection.ltr,
+                      child: SelectableText(
+                        _lrcResult.isEmpty ? AppI18n.instance.t('waitingInput') : _lrcResult,
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, fontFamily: 'monospace'),
+                      ),
                     ),
                     trailing: const Icon(Icons.verified_outlined, color: Colors.blue),
                   ),
                   const Divider(),
                   ListTile(
                     title: const Text('Sum 8 (Checksum)'),
-                    subtitle: Text(
-                      _sum8Result.isEmpty ? AppI18n.instance.t('waitingInput') : _sum8Result,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, fontFamily: 'monospace'),
+                    subtitle: Directionality(
+                      textDirection: TextDirection.ltr,
+                      child: SelectableText(
+                        _sum8Result.isEmpty ? AppI18n.instance.t('waitingInput') : _sum8Result,
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, fontFamily: 'monospace'),
+                      ),
                     ),
                     trailing: const Icon(Icons.tag, color: Colors.orange),
                   ),
@@ -464,7 +479,7 @@ class _ToolsTabState extends State<ToolsTab> {
         const SizedBox(height: 24),
         Expanded(
           child: _detectedPorts.isEmpty
-              ? const Center(
+              ? Center(
                   child: Text(AppI18n.instance.t('noSerialFound')),
                 )
               : ListView.builder(
@@ -476,9 +491,9 @@ class _ToolsTabState extends State<ToolsTab> {
                         leading: const Icon(Icons.usb, color: Colors.blue),
                         title: Text(port, style: const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'monospace')),
                         subtitle: Text(port.contains('USB') ? 'USB Serial Port' : 'System TTY / Virtual Terminal'),
-                        trailing: const Chip(
+                        trailing: Chip(
                           label: Text(AppI18n.instance.t('serialReady'), style: const TextStyle(color: Colors.green)),
-                          backgroundColor: Color(0x224CAF50),
+                          backgroundColor: const Color(0x224CAF50),
                         ),
                       ),
                     );

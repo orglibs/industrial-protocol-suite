@@ -27,7 +27,7 @@ class _ReportsTabState extends State<ReportsTab> {
     final rcbs = widget.manager.engine.reportControls;
 
     if (rcbs.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(i18n.t('noRcbConfigured'), style: const TextStyle(color: Colors.grey)),
       );
     }
@@ -80,9 +80,26 @@ class _ReportsTabState extends State<ReportsTab> {
                               ),
                               const SizedBox(width: 8),
                               Expanded(
-                                child: Text(
-                                  rcb.name,
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      rcb.displayName,
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    if (rcb.displayName != rcb.name)
+                                      Text(
+                                        rcb.name,
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                  ],
                                 ),
                               ),
                               Switch(
@@ -134,6 +151,7 @@ class _ReportsTabState extends State<ReportsTab> {
 
   Widget _buildRcbDetails(SclReportControl rcb) {
     final i18n = AppI18n.instance;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final ds = widget.manager.engine.dataSets.firstWhere(
       (d) => d.name == rcb.datSet,
       orElse: () => SclDataSet(name: rcb.datSet),
@@ -159,9 +177,19 @@ class _ReportsTabState extends State<ReportsTab> {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: Text(
-                  rcb.name,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      rcb.displayName,
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    if (rcb.displayName != rcb.name)
+                      Text(
+                        rcb.name,
+                        style: TextStyle(fontSize: 12, color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                      ),
+                  ],
                 ),
               ),
               FilledButton.icon(
@@ -241,7 +269,7 @@ class _ReportsTabState extends State<ReportsTab> {
                     children: [
                       const Icon(Icons.dataset, size: 18),
                       const SizedBox(width: 8),
-                      Text('${i18n.t("relDataSetMembers")} [${ds.name}] (${ds.entries.length})',
+                      Text('${i18n.t("relDataSetMembers")} [${ds.displayName}] (${ds.entries.length})',
                           style: const TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),

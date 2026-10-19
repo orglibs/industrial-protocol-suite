@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
+import '../i18n/app_i18n.dart';
 
 enum TrafficDirection { tx, rx }
 
@@ -38,7 +39,7 @@ class TrafficEntry {
     return '$h:$m:$s.$ms';
   }
 
-  String get directionLabel => direction == TrafficDirection.tx ? 'TX (发送)' : 'RX (接收)';
+  String get directionLabel => direction == TrafficDirection.tx ? AppI18n.instance.t('dirTxDesc') : AppI18n.instance.t('dirRxDesc');
 }
 
 typedef TrafficLogEntry = TrafficEntry;

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-/// Modbus Master (主站 / 客户端仿真器) 工业级矢量图标
+/// Modbus Master (主站 / 客户端仿真器 MME) 极简工业级矢量图标
 ///
-/// 符合 24x24 工业图标网格规范，基于工业微控制器/总线芯片与标志性 "M" 轮询路径设计。
-/// 支持任意缩放、自定义颜色与线宽，零第三方依赖。
+/// 遵循 24x24 极简矢量图标设计规范，基于工业主机控制器芯片与标志性 "M" 轮询脉冲路径设计。
+/// 支持任意缩放、自定义颜色与线宽，零第三方外部依赖。
 class ModbusMasterIcon extends StatelessWidget {
   final double size;
   final Color? color;
@@ -46,31 +46,31 @@ class _ModbusMasterIconPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 
-    // 1. 中央工业主控芯片/模块外壳 (4..20, 4..20)
+    // 1. 工业芯片封装主体
     final chipRRect = RRect.fromRectAndRadius(
       Rect.fromLTWH(4 * s, 4 * s, 16 * s, 16 * s),
-      Radius.circular(2.5 * s),
+      Radius.circular(3 * s),
     );
     canvas.drawRRect(chipRRect, strokePaint);
 
-    // 2. 顶部总线接线引脚 (Top Pins)
-    canvas.drawLine(Offset(7 * s, 2 * s), Offset(7 * s, 4 * s), strokePaint);
-    canvas.drawLine(Offset(12 * s, 2 * s), Offset(12 * s, 4 * s), strokePaint);
-    canvas.drawLine(Offset(17 * s, 2 * s), Offset(17 * s, 4 * s), strokePaint);
+    // 2. 顶部总线引脚
+    canvas.drawLine(Offset(7 * s, 1.5 * s), Offset(7 * s, 4 * s), strokePaint);
+    canvas.drawLine(Offset(12 * s, 1.5 * s), Offset(12 * s, 4 * s), strokePaint);
+    canvas.drawLine(Offset(17 * s, 1.5 * s), Offset(17 * s, 4 * s), strokePaint);
 
-    // 3. 底部总线接线引脚 (Bottom Pins)
-    canvas.drawLine(Offset(7 * s, 20 * s), Offset(7 * s, 22 * s), strokePaint);
-    canvas.drawLine(Offset(12 * s, 20 * s), Offset(12 * s, 22 * s), strokePaint);
-    canvas.drawLine(Offset(17 * s, 20 * s), Offset(17 * s, 22 * s), strokePaint);
+    // 3. 底部总线引脚
+    canvas.drawLine(Offset(7 * s, 20 * s), Offset(7 * s, 22.5 * s), strokePaint);
+    canvas.drawLine(Offset(12 * s, 20 * s), Offset(12 * s, 22.5 * s), strokePaint);
+    canvas.drawLine(Offset(17 * s, 20 * s), Offset(17 * s, 22.5 * s), strokePaint);
 
-    // 4. 中央标志性 Modbus "M" 轮询拓扑路径
-    final path = Path()
-      ..moveTo(7 * s, 15 * s)
-      ..lineTo(7 * s, 9 * s)
-      ..lineTo(12 * s, 13.5 * s)
-      ..lineTo(17 * s, 9 * s)
-      ..lineTo(17 * s, 15 * s);
-    canvas.drawPath(path, strokePaint);
+    // 4. 主机标志性 "M" 轮询主动请求脉冲
+    final mPath = Path()
+      ..moveTo(7.5 * s, 15.5 * s)
+      ..lineTo(7.5 * s, 9.5 * s)
+      ..lineTo(12.0 * s, 14.0 * s)
+      ..lineTo(16.5 * s, 9.5 * s)
+      ..lineTo(16.5 * s, 15.5 * s);
+    canvas.drawPath(mPath, strokePaint);
   }
 
   @override

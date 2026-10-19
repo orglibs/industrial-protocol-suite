@@ -1,6 +1,7 @@
 import 'dart:async';
 import '../models/register_group.dart';
 import '../protocol/modbus_client.dart';
+import '../i18n/app_i18n.dart';
 
 class ScanResult {
   final int idOrAddress;
@@ -51,7 +52,7 @@ class AddressScannerService {
         yield ScanResult(
           idOrAddress: id,
           isSuccess: true,
-          detail: '从站在线! (FC03 R0=${words.first})',
+          detail: AppI18n.instance.tf('scanSlaveOnline', {'r0': '${words.first}'}),
           latencyMs: sw.elapsedMilliseconds,
         );
       } catch (e) {
@@ -62,14 +63,14 @@ class AddressScannerService {
           yield ScanResult(
             idOrAddress: id,
             isSuccess: true,
-            detail: '从站在线 (返回非法地址异常, 证实从机存在)',
+            detail: AppI18n.instance.t('scanSlaveOnlineExc'),
             latencyMs: sw.elapsedMilliseconds,
           );
         } else {
           yield ScanResult(
             idOrAddress: id,
             isSuccess: false,
-            detail: '无应答: $errStr',
+            detail: AppI18n.instance.tf('scanNoResponse', {'err': errStr}),
             latencyMs: sw.elapsedMilliseconds,
           );
         }
@@ -98,16 +99,16 @@ class AddressScannerService {
         String detail = '';
         if (type == ModbusRegisterType.coils) {
           final res = await client.readCoils(unitId: unitId, startAddress: addr, quantity: 1, customTimeoutMs: timeoutMs);
-          detail = '线圈: ${res.first ? "ON (1)" : "OFF (0)"}';
+          detail = '${AppI18n.instance.t("tabCoils")}: ${res.first ? "ON (1)" : "OFF (0)"}';
         } else if (type == ModbusRegisterType.discreteInputs) {
           final res = await client.readDiscreteInputs(unitId: unitId, startAddress: addr, quantity: 1, customTimeoutMs: timeoutMs);
-          detail = '离散输入: ${res.first ? "1" : "0"}';
+          detail = '${AppI18n.instance.t("tabDiscrete")}: ${res.first ? "1" : "0"}';
         } else if (type == ModbusRegisterType.holdingRegisters) {
           final res = await client.readHoldingRegisters(unitId: unitId, startAddress: addr, quantity: 1, customTimeoutMs: timeoutMs);
-          detail = '保持寄存器: ${res.first} (0x${res.first.toRadixString(16).padLeft(4, "0").toUpperCase()})';
+          detail = '${AppI18n.instance.t("tabHolding")}: ${res.first} (0x${res.first.toRadixString(16).padLeft(4, "0").toUpperCase()})';
         } else {
           final res = await client.readInputRegisters(unitId: unitId, startAddress: addr, quantity: 1, customTimeoutMs: timeoutMs);
-          detail = '输入寄存器: ${res.first} (0x${res.first.toRadixString(16).padLeft(4, "0").toUpperCase()})';
+          detail = '${AppI18n.instance.t("tabInput")}: ${res.first} (0x${res.first.toRadixString(16).padLeft(4, "0").toUpperCase()})';
         }
         sw.stop();
         yield ScanResult(
@@ -121,7 +122,7 @@ class AddressScannerService {
         yield ScanResult(
           idOrAddress: addr,
           isSuccess: false,
-          detail: '读取失败: $e',
+          detail: AppI18n.instance.tf('scanReadFailed', {'err': '$e'}),
           latencyMs: sw.elapsedMilliseconds,
         );
       }

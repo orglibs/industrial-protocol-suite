@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../i18n/app_i18n.dart';
 import '../../models/client_variable_model.dart';
 import '../../models/dictionary_service.dart';
 import '../../protocol/iec61850_client_manager.dart';
@@ -43,7 +44,7 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
     final engine = widget.manager.activeEngine;
     if (engine == null || !engine.isConnected) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请先连接到 IEC 61850 服务端后再执行在线模型发现')),
+        SnackBar(content: Text(AppI18n.instance.t('connectFirstDiscover'))),
       );
       return;
     }
@@ -54,7 +55,7 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
       if (ok && mounted) {
         widget.onDataChanged();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('在线模型发现成功！已加载 ${engine.allVariables.length} 个数据属性。')),
+          SnackBar(content: Text(AppI18n.instance.tf('onlineDiscoverSuccess', {'count': '${engine.allVariables.length}'}))),
         );
       }
     } finally {
@@ -64,6 +65,7 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = AppI18n.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final engine = widget.manager.activeEngine;
     final allVars = engine?.allVariables ?? [];
@@ -73,6 +75,8 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
         : allVars.where((v) =>
             v.reference.toLowerCase().contains(_filterText) ||
             v.shortRef.toLowerCase().contains(_filterText) ||
+            v.displayName.toLowerCase().contains(_filterText) ||
+            (v.name != null && v.name!.toLowerCase().contains(_filterText)) ||
             v.lnName.toLowerCase().contains(_filterText) ||
             v.doName.toLowerCase().contains(_filterText)).toList();
 
@@ -89,30 +93,54 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
               children: [
                 // Top Search Bar & Online Discover Button
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
                   child: Row(
                     children: [
                       Expanded(
-                        child: TextField(
-                          controller: _searchCtrl,
-                          decoration: InputDecoration(
-                            hintText: '搜索逻辑节点 / 数据对象 (如 GGIO, CSWI, stVal)...',
-                            prefixIcon: const Icon(Icons.search, size: 20),
-                            suffixIcon: _filterText.isNotEmpty
-                                ? IconButton(icon: const Icon(Icons.clear, size: 18), onPressed: () => _searchCtrl.clear())
-                                : null,
-                            isDense: true,
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        child: SizedBox(
+                          height: 32,
+                          child: Tooltip(
+                            message: i18n.t('searchLnDo'),
+                            child: TextField(
+                              controller: _searchCtrl,
+                              style: const TextStyle(fontSize: 12),
+                              decoration: InputDecoration(
+                                hintText: i18n.t('searchLnDo'),
+                                hintStyle: const TextStyle(fontSize: 12),
+                                prefixIcon: const Icon(Icons.search, size: 16),
+                                suffixIcon: _filterText.isNotEmpty
+                                    ? IconButton(
+                                        icon: const Icon(Icons.clear, size: 14),
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(maxWidth: 24, maxHeight: 24),
+                                        onPressed: () => _searchCtrl.clear(),
+                                      )
+                                    : null,
+                                isDense: true,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+                              ),
+                            ),
                           ),
                         ),
                       ),
                       const SizedBox(width: 8),
-                      FilledButton.tonalIcon(
-                        icon: _isDiscovering
-                            ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
-                            : const Icon(Icons.travel_explore, size: 18),
-                        label: const Text('在线发现'),
-                        onPressed: _isDiscovering ? null : _discoverOnline,
+                      Tooltip(
+                        message: i18n.t('onlineDiscover'),
+                        child: SizedBox(
+                          height: 32,
+                          child: FilledButton.tonalIcon(
+                            style: FilledButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                              visualDensity: VisualDensity.compact,
+                            ),
+                            icon: _isDiscovering
+                                ? const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2))
+                                : const Icon(Icons.travel_explore, size: 16),
+                            label: Text(i18n.t('onlineDiscover'), style: const TextStyle(fontSize: 12)),
+                            onPressed: _isDiscovering ? null : _discoverOnline,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -126,13 +154,71 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                       Icon(Icons.device_hub, size: 16, color: Theme.of(context).colorScheme.primary),
                       Expanded(
                         child: Text(
-                          'IED: ${engine?.scl?.iedName ?? "已连接测控装置"} | 总变量: ${allVars.length}',
+                          'IED: ${engine?.scl?.iedName ?? i18n.t("connectedIed")} | ${i18n.t("allVarsCount")}: ${allVars.length}',
                           style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Text('匹配: ${filteredVars.length}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                      Text('${i18n.t("matchedVars")}: ${filteredVars.length}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                    ],
+                  ),
+                ),
+                // Column Header Bar for Variables List
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF252526) : const Color(0xFFF0F2F5),
+                    border: Border(
+                      top: BorderSide(color: isDark ? Colors.grey[800]! : Colors.grey[300]!),
+                      bottom: BorderSide(color: isDark ? Colors.grey[800]! : Colors.grey[300]!),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 36,
+                        child: Text(
+                          'FC',
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isDark ? Colors.grey[400] : Colors.grey[700]),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Tooltip(
+                          message: i18n.t('colRef'),
+                          waitDuration: const Duration(milliseconds: 200),
+                          child: Text(
+                            i18n.t('colRef'),
+                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isDark ? Colors.grey[400] : Colors.grey[700]),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: 100,
+                        child: Tooltip(
+                          message: i18n.t('colLiveAcqVal'),
+                          waitDuration: const Duration(milliseconds: 200),
+                          child: Text(
+                            i18n.t('colLiveAcqVal'),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isDark ? Colors.grey[400] : Colors.grey[700]),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: 110,
+                        child: Text(
+                          i18n.t('colAction'),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isDark ? Colors.grey[400] : Colors.grey[700]),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -145,11 +231,11 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                             children: [
                               const Icon(Icons.device_unknown, size: 40, color: Colors.grey),
                               const SizedBox(height: 8),
-                              const Text('当前连接无数据测点', style: TextStyle(color: Colors.grey)),
+                              Text(i18n.t('noDataPoints'), style: const TextStyle(color: Colors.grey)),
                               const SizedBox(height: 8),
                               TextButton.icon(
                                 icon: const Icon(Icons.travel_explore),
-                                label: const Text('执行 MMS 在线模型发现 (GetNameList)'),
+                                label: Text(i18n.t('mmsOnlineDiscover')),
                                 onPressed: _discoverOnline,
                               ),
                             ],
@@ -161,57 +247,152 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                             final v = filteredVars[index];
                             final isSelected = _selectedVariable?.reference == v.reference;
 
-                            return ListTile(
-                              dense: true,
-                              selected: isSelected,
-                              selectedTileColor: Theme.of(context).colorScheme.primary.withOpacity(0.12),
-                              title: Row(
-                                children: [
-                                  _fcBadge(v.fcCode),
-                                  const SizedBox(width: 6),
-                                  Expanded(
-                                    child: Text(
-                                      '${v.ldInst}/${v.lnName}.${v.doName}.${v.daName}',
-                                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              subtitle: Row(
-                                children: [
-                                  Text(
-                                    '${v.type.name}  |  值: ${v.displayValue}',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: isDark ? Colors.grey[400] : Colors.grey[600],
-                                    ),
-                                  ),
-                                  if (v.isControllable) ...[
-                                    const SizedBox(width: 6),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                      decoration: BoxDecoration(
-                                        color: Colors.deepOrange.withOpacity(0.2),
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: const Text('可控', style: TextStyle(fontSize: 10, color: Colors.deepOrange, fontWeight: FontWeight.bold)),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                              trailing: IconButton(
-                                icon: const Icon(Icons.refresh, size: 16),
-                                tooltip: '单点读取',
-                                onPressed: () async {
-                                  await engine?.readVariable(v);
-                                  setState(() {});
-                                  widget.onDataChanged();
-                                },
-                              ),
+                            return InkWell(
                               onTap: () {
                                 setState(() => _selectedVariable = v);
                               },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: isSelected ? Theme.of(context).colorScheme.primary.withOpacity(0.12) : null,
+                                  border: Border(
+                                    bottom: BorderSide(
+                                      color: isDark ? Colors.grey[850]! : Colors.grey[200]!,
+                                      width: 0.5,
+                                    ),
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    // FC Badge (width: 36)
+                                    SizedBox(
+                                      width: 36,
+                                      child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: _fcBadge(v.fcCode),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+
+                                    // 运行行为 / 变量标识 (Expanded with Tooltip & Ellipsis)
+                                    Expanded(
+                                      child: Tooltip(
+                                        message: '${v.displayName}\n${v.shortRef}\n${v.reference}${v.displayDesc != null && v.displayDesc!.isNotEmpty ? '\n${v.displayDesc}' : ''}',
+                                        waitDuration: const Duration(milliseconds: 200),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Flexible(
+                                                  child: Text(
+                                                    v.displayName != v.shortRef
+                                                        ? '${v.displayName} (${v.shortRef})'
+                                                        : v.shortRef,
+                                                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                                                    overflow: TextOverflow.ellipsis,
+                                                    maxLines: 1,
+                                                  ),
+                                                ),
+                                                if (v.isControllable) ...[
+                                                  const SizedBox(width: 4),
+                                                  Container(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.deepOrange.withOpacity(0.18),
+                                                      borderRadius: BorderRadius.circular(3),
+                                                    ),
+                                                    child: Text(
+                                                      i18n.t('controllable'),
+                                                      style: const TextStyle(fontSize: 9, color: Colors.deepOrange, fontWeight: FontWeight.bold),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ],
+                                            ),
+                                            Text(
+                                              '${v.type.name}  |  ${v.reference}',
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+
+                                    // 采集值 (Fixed Width: 100 with Monospace, Ellipsis & Tooltip)
+                                    SizedBox(
+                                      width: 100,
+                                      child: Tooltip(
+                                        message: '${i18n.t("colLiveAcqVal")}: ${v.displayValue}',
+                                        waitDuration: const Duration(milliseconds: 200),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: isDark ? Colors.grey[800] : Colors.grey[200],
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            v.displayValue,
+                                            style: TextStyle(
+                                              fontFamily: 'monospace',
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              color: isDark ? Colors.lightBlue[300] : Colors.blue[900],
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+
+                                    // 操作按钮组 (Fixed Width: 110, with 8px spacing)
+                                    SizedBox(
+                                      width: 110,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          _buildActionIconButton(
+                                            icon: Icons.refresh,
+                                            color: isDark ? Colors.lightBlue[300] : Colors.blue[700],
+                                            tooltip: i18n.t('readSingle'),
+                                            onPressed: () async {
+                                              await engine?.readVariable(v);
+                                              setState(() {});
+                                              widget.onDataChanged();
+                                            },
+                                          ),
+                                          const SizedBox(width: 8),
+                                          _buildActionIconButton(
+                                            icon: Icons.edit_outlined,
+                                            color: isDark ? Colors.tealAccent[400] : Colors.teal[700],
+                                            tooltip: i18n.t('writeValueTooltip'),
+                                            onPressed: () => _openWriteDialog(v),
+                                          ),
+                                          if (v.isControllable) ...[
+                                            const SizedBox(width: 8),
+                                            _buildActionIconButton(
+                                              icon: Icons.power_settings_new,
+                                              color: Colors.deepOrange,
+                                              tooltip: i18n.t('remoteControl'),
+                                              onPressed: () => _openControlDialog(v),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             );
                           },
                         ),
@@ -225,7 +406,7 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
         Expanded(
           flex: 6,
           child: _selectedVariable == null
-              ? const Center(child: Text('在左侧选择一个数据属性查看详情、实时读取或执行控制', style: TextStyle(color: Colors.grey)))
+              ? Center(child: Text(i18n.t('selectAttrHint'), style: const TextStyle(color: Colors.grey)))
               : _buildInspectorPanel(_selectedVariable!),
         ),
       ],
@@ -233,12 +414,14 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
   }
 
   Widget _buildInspectorPanel(ClientVariableModel v) {
+    final i18n = AppI18n.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final engine = widget.manager.activeEngine;
     final dict = DictionaryService.instance;
-    final lnDesc = dict.getLogicalNode(v.lnName.replaceAll(RegExp(r'\d+'), ''));
+    final lnDesc = dict.getLogicalNode(v.lnName);
     final doDesc = dict.getDataObject(v.doName);
     final daDesc = dict.getDataAttribute(v.daName);
+    final cdcDesc = (v.cdc != null && v.cdc!.isNotEmpty) ? dict.getCdc(v.cdc!) : null;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -250,15 +433,41 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
               _fcBadge(v.fcCode),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(
-                  v.shortRef,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (v.displayName != v.shortRef)
+                      Tooltip(
+                        message: v.displayName,
+                        waitDuration: const Duration(milliseconds: 200),
+                        child: Text(
+                          v.displayName,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ),
+                    Tooltip(
+                      message: v.shortRef,
+                      waitDuration: const Duration(milliseconds: 200),
+                      child: Text(
+                        v.shortRef,
+                        style: TextStyle(
+                          fontSize: v.displayName != v.shortRef ? 12 : 16,
+                          fontWeight: v.displayName != v.shortRef ? FontWeight.normal : FontWeight.bold,
+                          color: v.displayName != v.shortRef ? (isDark ? Colors.grey[400] : Colors.grey[700]) : null,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               IconButton(
                 icon: Icon(v.isMonitored ? Icons.bookmark : Icons.bookmark_border),
                 color: v.isMonitored ? Colors.amber : null,
-                tooltip: v.isMonitored ? '已加入数据监视表' : '加入数据监视表',
+                tooltip: i18n.t('tabMonitor'),
                 onPressed: () {
                   setState(() => v.isMonitored = !v.isMonitored);
                   widget.onDataChanged();
@@ -266,9 +475,15 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
               ),
             ],
           ),
-          Text(
-            'MMS Reference: ${v.reference}',
-            style: TextStyle(fontSize: 11, color: isDark ? Colors.grey[400] : Colors.grey[600]),
+          Tooltip(
+            message: 'MMS Reference: ${v.reference}',
+            waitDuration: const Duration(milliseconds: 200),
+            child: Text(
+              'MMS Reference: ${v.reference}',
+              style: TextStyle(fontSize: 11, color: isDark ? Colors.grey[400] : Colors.grey[600]),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
           ),
           const SizedBox(height: 16),
 
@@ -279,23 +494,42 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('实时采集状态与控制操作', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  Text(i18n.t('liveControlTitle'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      const Text('采集值 (Value): ', style: TextStyle(fontWeight: FontWeight.w600)),
-                      Text(
-                        v.displayValue,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
+                      Text(i18n.t('acqValLabel'), style: const TextStyle(fontWeight: FontWeight.w600)),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: 140,
+                        child: Tooltip(
+                          message: '${i18n.t("acqValLabel")}${v.displayValue}',
+                          waitDuration: const Duration(milliseconds: 200),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: isDark ? Colors.grey[800] : Colors.grey[200],
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              v.displayValue,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontFamily: 'monospace',
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
                         ),
                       ),
                       const Spacer(),
                       FilledButton.tonalIcon(
                         icon: const Icon(Icons.refresh, size: 16),
-                        label: const Text('单点读取'),
+                        label: Text(i18n.t('readSingle')),
                         onPressed: () async {
                           await engine?.readVariable(v);
                           setState(() {});
@@ -305,7 +539,7 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                       const SizedBox(width: 8),
                       FilledButton.tonalIcon(
                         icon: const Icon(Icons.edit, size: 16),
-                        label: const Text('写入值'),
+                        label: Text(i18n.t('writeVal')),
                         onPressed: () => _openWriteDialog(v),
                       ),
                       if (v.isControllable) ...[
@@ -313,7 +547,7 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                         FilledButton.icon(
                           style: FilledButton.styleFrom(backgroundColor: Colors.deepOrange[700]),
                           icon: const Icon(Icons.power_settings_new, size: 16),
-                          label: const Text('遥控操作 (Control)'),
+                          label: Text(i18n.t('controlCmd')),
                           onPressed: () => _openControlDialog(v),
                         ),
                       ],
@@ -326,7 +560,7 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('品质状态 (Quality)', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                            Text(i18n.t('quality'), style: const TextStyle(fontSize: 11, color: Colors.grey)),
                             const SizedBox(height: 2),
                             Text(v.qualityString, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
                           ],
@@ -336,7 +570,7 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('更新时间 (Timestamp)', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                            Text(i18n.t('updateTime'), style: const TextStyle(fontSize: 11, color: Colors.grey)),
                             const SizedBox(height: 2),
                             Text(v.timestamp.toIso8601String().substring(11, 23),
                                 style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
@@ -347,7 +581,7 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('基础数据类型', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                            Text(i18n.t('baseDataType'), style: const TextStyle(fontSize: 11, color: Colors.grey)),
                             const SizedBox(height: 2),
                             Text(v.type.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
                           ],
@@ -368,17 +602,19 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.library_books, size: 18),
-                      SizedBox(width: 8),
-                      Text('IEC 61850 标准元数据字典解释', style: TextStyle(fontWeight: FontWeight.bold)),
+                      const Icon(Icons.library_books, size: 18),
+                      const SizedBox(width: 8),
+                      Text(i18n.t('standardDictMeta'), style: const TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
                   const SizedBox(height: 12),
-                  _dictRow('逻辑节点 (LN)', v.lnName, lnDesc?.display),
-                  _dictRow('数据对象 (DO)', v.doName, doDesc?.display),
-                  _dictRow('数据属性 (DA)', v.daName, daDesc?.display),
+                  _dictRow(i18n.t('dictLn'), v.lnName, lnDesc?.display),
+                  _dictRow(i18n.t('dictDo'), v.doName, doDesc?.display),
+                  _dictRow(i18n.t('dictDa'), v.daName, daDesc?.display),
+                  if (v.cdc != null && v.cdc!.isNotEmpty)
+                    _dictRow(i18n.t('dictCdc'), v.cdc!, cdcDesc?.display),
                 ],
               ),
             ),
@@ -389,6 +625,7 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
   }
 
   Widget _dictRow(String title, String code, String? explanation) {
+    final i18n = AppI18n.instance;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -396,21 +633,45 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
         children: [
           SizedBox(
             width: 110,
-            child: Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-            decoration: BoxDecoration(
-              color: Colors.blueGrey.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(4),
+            child: Tooltip(
+              message: title,
+              waitDuration: const Duration(milliseconds: 200),
+              child: Text(
+                title,
+                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
             ),
-            child: Text(code, style: const TextStyle(fontFamily: 'monospace', fontSize: 11)),
+          ),
+          Tooltip(
+            message: code,
+            waitDuration: const Duration(milliseconds: 200),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+              decoration: BoxDecoration(
+                color: Colors.blueGrey.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                code,
+                style: const TextStyle(fontFamily: 'monospace', fontSize: 11),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ),
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(
-              explanation ?? '无内置说明',
-              style: TextStyle(fontSize: 12, color: explanation != null ? null : Colors.grey),
+            child: Tooltip(
+              message: explanation ?? i18n.t('dictNoDesc'),
+              waitDuration: const Duration(milliseconds: 200),
+              child: Text(
+                explanation ?? i18n.t('dictNoDesc'),
+                style: TextStyle(fontSize: 12, color: explanation != null ? null : Colors.grey),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+              ),
             ),
           ),
         ],
@@ -435,6 +696,42 @@ class _ModelExplorerTabState extends State<ModelExplorerTab> {
       child: Text(
         fc,
         style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  Widget _buildActionIconButton({
+    required IconData icon,
+    required String tooltip,
+    required VoidCallback? onPressed,
+    Color? color,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Tooltip(
+      message: tooltip,
+      waitDuration: const Duration(milliseconds: 200),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(6),
+          onTap: onPressed,
+          child: Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(6),
+              color: color?.withValues(alpha: isDark ? 0.15 : 0.08) ??
+                  (isDark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.04)),
+              border: Border.all(
+                color: color?.withValues(alpha: isDark ? 0.3 : 0.2) ??
+                    (isDark ? Colors.grey[700]! : Colors.grey[300]!),
+                width: 0.8,
+              ),
+            ),
+            alignment: Alignment.center,
+            child: Icon(icon, size: 15, color: color ?? (isDark ? Colors.grey[300] : Colors.grey[700])),
+          ),
+        ),
       ),
     );
   }

@@ -18,6 +18,8 @@ class ClientSession {
   final CommandCallback? onCommandReceived;
   final void Function(ClientSession session)? onClosed;
   final void Function(ClientSession session)? onStateChanged;
+  final void Function()? onFrameReceived;
+  final void Function()? onFrameSent;
 
   // Protocol parameters
   final int t0Seconds; // Connection timeout (default 30)
@@ -35,6 +37,8 @@ class ClientSession {
   bool isDataTransferActive = false;
   int txSeq = 0; // Transmit sequence number N(S)
   int rxSeq = 0; // Receive sequence number N(R)
+  int rxFrameCount = 0;
+  int txFrameCount = 0;
   int _unconfirmedRxCount = 0;
   Timer? _t2Timer;
   Timer? _t3Timer;
@@ -50,6 +54,8 @@ class ClientSession {
     this.onCommandReceived,
     this.onClosed,
     this.onStateChanged,
+    this.onFrameReceived,
+    this.onFrameSent,
     this.t0Seconds = 30,
     this.t1Seconds = 15,
     this.t2Seconds = 10,
@@ -128,6 +134,8 @@ class ClientSession {
   }
 
   void _handleIncomingFrame(Uint8List rawFrame) {
+    rxFrameCount++;
+    onFrameReceived?.call();
     TrafficLogger.instance.log(
       direction: TrafficDirection.rx,
       remoteAddress: remoteAddress,
@@ -572,6 +580,8 @@ class ClientSession {
       if (socket != null) {
         socket!.add(bytes);
       }
+      txFrameCount++;
+      onFrameSent?.call();
       TrafficLogger.instance.log(
         direction: TrafficDirection.tx,
         remoteAddress: remoteAddress,

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'src/i18n/app_i18n.dart';
+import 'src/models/connection_config.dart';
 import 'src/server/iec104_server.dart';
+import 'src/server/workspace_storage.dart';
 import 'src/ui/home_screen.dart';
 import 'src/ui/widgets/window_title_bar.dart';
 
@@ -8,18 +10,21 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await WindowManagerHelper.initialize();
 
-  // Instantiate the core IEC 104 Server
-  final server = Iec104Server();
-  await server.loadWorkspace();
+  // Load connections from workspace storage (with auto-migration from legacy single server)
+  final connections = await WorkspaceStorage.loadConnections();
 
-  // Core IEC 104 Server does not start automatically by default; started manually via UI.
-  runApp(Iec104SimulatorApp(server: server));
+  runApp(Iec104SimulatorApp(initialConnections: connections));
 }
 
 class Iec104SimulatorApp extends StatefulWidget {
-  final Iec104Server server;
+  final List<Iec104ConnectionConfig>? initialConnections;
+  final Iec104Server? server;
 
-  const Iec104SimulatorApp({super.key, required this.server});
+  const Iec104SimulatorApp({
+    super.key,
+    this.initialConnections,
+    this.server,
+  });
 
   @override
   State<Iec104SimulatorApp> createState() => _Iec104SimulatorAppState();
@@ -75,6 +80,7 @@ class _Iec104SimulatorAppState extends State<Iec104SimulatorApp> {
       home: Directionality(
         textDirection: i18n.currentLanguage.isRtl ? TextDirection.rtl : TextDirection.ltr,
         child: HomeScreen(
+          initialConnections: widget.initialConnections,
           server: widget.server,
           onToggleTheme: _toggleTheme,
           isDarkMode: _themeMode == ThemeMode.dark,

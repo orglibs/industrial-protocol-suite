@@ -38,7 +38,7 @@ class _CreateConnectionDialogState extends State<CreateConnectionDialog> {
   void initState() {
     super.initState();
     final c = widget.initialConfig;
-    _nameCtrl = TextEditingController(text: c?.name ?? 'IEC 61850 Server Connection');
+    _nameCtrl = TextEditingController(text: c?.displayName ?? (c?.name ?? 'IEC 61850 Server Connection'));
     _ipCtrl = TextEditingController(text: c?.ip ?? '127.0.0.1');
     _portCtrl = TextEditingController(text: (c?.port ?? 102).toString());
     _localTsapCtrl = TextEditingController(text: '0x${(c?.localTsap ?? 0x0001).toRadixString(16).padLeft(4, '0')}');
@@ -83,9 +83,38 @@ class _CreateConnectionDialogState extends State<CreateConnectionDialog> {
       remoteTsap = int.parse(rStr, radix: 16);
     } catch (_) {}
 
+    final newName = _nameCtrl.text.trim();
+    final originalName = widget.initialConfig?.name;
+    final originalDisplayName = widget.initialConfig?.displayName;
+    final bool nameUnchanged = widget.initialConfig != null &&
+        (newName == originalName || newName == originalDisplayName);
+
+    String? assignedNameKey;
+    if (widget.initialConfig != null) {
+      assignedNameKey = nameUnchanged ? widget.initialConfig!.nameKey : null;
+    } else {
+      final defaultName = 'IEC 61850 Server Connection';
+      final isDefaultOrTemplate = newName.isEmpty ||
+          newName == defaultName ||
+          newName == AppI18n.instance.t('preset_iec61850_client_conn') ||
+          _templates.any((t) => newName == AppI18n.instance.t(t.titleKey));
+      if (isDefaultOrTemplate) {
+        if (_selectedTemplate?.contains('basic_io') == true) {
+          assignedNameKey = 'preset_conn_basic_io';
+        } else if (_selectedTemplate?.contains('control') == true) {
+          assignedNameKey = 'preset_conn_control';
+        } else if (_selectedTemplate?.contains('goose') == true) {
+          assignedNameKey = 'preset_conn_goose';
+        } else {
+          assignedNameKey = 'preset_iec61850_client_conn';
+        }
+      }
+    }
+
     final cfg = ConnectionConfig(
       id: id,
-      name: _nameCtrl.text.trim(),
+      name: newName,
+      nameKey: assignedNameKey,
       ip: _ipCtrl.text.trim(),
       port: port,
       localTsap: localTsap,
@@ -98,11 +127,11 @@ class _CreateConnectionDialogState extends State<CreateConnectionDialog> {
     Navigator.of(context).pop();
   }
 
+  bool get isEdit => widget.initialConfig != null;
+
   @override
   Widget build(BuildContext context) {
     final i18n = AppI18n.instance;
-    
-    
 
     return AlertDialog(
       title: Row(
@@ -120,10 +149,10 @@ class _CreateConnectionDialogState extends State<CreateConnectionDialog> {
             children: [
               TextField(
                 controller: _nameCtrl,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: i18n.t('connAlias'),
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.label_outline),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.label_outline),
                 ),
               ),
               const SizedBox(height: 16),
@@ -133,11 +162,11 @@ class _CreateConnectionDialogState extends State<CreateConnectionDialog> {
                     flex: 3,
                     child: TextField(
                       controller: _ipCtrl,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: i18n.t('remoteIp'),
                         hintText: '127.0.0.1 / 192.168.1.100',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.lan),
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.lan),
                       ),
                     ),
                   ),
@@ -147,11 +176,11 @@ class _CreateConnectionDialogState extends State<CreateConnectionDialog> {
                     child: TextField(
                       controller: _portCtrl,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: i18n.t('tcpPort'),
                         hintText: '102 / 10102',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.numbers),
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.numbers),
                       ),
                     ),
                   ),
@@ -163,10 +192,10 @@ class _CreateConnectionDialogState extends State<CreateConnectionDialog> {
                   Expanded(
                     child: TextField(
                       controller: _localTsapCtrl,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: i18n.t('localTsap'),
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.tag),
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.tag),
                       ),
                     ),
                   ),
@@ -174,10 +203,10 @@ class _CreateConnectionDialogState extends State<CreateConnectionDialog> {
                   Expanded(
                     child: TextField(
                       controller: _remoteTsapCtrl,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: i18n.t('remoteTsap'),
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.tag),
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.tag),
                       ),
                     ),
                   ),
@@ -187,13 +216,13 @@ class _CreateConnectionDialogState extends State<CreateConnectionDialog> {
               DropdownButtonFormField<String?>(
                 value: _selectedTemplate,
                 isExpanded: true,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: i18n.t('bindSclModel'),
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.description),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.description),
                 ),
                 items: [
-                  const DropdownMenuItem<String?>(
+                  DropdownMenuItem<String?>(
                     value: null,
                     child: Text(i18n.t('noOfflineModel')),
                   ),

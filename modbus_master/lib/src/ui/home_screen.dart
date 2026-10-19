@@ -14,7 +14,6 @@ import 'tabs/traffic_tab.dart';
 import 'tabs/tools_tab.dart';
 import 'tabs/chart_tab.dart';
 import 'widgets/language_picker.dart';
-import 'widgets/modbus_master_icon.dart';
 import 'widgets/window_title_bar.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -101,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
       await _switchActiveConnection(newConn);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${AppI18n.instance.t('newConn')}: ${newConn.name}')),
+          SnackBar(content: Text('${AppI18n.instance.t('newConn')}: ${newConn.displayName}')),
         );
       }
     }
@@ -136,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await _saveWorkspace();
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${AppI18n.instance.t('deleteConn')}: ${conn.name}')),
+        SnackBar(content: Text('${AppI18n.instance.t('deleteConn')}: ${conn.displayName}')),
       );
     }
   }
@@ -176,18 +175,52 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  NavigationRailDestination _buildRailDestination({
+    required IconData icon,
+    required IconData selectedIcon,
+    required String labelText,
+  }) {
+    return NavigationRailDestination(
+      icon: Tooltip(
+        message: labelText,
+        waitDuration: const Duration(milliseconds: 300),
+        child: Icon(icon),
+      ),
+      selectedIcon: Tooltip(
+        message: labelText,
+        waitDuration: const Duration(milliseconds: 300),
+        child: Icon(selectedIcon),
+      ),
+      label: Tooltip(
+        message: labelText,
+        waitDuration: const Duration(milliseconds: 300),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 72),
+          child: Text(
+            labelText,
+            textAlign: TextAlign.center,
+            softWrap: true,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 11),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     if (_isLoading) {
-      return const Scaffold(
+      return Scaffold(
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
               Text(AppI18n.instance.t('waitingInput')),
             ],
           ),
@@ -218,14 +251,30 @@ class _HomeScreenState extends State<HomeScreen> {
         titleSpacing: 0,
         leading: WindowManagerHelper.isSupportedPlatform
             ? DragToMoveArea(
-                child: const Padding(
-                  padding: EdgeInsets.only(left: 12),
-                  child: ModbusMasterIcon(size: 26, color: Color(0xFF10B981)),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8, right: 4),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: Image.asset(
+                      'assets/icons/modbus_master_app_512.png',
+                      width: 28,
+                      height: 28,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 ),
               )
-            : const Padding(
-                padding: EdgeInsets.only(left: 12),
-                child: ModbusMasterIcon(size: 26, color: Color(0xFF10B981)),
+            : Padding(
+                padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8, right: 4),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: Image.asset(
+                    'assets/icons/modbus_master_app_512.png',
+                    width: 28,
+                    height: 28,
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ),
         flexibleSpace: WindowManagerHelper.isSupportedPlatform
             ? const DragToMoveArea(child: SizedBox.expand())
@@ -310,6 +359,7 @@ class _HomeScreenState extends State<HomeScreen> {
               });
             },
           ),
+          const SizedBox(width: 6),
 
           // Save Workspace button
           IconButton(
@@ -317,6 +367,7 @@ class _HomeScreenState extends State<HomeScreen> {
             tooltip: i18n.t('saveWorkspace'),
             onPressed: _saveWorkspace,
           ),
+          const SizedBox(width: 6),
 
           // Theme Toggle Button
           if (widget.onToggleTheme != null)
@@ -325,6 +376,8 @@ class _HomeScreenState extends State<HomeScreen> {
               tooltip: widget.isDarkMode ? i18n.t('themeLight') : i18n.t('themeDark'),
               onPressed: widget.onToggleTheme,
             ),
+          if (widget.onToggleTheme != null)
+            const SizedBox(width: 6),
 
           LanguagePickerButton(
             onLanguageChanged: () {
@@ -332,54 +385,54 @@ class _HomeScreenState extends State<HomeScreen> {
               widget.onLanguageChanged?.call();
             },
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: 8),
 
           WindowControls(brightness: theme.brightness),
         ],
       ),
       body: Row(
         children: [
-          // Left NavigationRail matching modbus_slave style
-          NavigationRail(
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: (idx) => setState(() => _selectedIndex = idx),
-            labelType: NavigationRailLabelType.all,
-            leading: const Padding(
-              padding: EdgeInsets.symmetric(vertical: 8),
-              child: Icon(Icons.precision_manufacturing_outlined, size: 28),
+          // Left NavigationRail
+          ConstrainedBox(
+            constraints: const BoxConstraints(minWidth: 72, maxWidth: 88),
+            child: NavigationRail(
+              minWidth: 72,
+              selectedIndex: _selectedIndex,
+              onDestinationSelected: (idx) => setState(() => _selectedIndex = idx),
+              labelType: NavigationRailLabelType.all,
+              destinations: [
+                _buildRailDestination(
+                  icon: Icons.grid_view_outlined,
+                  selectedIcon: Icons.grid_view,
+                  labelText: i18n.t('tabRegisters'),
+                ),
+                _buildRailDestination(
+                  icon: Icons.account_tree_outlined,
+                  selectedIcon: Icons.account_tree,
+                  labelText: i18n.t('tabConnections'),
+                ),
+                _buildRailDestination(
+                  icon: Icons.send_outlined,
+                  selectedIcon: Icons.send,
+                  labelText: i18n.t('tabCommands'),
+                ),
+                _buildRailDestination(
+                  icon: Icons.sync_alt_outlined,
+                  selectedIcon: Icons.sync_alt,
+                  labelText: i18n.t('tabTraffic'),
+                ),
+                _buildRailDestination(
+                  icon: Icons.construction_outlined,
+                  selectedIcon: Icons.construction,
+                  labelText: i18n.t('tabTools'),
+                ),
+                _buildRailDestination(
+                  icon: Icons.show_chart_outlined,
+                  selectedIcon: Icons.show_chart,
+                  labelText: i18n.t('tabCharts'),
+                ),
+              ],
             ),
-            destinations: [
-              NavigationRailDestination(
-                icon: const Icon(Icons.grid_view_outlined),
-                selectedIcon: const Icon(Icons.grid_view),
-                label: Text(i18n.t('tabRegisters')),
-              ),
-              NavigationRailDestination(
-                icon: const Icon(Icons.account_tree_outlined),
-                selectedIcon: const Icon(Icons.account_tree),
-                label: Text(i18n.t('tabConnections')),
-              ),
-              NavigationRailDestination(
-                icon: const Icon(Icons.send_outlined),
-                selectedIcon: const Icon(Icons.send),
-                label: Text(i18n.t('tabCommands')),
-              ),
-              NavigationRailDestination(
-                icon: const Icon(Icons.sync_alt_outlined),
-                selectedIcon: const Icon(Icons.sync_alt),
-                label: Text(i18n.t('tabTraffic')),
-              ),
-              NavigationRailDestination(
-                icon: const Icon(Icons.construction_outlined),
-                selectedIcon: const Icon(Icons.construction),
-                label: Text(i18n.t('tabTools')),
-              ),
-              NavigationRailDestination(
-                icon: const Icon(Icons.show_chart_outlined),
-                selectedIcon: const Icon(Icons.show_chart),
-                label: Text(i18n.t('tabCharts')),
-              ),
-            ],
           ),
 
           const VerticalDivider(width: 1),
@@ -387,6 +440,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // Tab content
           Expanded(
             child: IndexedStack(
+              key: ValueKey(i18n.currentLanguage.code),
               index: _selectedIndex,
               children: [
                 RegisterViewTab(
@@ -442,7 +496,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(width: 6),
               Text(peerBadge, style: const TextStyle(fontSize: 12)),
               const SizedBox(width: 20),
-              Text('${AppI18n.instance.t('connAlias')}: ${_activeConfig.name}', style: const TextStyle(fontSize: 12)),
+              Text('${AppI18n.instance.t('connAlias')}: ${_activeConfig.displayName}', style: const TextStyle(fontSize: 12)),
               const SizedBox(width: 20),
               Text('${AppI18n.instance.t('slavesList')}: ${_activeConfig.slaves.length}', style: const TextStyle(fontSize: 12)),
               const SizedBox(width: 20),
@@ -462,6 +516,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildTitleRow(ThemeData theme, AppI18n i18n) {
+    final isConnected = _client.state == ModbusConnectionState.connected;
+    final activeDesc = _activeConfig.mode == ModbusTransportMode.serialRtu
+        ? (_activeConfig.serialPortName ?? 'COM')
+        : (_activeConfig.mode == ModbusTransportMode.virtual ? 'Sim' : '${_activeConfig.ip}:${_activeConfig.port}');
+    final activeTooltip = '${_activeConfig.displayName} ($activeDesc)\n${isConnected ? i18n.t('connected') : i18n.t('disconnected')}';
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -484,37 +544,46 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(width: 12),
 
         // Connection selector dropdown in AppBar
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: theme.dividerColor),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<ConnectionConfig>(
-              value: _activeConfig,
-              style: TextStyle(
-                color: theme.colorScheme.onSurface,
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
+        Tooltip(
+          message: activeTooltip,
+          waitDuration: const Duration(milliseconds: 200),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: theme.dividerColor),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<ConnectionConfig>(
+                value: _activeConfig,
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+                items: _connections.map((c) {
+                  final desc = c.mode == ModbusTransportMode.serialRtu
+                      ? (c.serialPortName ?? 'COM')
+                      : (c.mode == ModbusTransportMode.virtual ? 'Sim' : '${c.ip}:${c.port}');
+                  return DropdownMenuItem(
+                    value: c,
+                    child: Tooltip(
+                      message: '${c.displayName} ($desc)',
+                      waitDuration: const Duration(milliseconds: 200),
+                      child: Text('🔌 ${c.displayName} ($desc)'),
+                    ),
+                  );
+                }).toList(),
+                onChanged: (newConn) {
+                  if (newConn != null && newConn != _activeConfig) {
+                    _switchActiveConnection(newConn);
+                  }
+                },
               ),
-              items: _connections.map((c) {
-                final desc = c.mode == ModbusTransportMode.serialRtu
-                    ? (c.serialPortName ?? 'COM')
-                    : (c.mode == ModbusTransportMode.virtual ? 'Sim' : '${c.ip}:${c.port}');
-                return DropdownMenuItem(
-                  value: c,
-                  child: Text('🔌 ${c.name} ($desc)'),
-                );
-              }).toList(),
-              onChanged: (newConn) {
-                if (newConn != null && newConn != _activeConfig) {
-                  _switchActiveConnection(newConn);
-                }
-              },
             ),
           ),
         ),
+        const SizedBox(width: 8),
 
         IconButton(
           icon: const Icon(Icons.add_circle_outline, size: 20),

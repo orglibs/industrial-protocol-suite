@@ -113,7 +113,7 @@ class _WriteSingleRegisterDialogState extends State<WriteSingleRegisterDialog> {
         children: [
           Icon(Icons.edit_note, color: theme.colorScheme.primary),
           const SizedBox(width: 8),
-          Text('FC 06: Write Single Register', style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(AppI18n.instance.t('writeSingleRegister'), style: const TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
       content: SizedBox(
@@ -122,16 +122,16 @@ class _WriteSingleRegisterDialogState extends State<WriteSingleRegisterDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Unit ID: ${widget.slaveId}  |  ${AppI18n.instance.t('colAddr')}: ${widget.address}'),
+            Text('${AppI18n.instance.t('slaveId')}: ${widget.slaveId}  |  ${AppI18n.instance.t('colAddr')}: ${widget.address}'),
             const SizedBox(height: 16),
             TextField(
               controller: _valCtrl,
               autofocus: true,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: AppI18n.instance.t('inputNum'),
                 hintText: '1234 | 0x04D2',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.numbers),
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.numbers),
               ),
               onSubmitted: (_) => _send(),
             ),

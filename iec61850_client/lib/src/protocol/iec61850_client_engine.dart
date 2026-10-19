@@ -105,17 +105,17 @@ class Iec61850ClientEngine {
     if (isConnected) return true;
 
     try {
-      config.statusMessage = '正在连接 ${config.ip}:${config.port} ...';
+      config.statusMessage = 'Connecting to ${config.ip}:${config.port} ...';
       config.notifyUpdated();
 
       _socket = await Socket.connect(config.ip, config.port, timeout: const Duration(seconds: 5));
       _socket!.done.catchError((err) {
-        _onDisconnected('连接中断: $err');
+        _onDisconnected('Connection disconnected: $err');
       });
       _socket!.listen(
         _onDataReceived,
-        onError: (err) => _onDisconnected('连接异常: $err'),
-        onDone: () => _onDisconnected('服务端关闭了连接'),
+        onError: (err) => _onDisconnected('Connection error: $err'),
+        onDone: () => _onDisconnected('Server closed connection'),
         cancelOnError: true,
       );
 
@@ -171,20 +171,20 @@ class Iec61850ClientEngine {
 
       config.isConnected = true;
       config.lastConnectTime = DateTime.now();
-      config.statusMessage = '已连接到服务端: ${config.ip}:${config.port}';
+      config.statusMessage = 'Connected to server: ${config.ip}:${config.port}';
       config.notifyUpdated();
 
       _startPollingTimer();
       return true;
     } catch (e) {
-      _onDisconnected('连接失败: $e');
+      _onDisconnected('Connection failed: $e');
       return false;
     }
   }
 
   void disconnect() {
     _socket?.destroy();
-    _onDisconnected('用户主动断开连接');
+    _onDisconnected('User disconnected');
   }
 
   void _onDisconnected(String reason) {
@@ -192,7 +192,7 @@ class Iec61850ClientEngine {
     _socket = null;
     _rxBuffer.clear();
     _pendingRequests.forEach((_, c) {
-      if (!c.isCompleted) c.completeError('连接已断开');
+      if (!c.isCompleted) c.completeError('Connection closed');
     });
     _pendingRequests.clear();
 
@@ -385,7 +385,7 @@ class Iec61850ClientEngine {
 
   Future<Uint8List> _sendConfirmedRequest(Uint8List confirmedServiceRequest) async {
     if (!isConnected || _socket == null) {
-      throw '未连接到 IEC 61850 服务端';
+      throw 'Not connected to IEC 61850 server';
     }
 
     final invokeId = _invokeSequence++;
@@ -403,7 +403,7 @@ class Iec61850ClientEngine {
       config.txCount++;
     } catch (e) {
       _pendingRequests.remove(invokeId);
-      _onDisconnected('发送数据失败: $e');
+      _onDisconnected('Failed to send data: $e');
       rethrow;
     }
 
@@ -411,7 +411,7 @@ class Iec61850ClientEngine {
       const Duration(seconds: 5),
       onTimeout: () {
         _pendingRequests.remove(invokeId);
-        throw '请求超时 (InvokeID: $invokeId)';
+        throw 'Request timeout (InvokeID: $invokeId)';
       },
     );
   }
@@ -491,7 +491,7 @@ class Iec61850ClientEngine {
     if (!isConnected) return false;
 
     try {
-      config.statusMessage = '正在进行在线模型发现 (MMS GetNameList) ...';
+      config.statusMessage = 'Discovering online model (MMS GetNameList) ...';
       config.notifyUpdated();
 
       final domains = await getDomainNames();
@@ -544,11 +544,11 @@ class Iec61850ClientEngine {
       );
 
       bindSclModel(parseRes);
-      config.statusMessage = '在线模型发现成功：发现 ${domains.length} 个域，${discoveredVars.length} 个数据测点。';
+      config.statusMessage = 'Online discovery succeeded: found ${domains.length} domain(s), ${discoveredVars.length} data point(s).';
       config.notifyUpdated();
       return true;
     } catch (e) {
-      config.statusMessage = '在线模型发现异常: $e';
+      config.statusMessage = 'Online discovery error: $e';
       config.notifyUpdated();
       return false;
     }

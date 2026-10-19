@@ -1,24 +1,33 @@
+import '../i18n/app_i18n.dart';
+import 'dictionary_service.dart';
+
 /// Standard IEC 61850 Functional Constraints (FC)
 enum FunctionalConstraint {
-  st('ST', '状态信息 (Status)'),
-  mx('MX', '测量值模拟量 (Measurand)'),
-  co('CO', '控制命令 (Control)'),
-  sp('SP', '定值参数 (Setpoint)'),
-  sv('SV', '替代值 (Substitution)'),
-  cf('CF', '配置参数 (Configuration)'),
-  dc('DC', '描述信息 (Description)'),
-  sg('SG', '定值组 (Setting Group)'),
-  se('SE', '可编辑定值组 (Setting Group Editable)'),
-  rp('RP', '非缓存报告控制 (Unbuffered Report)'),
-  br('BR', '缓存报告控制 (Buffered Report)'),
-  lg('LG', '日志控制 (Log Control)'),
-  go('GO', 'GOOSE控制块 (GOOSE Control)'),
-  ms('MS', '组播采样值控制 (Multicast SV)'),
-  us('US', '单播采样值控制 (Unicast SV)');
+  st('ST', 'Status (ST)'),
+  mx('MX', 'Measurand (MX)'),
+  co('CO', 'Control (CO)'),
+  sp('SP', 'Setpoint (SP)'),
+  sv('SV', 'Substitution (SV)'),
+  cf('CF', 'Configuration (CF)'),
+  dc('DC', 'Description (DC)'),
+  sg('SG', 'Setting Group (SG)'),
+  se('SE', 'Setting Group Edit (SE)'),
+  rp('RP', 'Unbuffered Report (RP)'),
+  br('BR', 'Buffered Report (BR)'),
+  lg('LG', 'Log Control (LG)'),
+  go('GO', 'GOOSE Control (GO)'),
+  ms('MS', 'Multicast SV (MS)'),
+  us('US', 'Unicast SV (US)');
 
   final String code;
-  final String label;
-  const FunctionalConstraint(this.code, this.label);
+  final String englishLabel;
+  const FunctionalConstraint(this.code, this.englishLabel);
+
+  String get label {
+    final key = 'fc_${code.toLowerCase()}';
+    final translated = AppI18n.instance.t(key);
+    return translated.isNotEmpty && translated != key ? translated : englishLabel;
+  }
 
   static FunctionalConstraint fromCode(String code) {
     final upper = code.toUpperCase().trim();
@@ -103,6 +112,7 @@ class SclFCDA {
 /// SCL DataSet Model
 class SclDataSet {
   final String name;
+  String? nameKey;
   final String? desc;
   String ldInst;
   String lnName;
@@ -110,11 +120,16 @@ class SclDataSet {
 
   SclDataSet({
     required this.name,
+    this.nameKey,
     this.desc,
     this.ldInst = '',
     this.lnName = '',
     List<SclFCDA>? fcdaList,
   }) : fcdaList = fcdaList ?? [];
+
+  String get displayName => (nameKey != null && nameKey!.isNotEmpty)
+      ? AppI18n.instance.t(nameKey!)
+      : name;
 
   List<SclFCDA> get entries => fcdaList;
 }
@@ -164,6 +179,7 @@ class ReportOptFields {
 /// SCL Report Control Block (BRCB / URCB)
 class SclReportControl {
   final String name;
+  String? nameKey;
   final String rptId;
   final bool buffered;
   final int bufTime; // in milliseconds
@@ -183,6 +199,7 @@ class SclReportControl {
 
   SclReportControl({
     required this.name,
+    this.nameKey,
     required this.rptId,
     required this.buffered,
     this.bufTime = 50,
@@ -199,11 +216,16 @@ class SclReportControl {
     this.lastReportTime,
   })  : trgOps = trgOps ?? TriggerOptions(),
         optFields = optFields ?? ReportOptFields();
+
+  String get displayName => (nameKey != null && nameKey!.isNotEmpty)
+      ? AppI18n.instance.t(nameKey!)
+      : name;
 }
 
 /// SCL GOOSE Control Block (GCB)
 class SclGSEControl {
   final String name;
+  String? nameKey;
   final String goId;
   final String datSet;
   final int confRev;
@@ -215,6 +237,7 @@ class SclGSEControl {
 
   SclGSEControl({
     required this.name,
+    this.nameKey,
     required this.goId,
     required this.datSet,
     this.confRev = 1,
@@ -224,6 +247,10 @@ class SclGSEControl {
     this.minTime = 4,
     this.maxTime = 1000,
   });
+
+  String get displayName => (nameKey != null && nameKey!.isNotEmpty)
+      ? AppI18n.instance.t(nameKey!)
+      : name;
 }
 
 /// SCL Sampled Value Control Block (SVCB)
@@ -257,7 +284,9 @@ class SclLN {
   final String inst;
   final String prefix;
   final String lnType;
+  String? nameKey;
   final String? desc;
+  String? descKey;
   final List<SclDataSet> dataSets;
   final List<SclReportControl> reportControls;
   final List<SclGSEControl> gseControls;
@@ -268,7 +297,9 @@ class SclLN {
     this.inst = '',
     this.prefix = '',
     required this.lnType,
+    this.nameKey,
     this.desc,
+    this.descKey,
     List<SclDataSet>? dataSets,
     List<SclReportControl>? reportControls,
     List<SclGSEControl>? gseControls,
@@ -279,19 +310,59 @@ class SclLN {
         svControls = svControls ?? [];
 
   String get lnName => '$prefix$lnClass$inst';
+
+  String get displayName {
+    if (nameKey != null && nameKey!.isNotEmpty) {
+      return AppI18n.instance.t(nameKey!);
+    }
+    final dictDesc = DictionaryService.instance.getLogicalNode(lnClass);
+    if (dictDesc != null) {
+      return '$lnName (${dictDesc.display})';
+    }
+    return lnName;
+  }
+
+  String? get displayDesc {
+    if (descKey != null && descKey!.isNotEmpty) {
+      return AppI18n.instance.t(descKey!);
+    }
+    final dictDesc = DictionaryService.instance.getLogicalNode(lnClass);
+    if (dictDesc != null) {
+      return dictDesc.display;
+    }
+    return desc;
+  }
 }
 
 /// SCL Logical Device (LDevice)
 class SclLDevice {
   final String inst;
+  String? nameKey;
   final String? desc;
+  String? descKey;
   final List<SclLN> logicalNodes;
 
   SclLDevice({
     required this.inst,
+    this.nameKey,
     this.desc,
+    this.descKey,
     List<SclLN>? logicalNodes,
   }) : logicalNodes = logicalNodes ?? [];
+
+  String get displayName {
+    if (nameKey != null && nameKey!.isNotEmpty) {
+      return AppI18n.instance.t(nameKey!);
+    }
+    return inst;
+  }
+
+  String? get displayDesc {
+    if (descKey != null && descKey!.isNotEmpty) {
+      return AppI18n.instance.t(descKey!);
+    }
+    return desc;
+  }
 
   SclLN? findLN(String name) {
     for (final ln in logicalNodes) {
@@ -304,18 +375,36 @@ class SclLDevice {
 /// SCL IED (Intelligent Electronic Device)
 class SclIED {
   final String name;
+  String? nameKey;
   final String? desc;
+  String? descKey;
   final String? type;
   final String? manufacturer;
   final List<SclLDevice> lDevices;
 
   SclIED({
     required this.name,
+    this.nameKey,
     this.desc,
+    this.descKey,
     this.type,
     this.manufacturer,
     List<SclLDevice>? lDevices,
   }) : lDevices = lDevices ?? [];
+
+  String get displayName {
+    if (nameKey != null && nameKey!.isNotEmpty) {
+      return AppI18n.instance.t(nameKey!);
+    }
+    return name;
+  }
+
+  String? get displayDesc {
+    if (descKey != null && descKey!.isNotEmpty) {
+      return AppI18n.instance.t(descKey!);
+    }
+    return desc;
+  }
 
   SclLDevice? findLDevice(String inst) {
     for (final ld in lDevices) {
@@ -371,6 +460,11 @@ class SclDOType {
     List<SclSDOElement>? sdoList,
   })  : daList = daList ?? [],
         sdoList = sdoList ?? [];
+
+  String get cdcDisplay {
+    final d = DictionaryService.instance.getCdc(cdc);
+    return d != null ? '$cdc (${d.display})' : cdc;
+  }
 }
 
 class SclSDOElement {

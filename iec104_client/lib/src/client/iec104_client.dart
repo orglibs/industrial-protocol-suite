@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
+import '../i18n/app_i18n.dart';
 import '../protocol/apci.dart';
 import '../protocol/asdu.dart';
 import '../protocol/asdu_types.dart';
@@ -11,13 +12,27 @@ import 'traffic_logger.dart';
 import 'workspace_storage.dart';
 
 enum ClientConnectionState {
-  disconnected('未连接'),
-  connecting('连接中...'),
-  connected('已建立TCP连接'),
-  active('数据传输激活 (STARTDT已确认)');
+  disconnected('Disconnected'),
+  connecting('Connecting...'),
+  connected('Connected (TCP)'),
+  active('Active (STARTDT Confirmed)');
 
-  final String label;
-  const ClientConnectionState(this.label);
+  final String englishLabel;
+  const ClientConnectionState(this.englishLabel);
+
+  String get label {
+    final i18n = AppI18n.instance;
+    switch (this) {
+      case ClientConnectionState.disconnected:
+        return i18n.t('stateDisconnected');
+      case ClientConnectionState.connecting:
+        return i18n.t('stateConnecting');
+      case ClientConnectionState.connected:
+        return i18n.t('stateConnected');
+      case ClientConnectionState.active:
+        return i18n.t('stateActive');
+    }
+  }
 }
 
 class CommandResultEvent {
@@ -208,7 +223,8 @@ class Iec104Client {
     if (!stations.containsKey(ca)) {
       final st = ClientStationModel(
         commonAddress: ca,
-        name: '从站 #$ca (默认变电站)',
+        name: 'Station #$ca (Default Substation)',
+        nameKey: 'preset_station_110kv',
         onDataChanged: scheduleAutoSave,
       );
       st.applyTemplate('distribution');
@@ -222,7 +238,7 @@ class Iec104Client {
       ca,
       () => ClientStationModel(
         commonAddress: ca,
-        name: '从站 #$ca',
+        name: 'Station #$ca',
         onDataChanged: scheduleAutoSave,
       ),
     );
@@ -237,7 +253,7 @@ class Iec104Client {
   void addStation(int ca, {String? name, String? template}) {
     final st = ClientStationModel(
       commonAddress: ca,
-      name: (name != null && name.trim().isNotEmpty) ? name.trim() : '从站 #$ca',
+      name: (name != null && name.trim().isNotEmpty) ? name.trim() : 'Station #$ca',
       onDataChanged: scheduleAutoSave,
     );
     if (template != null && template.isNotEmpty) {
@@ -261,6 +277,7 @@ class Iec104Client {
   void updateStation(int oldCa, int newCa, String newName) {
     if (oldCa == newCa) {
       if (stations.containsKey(oldCa)) {
+        stations[oldCa]!.nameKey = null;
         stations[oldCa]!.name = newName.trim();
       }
     } else {
@@ -268,6 +285,7 @@ class Iec104Client {
       final newModel = ClientStationModel(
         commonAddress: newCa,
         name: newName.trim(),
+        nameKey: null,
         onDataChanged: scheduleAutoSave,
       );
       if (oldModel != null) {
@@ -277,6 +295,7 @@ class Iec104Client {
             ioa: p.ioa,
             typeId: p.typeId,
             name: p.name,
+            nameKey: p.nameKey,
             value: p.value,
             quality: p.quality,
             lastUpdated: p.lastUpdated,
@@ -576,26 +595,26 @@ class Iec104Client {
 
   String _generatePointName(AsduTypeId typeId, int ioa) {
     if (typeId == AsduTypeId.mSpNa1 || typeId == AsduTypeId.mSpTb1) {
-      return '单点遥信 #$ioa';
+      return 'Single Point #$ioa';
     } else if (typeId == AsduTypeId.mDpNa1 || typeId == AsduTypeId.mDpTb1) {
-      return '双点遥信 #$ioa';
+      return 'Double Point #$ioa';
     } else if (typeId == AsduTypeId.mMeNc1 || typeId == AsduTypeId.mMeTf1) {
       if (ioa >= 16385 && ioa <= 16387) {
-        return '三相母线电压 U${String.fromCharCode(65 + ioa - 16385)}';
+        return 'Bus Voltage U${String.fromCharCode(65 + ioa - 16385)}';
       } else if (ioa >= 16388 && ioa <= 16390) {
-        return '出线负荷电流 I${String.fromCharCode(65 + ioa - 16388)}';
+        return 'Feeder Current I${String.fromCharCode(65 + ioa - 16388)}';
       }
-      return '短浮点测量 #$ioa';
+      return 'Short Float Measurand #$ioa';
     } else if (typeId == AsduTypeId.mMeNa1 || typeId == AsduTypeId.mMeTd1) {
-      return '归一化遥测 #$ioa';
+      return 'Normalized Measurand #$ioa';
     } else if (typeId == AsduTypeId.mMeNb1 || typeId == AsduTypeId.mMeTe1) {
-      return '标度化遥测 #$ioa';
+      return 'Scaled Measurand #$ioa';
     } else if (typeId == AsduTypeId.mItNa1 || typeId == AsduTypeId.mItTb1) {
-      return '有功电能累计 #$ioa';
+      return 'Active Energy Total #$ioa';
     } else if (typeId == AsduTypeId.mStNa1 || typeId == AsduTypeId.mStTb1) {
-      return '变压器档位 #$ioa';
+      return 'Tap Position #$ioa';
     }
-    return '信息对象 #$ioa';
+    return 'Information Object #$ioa';
   }
 
   // --------------------------------------------------------------------------
@@ -1125,15 +1144,15 @@ class Iec104Client {
 
     // Connect in virtual mode
     _startWebVirtualMode();
-    results.add('1. [连接创建] 客户端初始化并接入仿真服务 (状态: ${_state.label})');
+    results.add('1. [Connection Setup] Client initialized and connected to simulation service (State: ${_state.label})');
 
     // Send STARTDT
     sendStartDt();
     await Future.delayed(const Duration(milliseconds: 150));
     if (_state == ClientConnectionState.active) {
-      results.add('2. [U格式握手] 成功发送 STARTDT act 并收到服务端 STARTDT con 确认，激活链路');
+      results.add('2. [U-Format Handshake] STARTDT act sent and STARTDT con confirmed, link activated');
     } else {
-      results.add('2. [U格式握手失败] 未能转为 active 状态');
+      results.add('2. [U-Format Handshake Failed] Unable to switch to active state');
     }
 
     // General Interrogation
@@ -1141,50 +1160,50 @@ class Iec104Client {
     await Future.delayed(const Duration(milliseconds: 250));
     final st = getStation(1);
     if (st.points.isNotEmpty) {
-      results.add('3. [总召唤测试] 下发 C_IC_NA_1 (Type 100) 总召唤，收到遥信(${st.points.values.where((p) => p.typeId == AsduTypeId.mSpNa1).length})与遥测(${st.points.values.where((p) => p.typeId == AsduTypeId.mMeNc1).length})，点位入库成功');
+      results.add('3. [General Interrogation] Sent C_IC_NA_1 (Type 100) GI, received single points (${st.points.values.where((p) => p.typeId == AsduTypeId.mSpNa1).length}) and measurands (${st.points.values.where((p) => p.typeId == AsduTypeId.mMeNc1).length})');
     } else {
-      results.add('3. [总召唤测试失败] 未收到总召数据点');
+      results.add('3. [General Interrogation Failed] No GI data points received');
     }
 
     // Clock Sync
     sendClockSynchronization(ca: 1);
     await Future.delayed(const Duration(milliseconds: 150));
-    results.add('4. [时钟对时测试] 下发 C_CS_NA_1 (Type 103) 时钟同步命令，服务端回复激活确认 (COT=7)');
+    results.add('4. [Clock Sync] Sent C_CS_NA_1 (Type 103) clock synchronization, server replied ActCon (COT=7)');
 
     // Single Command Select and Execute
     sendSingleCommand(ca: 1, ioa: 1, value: true, select: true);
     await Future.delayed(const Duration(milliseconds: 100));
     sendSingleCommand(ca: 1, ioa: 1, value: true, select: false);
     await Future.delayed(const Duration(milliseconds: 150));
-    results.add('5. [遥控预置与执行] 下发 C_SC_NA_1 (Type 45, IOA=1) 合闸预置与执行命令，触发突发上送 COT=3');
+    results.add('5. [Remote Control] Sent C_SC_NA_1 (Type 45, IOA=1) select and execute, triggered spontaneous transmission (COT=3)');
 
     // Counter Interrogation
     sendCounterInterrogation(ca: 1);
     await Future.delayed(const Duration(milliseconds: 150));
     final ymPoints = st.points.values.where((p) => p.typeId == AsduTypeId.mItNa1).toList();
     if (ymPoints.isNotEmpty) {
-      results.add('6. [电能量总召] 下发 C_CI_NA_1 (Type 101) 电能量召唤，成功收到遥脉电量值: ${ymPoints.first.displayValue}');
+      results.add('6. [Counter Interrogation] Sent C_CI_NA_1 (Type 101) counter interrogation, received counter value: ${ymPoints.first.displayValue}');
     } else {
-      results.add('6. [电能量总召完成] 下发 C_CI_NA_1 并处理电能量脉冲');
+      results.add('6. [Counter Interrogation Done] Sent C_CI_NA_1 and processed energy totals');
     }
 
     // Read single point
     sendReadCommand(ca: 1, ioa: 16385);
     await Future.delayed(const Duration(milliseconds: 150));
-    results.add('7. [单点读取测试] 下发 C_RD_NA_1 (Type 102, IOA=16385)，收到当前点位实时数值反馈');
+    results.add('7. [Single Point Read] Sent C_RD_NA_1 (Type 102, IOA=16385), received realtime value feedback');
 
     // S-Frame ACK
     sendSFrame();
-    results.add('8. [S格式确认测试] 主动下发 S 格式监视确认帧 N(R)=$recvSeq 对齐接收窗口');
+    results.add('8. [S-Frame ACK] Sent S-format supervisory frame N(R)=$recvSeq to align window');
 
     // TESTFR Heartbeat
     sendTestFr();
     await Future.delayed(const Duration(milliseconds: 100));
-    results.add('9. [测试心跳保活] 下发 TESTFR act 测试保活，收到 TESTFR con 回复');
+    results.add('9. [Heartbeat Test] Sent TESTFR act, received TESTFR con');
 
     // Disconnect
     await disconnect();
-    results.add('10. [链路释放] 发送 STOPDT act 并正常关闭连接 (状态: ${_state.label})');
+    results.add('10. [Link Release] Sent STOPDT act and closed connection (State: ${_state.label})');
 
     return results;
   }

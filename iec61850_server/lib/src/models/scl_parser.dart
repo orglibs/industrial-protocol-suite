@@ -54,7 +54,8 @@ class SclParser {
     final lnTypes = _parseLNTypes(xmlContent);
 
     // 4. Extract IED LDevices & LNs
-    final ied = SclIED(name: iedName);
+    final iedDesc = RegExp(r'<IED\s+[^>]*desc=["\x27]([^"\x27]*?)["\x27]').firstMatch(xmlContent)?.group(1);
+    final ied = SclIED(name: iedName, desc: iedDesc);
     final variables = <ServerVariableModel>[];
     final allDataSets = <SclDataSet>[];
     final allReportControls = <SclReportControl>[];
@@ -63,13 +64,19 @@ class SclParser {
     int numOfSG = 1;
 
     // Scan LDevice elements
-    final ldRegex = RegExp(r'<LDevice\s+[^>]*inst=["\x27]([^"\x27]+)["\x27][^>]*>([\s\S]*?)</LDevice>');
+    final ldRegex = RegExp(r'<LDevice\s+([^>]*inst=["\x27]([^"\x27]+)["\x27][^>]*)>([\s\S]*?)</LDevice>');
     final ldMatches = ldRegex.allMatches(xmlContent);
 
     for (final ldMatch in ldMatches) {
-      final ldInst = ldMatch.group(1)!;
-      final ldBody = ldMatch.group(2)!;
-      final lDevice = SclLDevice(inst: ldInst);
+      final ldAttrs = ldMatch.group(1)!;
+      final ldInst = ldMatch.group(2)!;
+      final ldBody = ldMatch.group(3)!;
+      final ldDesc = RegExp(r'desc=["\x27]([^"\x27]*?)["\x27]').firstMatch(ldAttrs)?.group(1);
+      final lDevice = SclLDevice(
+        inst: ldInst,
+        desc: ldDesc,
+        nameKey: _inferLDeviceNameKey(ldInst),
+      );
       ied.lDevices.add(lDevice);
 
       // Scan LN0 and LN elements inside LDevice
@@ -91,12 +98,15 @@ class SclParser {
 
         final lnTypeMatch = RegExp(r'lnType=["\x27]([^"\x27]+)["\x27]').firstMatch(lnAttrs);
         final lnTypeId = lnTypeMatch?.group(1) ?? '';
+        final lnDesc = RegExp(r'desc=["\x27]([^"\x27]*?)["\x27]').firstMatch(lnAttrs)?.group(1);
 
         final ln = SclLN(
           lnClass: lnClass,
           inst: inst,
           prefix: prefix,
           lnType: lnTypeId,
+          desc: lnDesc,
+          nameKey: _inferLnNameKey(lnClass, inst),
         );
         lDevice.logicalNodes.add(ln);
 
@@ -107,6 +117,7 @@ class SclParser {
           final dsBody = dsMatch.group(2)!;
           final ds = SclDataSet(
             name: dsName,
+            nameKey: _inferDataSetNameKey(dsName),
             ldInst: ldInst,
             lnName: ln.lnName,
           );
@@ -157,6 +168,7 @@ class SclParser {
 
           final rpt = SclReportControl(
             name: name,
+            nameKey: _inferRcbNameKey(name),
             rptId: rptId,
             buffered: buffered,
             bufTime: bufTime,
@@ -182,6 +194,7 @@ class SclParser {
 
           final gcb = SclGSEControl(
             name: name,
+            nameKey: _inferGcbNameKey(name),
             goId: appID,
             datSet: datSet,
             confRev: confRev,
@@ -274,6 +287,12 @@ class SclParser {
         for (final subElem in subDAType.elements) {
           final leafRef = '$iedName/$ldInst/$lnName.$doName.$daFullName.${subElem.name}';
           final bType = IecBasicType.fromString(subElem.bType);
+          final inferredKey = ServerVariableModel.inferNameKey(
+            doName: doName,
+            daName: '$daFullName.${subElem.name}',
+            lnName: lnName,
+            ref: leafRef,
+          );
 
           final model = ServerVariableModel(
             reference: leafRef,
@@ -284,6 +303,9 @@ class SclParser {
             daName: '$daFullName.${subElem.name}',
             fc: da.fc,
             type: bType,
+            cdc: doType.cdc,
+            name: '$doName.$daFullName.${subElem.name}',
+            nameKey: inferredKey,
             initialValue: bType == IecBasicType.float32 ? 220.0 : null,
             simulation: bType == IecBasicType.float32
                 ? SimulationConfig(
@@ -311,6 +333,13 @@ class SclParser {
           initialVal = 50.0;
         }
 
+        final inferredKey = ServerVariableModel.inferNameKey(
+          doName: doName,
+          daName: daFullName,
+          lnName: lnName,
+          ref: leafRef,
+        );
+
         final model = ServerVariableModel(
           reference: leafRef,
           iedName: iedName,
@@ -320,6 +349,9 @@ class SclParser {
           daName: daFullName,
           fc: da.fc,
           type: bType,
+          cdc: doType.cdc,
+          name: '$doName.$daFullName',
+          nameKey: inferredKey,
           initialValue: initialVal,
           desc: '${doType.cdc} - ${da.name}',
         );
@@ -456,6 +488,9 @@ class SclParser {
         daName: 'mag.f',
         fc: FunctionalConstraint.mx,
         type: IecBasicType.float32,
+        cdc: 'MV',
+        name: 'Phase A Voltage Ua (kV)',
+        nameKey: 'point_volt_a',
         initialValue: 220.5,
         isMonitored: true,
         simulation: SimulationConfig(enabled: true, waveType: EaseWaveType.sine, min: 215, max: 225),
@@ -469,6 +504,9 @@ class SclParser {
         daName: 'q',
         fc: FunctionalConstraint.mx,
         type: IecBasicType.quality,
+        cdc: 'MV',
+        name: 'AnIn1 Quality',
+        nameKey: null,
         initialValue: 0,
       ),
       ServerVariableModel(
@@ -480,6 +518,9 @@ class SclParser {
         daName: 'stVal',
         fc: FunctionalConstraint.st,
         type: IecBasicType.boolean,
+        cdc: 'SPC',
+        name: '101 Breaker Closed Status',
+        nameKey: 'point_breaker_101',
         initialValue: true,
         isMonitored: true,
       ),
@@ -492,8 +533,65 @@ class SclParser {
         daName: 'q',
         fc: FunctionalConstraint.st,
         type: IecBasicType.quality,
+        cdc: 'SPC',
+        name: 'SPCSO1 Quality',
+        nameKey: null,
         initialValue: 0,
       ),
     ];
+  }
+
+  static String? _inferLDeviceNameKey(String ldInst) {
+    final lower = ldInst.toLowerCase();
+    if (lower == 'genericio') return 'ld_generic_io';
+    if (lower == 'prot') return 'ld_prot';
+    if (lower == 'ctrl' || lower == 'control') return 'ld_ctrl';
+    if (lower == 'meas' || lower == 'measurements') return 'ld_meas';
+    if (lower == 'dwtg') return 'ld_dwtg';
+    return null;
+  }
+
+  static String? _inferLnNameKey(String lnClass, String inst) {
+    final upper = lnClass.toUpperCase();
+    if (upper == 'LLN0') return 'ln_lln0';
+    if (upper == 'LPHD') return 'ln_lphd';
+    if (upper == 'GGIO') return 'ln_ggio';
+    if (upper == 'MMXU') return 'ln_mmxu';
+    if (upper == 'CSWI') return 'ln_cswi';
+    if (upper == 'XCBR') return 'ln_xcbr';
+    if (upper == 'XSWI') return 'ln_xswi';
+    if (upper == 'PTOC') return 'ln_ptoc';
+    if (upper == 'PTRC') return 'ln_ptrc';
+    return null;
+  }
+
+  static String? _inferDataSetNameKey(String dsName) {
+    final lower = dsName.toLowerCase();
+    if (lower == 'events') return 'preset_ds_events';
+    if (lower == 'events2') return 'preset_ds_events2';
+    if (lower == 'measurements') return 'preset_ds_measurements';
+    if (lower == 'controlevents') return 'preset_ds_control_events';
+    if (lower.contains('goose')) return 'preset_ds_goose';
+    if (lower.contains('alarm')) return 'preset_ds_alarms';
+    return null;
+  }
+
+  static String? _inferRcbNameKey(String rptName) {
+    final lower = rptName.toLowerCase();
+    if (lower == 'eventsrcb') return 'preset_rcb_events';
+    if (lower == 'eventsrcbpreconf') return 'preset_rcb_events_preconf';
+    if (lower == 'eventsindexed') return 'preset_rcb_events_indexed';
+    if (lower == 'eventsbrcb') return 'preset_rcb_events_brcb';
+    if (lower == 'eventsbrcbpreconf') return 'preset_rcb_events_brcb_preconf';
+    if (lower == 'measurements') return 'preset_rcb_measurements';
+    if (lower == 'controleventsrcb') return 'preset_rcb_control_events';
+    return null;
+  }
+
+  static String? _inferGcbNameKey(String gcbName) {
+    final lower = gcbName.toLowerCase();
+    if (lower.contains('trip')) return 'preset_gcb_trip';
+    if (lower.contains('gcb') || lower.contains('goose')) return 'preset_gcb_goose';
+    return null;
   }
 }

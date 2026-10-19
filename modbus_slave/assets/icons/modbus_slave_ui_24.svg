@@ -1,10 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <rect x="4" y="4" width="16" height="16" rx="2" />
-  <line x1="7" y1="2" x2="7" y2="4" />
-  <line x1="12" y1="2" x2="12" y2="4" />
-  <line x1="17" y1="2" x2="17" y2="4" />
-  <line x1="7" y1="20" x2="7" y2="22" />
-  <line x1="12" y1="20" x2="12" y2="22" />
-  <line x1="17" y1="20" x2="17" y2="22" />
-  <path d="M15 8.5c-.5-1-1.5-1.5-2.5-1.5h-1a2 2 0 0 0 0 4h1a2 2 0 0 1 0 4h-1c-1 0-2-.5-2.5-1.5" />
+<!-- Microcontroller IC Body -->
+  <rect x="4" y="4" width="16" height="16" rx="3" />
+  <!-- Bus Pins -->
+  <line x1="7" y1="1.5" x2="7" y2="4" />
+  <line x1="12" y1="1.5" x2="12" y2="4" />
+  <line x1="17" y1="1.5" x2="17" y2="4" />
+  <line x1="7" y1="20" x2="7" y2="22.5" />
+  <line x1="12" y1="20" x2="12" y2="22.5" />
+  <line x1="17" y1="20" x2="17" y2="22.5" />
+  <!-- Flowing 'S' Register Wave -->
+  <path d="M15 8.5a2 2 0 0 0-2-1.5h-2a2 2 0 0 0 0 4h2a2 2 0 0 1 0 4h-2a2 2 0 0 1-2-1.5" />
 </svg>

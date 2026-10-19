@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
+import '../../i18n/app_i18n.dart';
 
 class WindowManagerHelper {
   static bool isInitialized = false;
@@ -90,47 +91,56 @@ class _WindowControlsState extends State<WindowControls> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Minimize
-        MouseRegion(
-          onEnter: (_) => setState(() => _isMinHovered = true),
-          onExit: (_) => setState(() => _isMinHovered = false),
-          child: GestureDetector(
-            onTap: WindowManagerHelper.minimize,
-            child: Container(
-              width: 42,
-              alignment: Alignment.center,
-              color: _isMinHovered ? hoverBg : Colors.transparent,
-              child: Icon(Icons.remove, size: 16, color: iconColor),
+        Tooltip(
+          message: AppI18n.instance.t('minimize'),
+          child: MouseRegion(
+            onEnter: (_) => setState(() => _isMinHovered = true),
+            onExit: (_) => setState(() => _isMinHovered = false),
+            child: GestureDetector(
+              onTap: WindowManagerHelper.minimize,
+              child: Container(
+                width: 42,
+                alignment: Alignment.center,
+                color: _isMinHovered ? hoverBg : Colors.transparent,
+                child: Icon(Icons.remove, size: 16, color: iconColor),
+              ),
             ),
           ),
         ),
         // Maximize / Restore
-        MouseRegion(
-          onEnter: (_) => setState(() => _isMaxHovered = true),
-          onExit: (_) => setState(() => _isMaxHovered = false),
-          child: GestureDetector(
-            onTap: WindowManagerHelper.toggleMaximize,
-            child: Container(
-              width: 42,
-              alignment: Alignment.center,
-              color: _isMaxHovered ? hoverBg : Colors.transparent,
-              child: Icon(Icons.crop_square, size: 14, color: iconColor),
+        Tooltip(
+          message: AppI18n.instance.t('maximize'),
+          child: MouseRegion(
+            onEnter: (_) => setState(() => _isMaxHovered = true),
+            onExit: (_) => setState(() => _isMaxHovered = false),
+            child: GestureDetector(
+              onTap: WindowManagerHelper.toggleMaximize,
+              child: Container(
+                width: 42,
+                alignment: Alignment.center,
+                color: _isMaxHovered ? hoverBg : Colors.transparent,
+                child: Icon(Icons.crop_square, size: 14, color: iconColor),
+              ),
             ),
           ),
         ),
         // Close Button
-        MouseRegion(
-          onEnter: (_) => setState(() => _isCloseHovered = true),
-          onExit: (_) => setState(() => _isCloseHovered = false),
-          child: GestureDetector(
-            onTap: WindowManagerHelper.close,
-            child: Container(
-              width: 46,
-              alignment: Alignment.center,
-              color: _isCloseHovered ? const Color(0xFFE81123) : Colors.transparent,
-              child: Icon(
-                Icons.close,
-                size: 16,
-                color: _isCloseHovered ? Colors.white : iconColor,
+        Tooltip(
+          message: AppI18n.instance.t('close'),
+          child: MouseRegion(
+            onEnter: (_) => setState(() => _isCloseHovered = true),
+            onExit: (_) => setState(() => _isCloseHovered = false),
+            child: GestureDetector(
+              onTap: WindowManagerHelper.close,
+              child: Container(
+                width: 46,
+                alignment: Alignment.center,
+                color: _isCloseHovered ? const Color(0xFFE81123) : Colors.transparent,
+                child: Icon(
+                  Icons.close,
+                  size: 16,
+                  color: _isCloseHovered ? Colors.white : iconColor,
+                ),
               ),
             ),
           ),

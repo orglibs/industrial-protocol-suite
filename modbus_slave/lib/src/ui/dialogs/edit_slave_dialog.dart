@@ -25,7 +25,7 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
   void initState() {
     super.initState();
     final s = widget.initialSlave;
-    _nameController = TextEditingController(text: s?.name ?? 'Slave');
+    _nameController = TextEditingController(text: s?.displayName ?? 'Slave');
     _slaveIdController = TextEditingController(text: (s?.slaveId ?? 1).toString());
     _delayController = TextEditingController(text: (s?.responseDelay ?? 0).toString());
 
@@ -52,7 +52,12 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
         children: [
           Icon(Icons.developer_board, color: theme.colorScheme.primary),
           const SizedBox(width: 8),
-          Text(widget.initialSlave == null ? AppI18n.instance.t('newSlaveTitle') : AppI18n.instance.t('editSlaveTitle')),
+          Expanded(
+            child: Text(
+              widget.initialSlave == null ? AppI18n.instance.t('newSlaveTitle') : AppI18n.instance.t('editSlaveTitle'),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
       content: SizedBox(
@@ -65,11 +70,11 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
             children: [
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: AppI18n.instance.t('slaveAlias'),
                   hintText: AppI18n.instance.t('slaveAliasHint'),
-                  prefixIcon: Icon(Icons.label_outline),
-                  border: OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.label_outline),
+                  border: const OutlineInputBorder(),
                 ),
                 validator: (v) => (v == null || v.trim().isEmpty) ? AppI18n.instance.t('slaveAliasRequired') : null,
               ),
@@ -80,10 +85,10 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
                     child: TextFormField(
                       controller: _slaveIdController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: AppI18n.instance.t('slaveId'),
-                        prefixIcon: Icon(Icons.numbers),
-                        border: OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.numbers),
+                        border: const OutlineInputBorder(),
                       ),
                       validator: (v) {
                         final id = int.tryParse(v ?? '');
@@ -97,11 +102,11 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
                     child: TextFormField(
                       controller: _delayController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: AppI18n.instance.t('respDelay'),
                         suffixText: 'ms',
-                        prefixIcon: Icon(Icons.timer_outlined),
-                        border: OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.timer_outlined),
+                        border: const OutlineInputBorder(),
                       ),
                       validator: (v) {
                         final d = int.tryParse(v ?? '');
@@ -115,25 +120,25 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
               const SizedBox(height: 16),
               DropdownButtonFormField<int>(
                 value: _addressType,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: AppI18n.instance.t('addrBase'),
-                  prefixIcon: Icon(Icons.format_list_numbered),
-                  border: OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.format_list_numbered),
+                  border: const OutlineInputBorder(),
                 ),
-                items: const [
-                  DropdownMenuItem(value: 0, child: Text('0-based (00000 - 09999)')),
-                  DropdownMenuItem(value: 1, child: Text('1-based (00001 - 10000)')),
-                  DropdownMenuItem(value: 2, child: Text('PLC Modicon (0x/1x/3x/40001+)')),
+                items: [
+                  DropdownMenuItem(value: 0, child: Text(AppI18n.instance.t('addrMode0'))),
+                  DropdownMenuItem(value: 1, child: Text(AppI18n.instance.t('addrMode1'))),
+                  DropdownMenuItem(value: 2, child: Text(AppI18n.instance.t('addrModeModicon'))),
                 ],
                 onChanged: (v) => setState(() => _addressType = v ?? 0),
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<ModbusByteOrder>(
                 value: _byteOrder,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: AppI18n.instance.t('byteOrder'),
-                  prefixIcon: Icon(Icons.swap_vertical_circle_outlined),
-                  border: OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.swap_vertical_circle_outlined),
+                  border: const OutlineInputBorder(),
                 ),
                 items: ModbusByteOrder.values.map((o) {
                   return DropdownMenuItem(value: o, child: Text(o.label));
@@ -166,6 +171,7 @@ class _EditSlaveDialogState extends State<EditSlaveDialog> {
                   );
 
               slave.name = _nameController.text.trim();
+              slave.nameKey = null;
               slave.slaveId = slaveId;
               slave.registerAddressesType = _addressType;
               slave.responseDelay = delay;

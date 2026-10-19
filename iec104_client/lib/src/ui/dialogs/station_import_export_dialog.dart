@@ -104,15 +104,18 @@ class _StationImportExportDialogState extends State<StationImportExportDialog> {
         ],
       ),
       content: SizedBox(
-        width: 600,
+        width: 680,
         height: 440,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 ChoiceChip(
-                  label: Text('${i18n.t('currentStation')} (${widget.currentStation.name})'),
+                  label: Text('${i18n.t('currentStation')} (${widget.currentStation.displayName})'),
                   selected: !_exportAll,
                   onSelected: (sel) {
                     if (sel) {
@@ -123,7 +126,6 @@ class _StationImportExportDialogState extends State<StationImportExportDialog> {
                     }
                   },
                 ),
-                const SizedBox(width: 8),
                 ChoiceChip(
                   label: Text('${i18n.t('allStations')} (${widget.client.stations.length})'),
                   selected: _exportAll,
@@ -136,7 +138,6 @@ class _StationImportExportDialogState extends State<StationImportExportDialog> {
                     }
                   },
                 ),
-                const Spacer(),
                 FilledButton.tonalIcon(
                   icon: const Icon(Icons.copy, size: 16),
                   label: Text(i18n.t('copyJson')),

@@ -29,9 +29,9 @@ class ClientSession {
 class Iec61850ServerManager {
   final ServerConfig config;
   late final Iec61850ServerEngine engine;
-  final GoosePublisherService gooseService = GoosePublisherService.instance;
-  final SimulationService simulationService = SimulationService.instance;
-  final TrafficLogger logger = TrafficLogger.instance;
+  final GoosePublisherService gooseService;
+  final SimulationService simulationService;
+  final TrafficLogger logger;
 
   ServerSocket? _serverSocket;
   final Map<String, ClientSession> _sessions = {};
@@ -46,14 +46,38 @@ class Iec61850ServerManager {
     }
   }
 
-  Iec61850ServerManager({required this.config}) {
+  Iec61850ServerManager({
+    required this.config,
+    GoosePublisherService? gooseService,
+    SimulationService? simulationService,
+    TrafficLogger? logger,
+  })  : gooseService = gooseService ?? GoosePublisherService(),
+        simulationService = simulationService ?? SimulationService(),
+        logger = logger ?? TrafficLogger.instance {
+    config.attachManager(this);
     engine = Iec61850ServerEngine(config: config);
     engine.onReportGenerated = _broadcastReport;
 
     // Connect simulation changes to report triggering
-    simulationService.onVariableUpdated = (variable) {
+    this.simulationService.onVariableUpdated = (variable) {
       _checkAndTriggerReportsForVariable(variable);
     };
+  }
+
+  static Future<void> startAll(List<ServerConfig> connections) async {
+    for (final conn in connections) {
+      if (!conn.isRunning) {
+        await conn.manager.startServer();
+      }
+    }
+  }
+
+  static Future<void> stopAll(List<ServerConfig> connections) async {
+    for (final conn in connections) {
+      if (conn.isRunning) {
+        conn.manager.stopServer();
+      }
+    }
   }
 
   bool get isRunning => config.isRunning;
@@ -67,13 +91,13 @@ class Iec61850ServerManager {
       _serverSocket = await ServerSocket.bind(bindIp, config.port, shared: true);
 
       config.isRunning = true;
-      config.statusMessage = '服务已启动: ${bindIp.address}:${config.port}';
+      config.statusMessage = 'Server started: ${bindIp.address}:${config.port}';
       config.notifyUpdated();
 
       _serverSocket!.listen(
         _onClientConnected,
         onError: (err) {
-          config.statusMessage = '服务监听异常: $err';
+          config.statusMessage = 'Server listen error: $err';
           config.notifyUpdated();
         },
         onDone: () {
@@ -90,9 +114,9 @@ class Iec61850ServerManager {
     } catch (e) {
       config.isRunning = false;
       if (e is SocketException && e.osError?.errorCode == 13) {
-        config.statusMessage = '启动失败: 端口 ${config.port} 需要超级用户权限 (EACCES)。可切换为非特权端口 (如 10102) 测试。';
+        config.statusMessage = 'Start failed: Port ${config.port} requires root privileges (EACCES). Switch to non-privileged port (e.g. 10102).';
       } else {
-        config.statusMessage = '启动失败: $e';
+        config.statusMessage = 'Start failed: $e';
       }
       config.notifyUpdated();
       _notifyListeners();
@@ -116,7 +140,7 @@ class Iec61850ServerManager {
 
     config.isRunning = false;
     config.clientCount = 0;
-    config.statusMessage = '服务已停止';
+    config.statusMessage = 'Server stopped';
     config.notifyUpdated();
     _notifyListeners();
   }

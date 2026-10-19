@@ -61,17 +61,17 @@ class _PointEditValueDialogState extends State<PointEditValueDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${AppI18n.instance.t("pointName")}: ${widget.point.name}', style: const TextStyle(fontWeight: FontWeight.bold)),
-            Text('ASDU: ${widget.point.typeId.nameString}',
+            Text('${AppI18n.instance.t("pointName")}: ${widget.point.displayName}', style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text('${AppI18n.instance.t("pointType")}: ${widget.point.typeId.nameString} (${widget.point.typeId.description})',
                 style: TextStyle(color: Colors.grey[700], fontSize: 13)),
             const Divider(height: 24),
             Text('${AppI18n.instance.t("currValue")}:', style: const TextStyle(fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             if (isSinglePoint) ...[
               SegmentedButton<bool>(
-                segments: const [
-                  ButtonSegment<bool>(value: true, label: const Text('1 (ON)')),
-                  ButtonSegment<bool>(value: false, label: const Text('0 (OFF)')),
+                segments: [
+                  ButtonSegment<bool>(value: true, label: Text(AppI18n.instance.t('spStateOn'))),
+                  ButtonSegment<bool>(value: false, label: Text(AppI18n.instance.t('spStateOff'))),
                 ],
                 selected: {_boolVal},
                 onSelectionChanged: (newSet) {
@@ -81,12 +81,12 @@ class _PointEditValueDialogState extends State<PointEditValueDialog> {
             ] else if (isDoublePoint) ...[
               DropdownButtonFormField<int>(
                 initialValue: _dpVal,
-                decoration: InputDecoration(border: OutlineInputBorder(), labelText: 'DP State'),
-                items: const [
-                  DropdownMenuItem(value: 1, child: const Text('01: OFF')),
-                  DropdownMenuItem(value: 2, child: const Text('10: ON')),
-                  DropdownMenuItem(value: 0, child: const Text('00: Indeterminate')),
-                  DropdownMenuItem(value: 3, child: const Text('11: Fault')),
+                decoration: InputDecoration(border: const OutlineInputBorder(), labelText: AppI18n.instance.t('dpState')),
+                items: [
+                  DropdownMenuItem(value: 1, child: Text(AppI18n.instance.t('dpStateOff'))),
+                  DropdownMenuItem(value: 2, child: Text(AppI18n.instance.t('dpStateOn'))),
+                  DropdownMenuItem(value: 0, child: Text(AppI18n.instance.t('dpStateIndeterminate'))),
+                  DropdownMenuItem(value: 3, child: Text(AppI18n.instance.t('dpStateFault'))),
                 ],
                 onChanged: (v) => setState(() => _dpVal = v!),
               ),
@@ -109,31 +109,31 @@ class _PointEditValueDialogState extends State<PointEditValueDialog> {
             Text('${AppI18n.instance.t("qualityFlags")}:', style: const TextStyle(fontWeight: FontWeight.w600)),
             CheckboxListTile(
               dense: true,
-              title: const Text('IV: Invalid'),
+              title: Text('IV: ${AppI18n.instance.t("qualityInvalid")}'),
               value: _invalid,
               onChanged: (v) => setState(() => _invalid = v ?? false),
             ),
             CheckboxListTile(
               dense: true,
-              title: const Text('BL: Blocked'),
+              title: Text('BL: ${AppI18n.instance.t("qualityBlocked")}'),
               value: _blocked,
               onChanged: (v) => setState(() => _blocked = v ?? false),
             ),
             CheckboxListTile(
               dense: true,
-              title: const Text('SB: Substituted'),
+              title: Text('SB: ${AppI18n.instance.t("qualitySubstituted")}'),
               value: _substituted,
               onChanged: (v) => setState(() => _substituted = v ?? false),
             ),
             CheckboxListTile(
               dense: true,
-              title: const Text('NT: Non-topical'),
+              title: Text('NT: ${AppI18n.instance.t("qualityNonTopical")}'),
               value: _nonTopical,
               onChanged: (v) => setState(() => _nonTopical = v ?? false),
             ),
             CheckboxListTile(
               dense: true,
-              title: const Text('OV: Overflow'),
+              title: Text('OV: ${AppI18n.instance.t("qualityOverflow")}'),
               value: _overflow,
               onChanged: (v) => setState(() => _overflow = v ?? false),
             ),

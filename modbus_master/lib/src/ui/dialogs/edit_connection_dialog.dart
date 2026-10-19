@@ -48,14 +48,18 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
   List<String> _availablePorts = [];
   static const List<int> _baudRates = [1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200];
   static const List<int> _dataBitsList = [8, 7];
-  static const Map<int, String> _parityLabels = {0: 'None (0)', 1: 'Odd (1)', 2: 'Even (2)'};
+  Map<int, String> get _parityLabels => {
+    0: AppI18n.instance.t('parityNone'),
+    1: AppI18n.instance.t('parityOdd'),
+    2: AppI18n.instance.t('parityEven'),
+  };
   static const List<int> _stopBitsList = [1, 2];
 
   @override
   void initState() {
     super.initState();
     final c = widget.connection;
-    _nameCtrl = TextEditingController(text: c?.name ?? 'Connection ${widget.defaultIndex}');
+    _nameCtrl = TextEditingController(text: c?.displayName ?? 'Connection ${widget.defaultIndex}');
     _ipCtrl = TextEditingController(text: c?.ip ?? '127.0.0.1');
     _portCtrl = TextEditingController(text: (c?.port ?? 502).toString());
     _timeoutCtrl = TextEditingController(text: (c?.timeoutMs ?? 1500).toString());
@@ -98,10 +102,10 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
             TextField(
               controller: textCtrl,
               autofocus: true,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: AppI18n.instance.t('serialPort'),
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.usb),
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.usb),
               ),
             ),
           ],
@@ -145,6 +149,9 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
 
     if (widget.connection != null) {
       final c = widget.connection!;
+      if (c.nameKey != null && name != AppI18n.instance.t(c.nameKey!)) {
+        c.nameKey = null;
+      }
       c.name = name;
       c.mode = _mode;
       c.ip = ip;
@@ -198,10 +205,10 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
             children: [
               TextField(
                 controller: _nameCtrl,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: AppI18n.instance.t('connAlias'),
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.label_outline),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.label_outline),
                 ),
               ),
               const SizedBox(height: 14),
@@ -210,10 +217,10 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                 key: ValueKey(_mode),
                 isExpanded: true,
                 initialValue: _mode,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: AppI18n.instance.t('protoType'),
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.settings_ethernet),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.settings_ethernet),
                 ),
                 items: ModbusTransportMode.values.map((m) {
                   return DropdownMenuItem(value: m, child: Text(m.label));
@@ -235,10 +242,10 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                         initialValue: _availablePorts.contains(_serialPortName)
                             ? _serialPortName
                             : (_availablePorts.isNotEmpty ? _availablePorts.first : null),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: AppI18n.instance.t('serialPort'),
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.usb),
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.usb),
                         ),
                         items: _availablePorts.map((p) => DropdownMenuItem(value: p, child: Text(p))).toList(),
                         onChanged: (p) => setState(() => _serialPortName = p),
@@ -319,10 +326,10 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                       flex: 3,
                       child: TextField(
                         controller: _ipCtrl,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: AppI18n.instance.t('listenIp'),
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.dns),
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.dns),
                         ),
                       ),
                     ),
@@ -331,10 +338,10 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
                       flex: 2,
                       child: TextField(
                         controller: _portCtrl,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: AppI18n.instance.t('listenPort'),
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.numbers),
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.numbers),
                         ),
                         keyboardType: TextInputType.number,
                       ),
@@ -370,10 +377,10 @@ class _EditConnectionDialogState extends State<EditConnectionDialog> {
 
               TextField(
                 controller: _timeoutCtrl,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: AppI18n.instance.t('respDelay'),
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.timer),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.timer),
                 ),
                 keyboardType: TextInputType.number,
               ),

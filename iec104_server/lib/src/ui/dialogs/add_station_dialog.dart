@@ -1,14 +1,18 @@
 import "../../i18n/app_i18n.dart";
 import 'package:flutter/material.dart';
+import '../../models/connection_config.dart';
 import '../../server/iec104_server.dart';
+import '../../server/station.dart';
 
 class AddStationDialog extends StatefulWidget {
-  final Iec104Server server;
+  final Iec104Server? server;
+  final Iec104ConnectionConfig? connection;
   final ValueChanged<int>? onAdded;
 
   const AddStationDialog({
     super.key,
-    required this.server,
+    this.server,
+    this.connection,
     this.onAdded,
   });
 
@@ -22,11 +26,14 @@ class _AddStationDialogState extends State<AddStationDialog> {
   late TextEditingController _nameCtrl;
   String _selectedTemplate = 'distribution';
 
+  Iec104Server get _effectiveServer => widget.connection?.server ?? widget.server!;
+
   @override
   void initState() {
     super.initState();
     int nextCa = 1;
-    while (widget.server.stations.containsKey(nextCa)) {
+    final stationsMap = _effectiveServer.stations;
+    while (stationsMap.containsKey(nextCa)) {
       nextCa++;
     }
     _caCtrl = TextEditingController(text: nextCa.toString());
@@ -77,7 +84,7 @@ class _AddStationDialogState extends State<AddStationDialog> {
                   if (v == null || v < 1 || v > 65535) {
                     return '1 ~ 65535';
                   }
-                  if (widget.server.stations.containsKey(v)) {
+                  if (_effectiveServer.stations.containsKey(v)) {
                     return 'COA=$v already exists';
                   }
                   return null;
@@ -108,26 +115,26 @@ class _AddStationDialogState extends State<AddStationDialog> {
               DropdownButtonFormField<String>(
                 initialValue: _selectedTemplate,
                 decoration: InputDecoration(
-                  labelText: 'Point Template',
-                  prefixIcon: Icon(Icons.auto_awesome),
-                  border: OutlineInputBorder(),
+                  labelText: AppI18n.instance.t('pointTemplate'),
+                  prefixIcon: const Icon(Icons.auto_awesome),
+                  border: const OutlineInputBorder(),
                 ),
-                items: const [
+                items: [
                   DropdownMenuItem(
                     value: 'distribution',
-                    child: const Text('Distribution Grid (16 SP + 8 ME + 4 DP + 2 IT)'),
+                    child: Text(AppI18n.instance.t('templateDistribution')),
                   ),
                   DropdownMenuItem(
                     value: 'substation',
-                    child: const Text('Substation Standard (32 SP + 16 ME + 8 DP + 4 IT)'),
+                    child: Text(AppI18n.instance.t('templateSubstation')),
                   ),
                   DropdownMenuItem(
                     value: 'default',
-                    child: const Text('Full Featured Demo with Auto-Curves'),
+                    child: Text(AppI18n.instance.t('templateDefault')),
                   ),
                   DropdownMenuItem(
                     value: 'empty',
-                    child: const Text('Blank Station (Manual)'),
+                    child: Text(AppI18n.instance.t('templateEmpty')),
                   ),
                 ],
                 onChanged: (val) {
@@ -150,11 +157,32 @@ class _AddStationDialogState extends State<AddStationDialog> {
             if (_formKey.currentState?.validate() ?? false) {
               final ca = int.parse(_caCtrl.text.trim());
               final name = _nameCtrl.text.trim();
-              widget.server.addStation(
-                ca,
-                name: name,
-                template: _selectedTemplate == 'empty' ? null : _selectedTemplate,
-              );
+              final st = Station(commonAddress: ca, name: name);
+
+              if (_selectedTemplate == 'default') {
+                final def = Station.createDefault(commonAddress: ca, name: name);
+                for (final p in def.pointList) {
+                  st.addPoint(p);
+                }
+              } else if (_selectedTemplate == 'distribution') {
+                final def = Station.createDistributionStation(commonAddress: ca, name: name);
+                for (final p in def.pointList) {
+                  st.addPoint(p);
+                }
+              } else if (_selectedTemplate == 'substation') {
+                st.applyTemplate('substation');
+              }
+
+              if (widget.connection != null) {
+                widget.connection!.addStation(st);
+              } else {
+                widget.server?.addStation(
+                  ca,
+                  name: name,
+                  template: _selectedTemplate == 'empty' ? null : _selectedTemplate,
+                );
+              }
+
               Navigator.pop(context);
               widget.onAdded?.call(ca);
               ScaffoldMessenger.of(context).showSnackBar(

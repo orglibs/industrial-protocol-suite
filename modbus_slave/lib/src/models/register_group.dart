@@ -1,19 +1,32 @@
 import 'dart:math';
+import '../i18n/app_i18n.dart';
 import '../protocol/modbus_data_types.dart';
 import 'register_model.dart';
 import 'simulation_config.dart';
 
 enum ModbusRegisterType {
-  coils(0, '01: 线圈状态 (Coils 0x)', 1, '0x'),
-  discreteInputs(1, '02: 离散输入 (Discrete 1x)', 2, '1x'),
-  holdingRegisters(2, '03: 保持寄存器 (Holding 4x)', 3, '4x'),
-  inputRegisters(3, '04: 输入寄存器 (Input 3x)', 4, '3x');
+  coils(0, 1, '0x'),
+  discreteInputs(1, 2, '1x'),
+  holdingRegisters(2, 3, '4x'),
+  inputRegisters(3, 4, '3x');
 
   final int code;
-  final String label;
   final int fc;
   final String prefix;
-  const ModbusRegisterType(this.code, this.label, this.fc, this.prefix);
+  const ModbusRegisterType(this.code, this.fc, this.prefix);
+
+  String get label {
+    switch (this) {
+      case ModbusRegisterType.coils:
+        return AppI18n.instance.t('regTypeCoils');
+      case ModbusRegisterType.discreteInputs:
+        return AppI18n.instance.t('regTypeDiscrete');
+      case ModbusRegisterType.holdingRegisters:
+        return AppI18n.instance.t('regTypeHolding');
+      case ModbusRegisterType.inputRegisters:
+        return AppI18n.instance.t('regTypeInput');
+    }
+  }
 
   static ModbusRegisterType fromCode(int code) {
     return ModbusRegisterType.values.firstWhere(
@@ -25,6 +38,7 @@ enum ModbusRegisterType {
 
 class RegisterGroupModel {
   String groupName;
+  String? groupNameKey;
   ModbusRegisterType registerType;
   int startAddress;
   int quantity;
@@ -32,6 +46,7 @@ class RegisterGroupModel {
 
   RegisterGroupModel({
     required this.groupName,
+    this.groupNameKey,
     this.registerType = ModbusRegisterType.holdingRegisters,
     this.startAddress = 0,
     this.quantity = 10,
@@ -39,6 +54,10 @@ class RegisterGroupModel {
   }) : registers = registers ?? [] {
     syncRegisters();
   }
+
+  String get displayGroupName => (groupNameKey != null && groupNameKey!.isNotEmpty)
+      ? AppI18n.instance.t(groupNameKey!)
+      : groupName;
 
   bool get isBitType =>
       registerType == ModbusRegisterType.coils || registerType == ModbusRegisterType.discreteInputs;
@@ -114,6 +133,7 @@ class RegisterGroupModel {
 
   Map<String, dynamic> toJson() => {
     'GroupName': groupName,
+    'GroupNameKey': groupNameKey,
     'RegisterType': registerType.code,
     'StartAddress': startAddress,
     'Quantity': quantity,
@@ -125,6 +145,18 @@ class RegisterGroupModel {
     final startAddr = json['StartAddress'] as int? ?? 0;
     final qty = json['Quantity'] as int? ?? 10;
     final name = json['GroupName'] as String? ?? 'Group';
+    String? nameKey = json['GroupNameKey'] as String?;
+    if (nameKey == null) {
+      if (typeCode == 2 && (name.contains('Holding') || name.contains('保持'))) {
+        nameKey = 'preset_grp_holding_power';
+      } else if (typeCode == 3 && (name.contains('Input') || name.contains('输入'))) {
+        nameKey = 'preset_grp_input_sensor';
+      } else if (typeCode == 0 && (name.contains('Coil') || name.contains('线圈'))) {
+        nameKey = 'preset_grp_coils_switch';
+      } else if (typeCode == 1 && (name.contains('Discrete') || name.contains('离散'))) {
+        nameKey = 'preset_grp_discrete_alarm';
+      }
+    }
 
     List<RegisterModel> regs = [];
     if (json['RegisterModels'] != null) {
@@ -135,6 +167,7 @@ class RegisterGroupModel {
 
     final group = RegisterGroupModel(
       groupName: name,
+      groupNameKey: nameKey,
       registerType: ModbusRegisterType.fromCode(typeCode),
       startAddress: startAddr,
       quantity: qty,

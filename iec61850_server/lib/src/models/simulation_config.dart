@@ -1,16 +1,23 @@
 import 'dart:math';
+import '../i18n/app_i18n.dart';
 
 enum EaseWaveType {
-  none('无 (None)'),
-  sine('正弦波 (Sine Wave)'),
-  triangle('三角波 (Triangle Wave)'),
-  square('方波 (Square Wave)'),
-  sawtooth('锯齿波 (Sawtooth Wave)'),
-  increment('线性累加 (Linear Counter)'),
-  random('随机波动 (Random Walk)');
+  none('None', 'waveNone'),
+  sine('Sine Wave', 'waveSine'),
+  triangle('Triangle Wave', 'waveTriangle'),
+  square('Square Wave', 'waveSquare'),
+  sawtooth('Sawtooth Wave', 'waveSawtooth'),
+  increment('Linear Counter', 'waveIncrement'),
+  random('Random Walk', 'waveRandom');
 
-  final String label;
-  const EaseWaveType(this.label);
+  final String englishLabel;
+  final String key;
+  const EaseWaveType(this.englishLabel, this.key);
+
+  String get label {
+    final translated = AppI18n.instance.t(key);
+    return translated.isNotEmpty && translated != key ? translated : englishLabel;
+  }
 
   static EaseWaveType fromIndex(int index) {
     if (index >= 0 && index < EaseWaveType.values.length) {

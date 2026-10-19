@@ -144,11 +144,11 @@ class _ToolsTabState extends State<ToolsTab> with SingleTickerProviderStateMixin
           controller: _tabController,
           labelColor: theme.colorScheme.primary,
           indicatorColor: theme.colorScheme.primary,
-          tabs: const [
+          tabs: [
             Tab(icon: const Icon(Icons.calculate), text: AppI18n.instance.t('checkAlgo')), 
             Tab(icon: const Icon(Icons.swap_horiz), text: AppI18n.instance.t('numByteConvert')), 
-            Tab(icon: const Icon(Icons.radar), text: AppI18n.instance.t('slaveAlias')), 
-            Tab(icon: const Icon(Icons.speed), text: AppI18n.instance.t('refreshRate')), 
+            Tab(icon: const Icon(Icons.radar), text: AppI18n.instance.t('addressScan')), 
+            Tab(icon: const Icon(Icons.speed), text: AppI18n.instance.t('stressTest')), 
           ],
         ),
         Expanded(
@@ -177,11 +177,11 @@ class _ToolsTabState extends State<ToolsTab> with SingleTickerProviderStateMixin
           const SizedBox(height: 12),
           TextField(
             controller: _crcHexCtrl,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: AppI18n.instance.t('inputHex'),
               hintText: '01 03 00 00 00 0A',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.code),
+              border: const OutlineInputBorder(),
+              prefixIcon: const Icon(Icons.code),
             ),
             onChanged: (_) => _calculateCrc(),
           ),
@@ -255,10 +255,10 @@ class _ToolsTabState extends State<ToolsTab> with SingleTickerProviderStateMixin
             width: 300,
             child: TextField(
               controller: _floatInputCtrl,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: AppI18n.instance.t('inputNum'),
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.numbers),
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.numbers),
               ),
               keyboardType: TextInputType.number,
               onChanged: (_) => setState(() {}),
@@ -271,10 +271,10 @@ class _ToolsTabState extends State<ToolsTab> with SingleTickerProviderStateMixin
               scrollDirection: Axis.horizontal,
               child: DataTable(
                 headingRowColor: WidgetStateProperty.all(Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.25)),
-                columns: const [
+                columns: [
                   DataColumn(label: Text(AppI18n.instance.t('byteOrder'), style: const TextStyle(fontWeight: FontWeight.bold))),
                   DataColumn(label: Text(AppI18n.instance.t('dataFormat'), style: const TextStyle(fontWeight: FontWeight.bold))),
-                  DataColumn(label: const Text('Hex', style: TextStyle(fontWeight: FontWeight.bold))),
+                  DataColumn(label: Text(AppI18n.instance.t('colHex'), style: const TextStyle(fontWeight: FontWeight.bold))),
                   DataColumn(label: Text(AppI18n.instance.t('currValue'), style: const TextStyle(fontWeight: FontWeight.bold))),
                 ],
                 rows: ModbusByteOrder.values.map((order) {
@@ -345,7 +345,7 @@ class _ToolsTabState extends State<ToolsTab> with SingleTickerProviderStateMixin
                         res.isSuccess ? Icons.check_circle : Icons.cancel_outlined,
                         color: res.isSuccess ? Colors.green : Colors.grey,
                       ),
-                      title: Text('Unit ID: ${res.idOrAddress}  -  ${res.isSuccess ? "Online" : "Offline"}'),
+                      title: Text('${AppI18n.instance.t('slaveId')}: ${res.idOrAddress}  -  ${res.isSuccess ? AppI18n.instance.t('online') : AppI18n.instance.t('offline')}'),
                       subtitle: Text(res.detail),
                       trailing: Text('${res.latencyMs} ms', style: const TextStyle(fontFamily: 'monospace')),
                     );
