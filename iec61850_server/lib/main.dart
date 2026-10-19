@@ -4,33 +4,45 @@ import 'src/ui/home_screen.dart';
 import 'src/ui/widgets/window_title_bar.dart';
 
 import 'src/models/server_config.dart';
+import 'src/models/app_settings.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await WindowManagerHelper.initialize();
-  runApp(const Iec61850App());
+  final settings = await AppSettingsStorage.load();
+  AppI18n.instance.setLanguage(settings.language);
+  runApp(Iec61850App(initialThemeMode: settings.themeMode));
 }
 
 class Iec61850App extends StatefulWidget {
   final List<ServerConfig>? initialConnections;
+  final ThemeMode? initialThemeMode;
 
-  const Iec61850App({super.key, this.initialConnections});
+  const Iec61850App({super.key, this.initialConnections, this.initialThemeMode});
 
   @override
   State<Iec61850App> createState() => _Iec61850AppState();
 }
 
 class _Iec61850AppState extends State<Iec61850App> {
-  ThemeMode _themeMode = ThemeMode.dark;
+  late ThemeMode _themeMode;
+
+  @override
+  void initState() {
+    super.initState();
+    _themeMode = widget.initialThemeMode ?? ThemeMode.dark;
+  }
 
   void _toggleTheme() {
     setState(() {
       _themeMode = _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
     });
+    AppSettingsStorage.saveThemeMode(_themeMode);
   }
 
   void _onLanguageChanged() {
     setState(() {});
+    AppSettingsStorage.saveLanguage(AppI18n.instance.currentLanguage);
   }
 
   @override

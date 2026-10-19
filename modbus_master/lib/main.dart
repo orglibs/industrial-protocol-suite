@@ -1,32 +1,48 @@
 import 'package:flutter/material.dart';
 import 'src/i18n/app_i18n.dart';
+import 'src/models/app_settings.dart';
 import 'src/ui/home_screen.dart';
 import 'src/ui/widgets/window_title_bar.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await WindowManagerHelper.initialize();
-  runApp(const ModbusMasterApp());
+
+  // Load app settings (language and theme)
+  final settings = await AppSettingsStorage.load();
+  AppI18n.instance.setLanguage(settings.language);
+
+  runApp(ModbusMasterApp(initialThemeMode: settings.themeMode));
 }
 
 class ModbusMasterApp extends StatefulWidget {
-  const ModbusMasterApp({super.key});
+  final ThemeMode? initialThemeMode;
+
+  const ModbusMasterApp({super.key, this.initialThemeMode});
 
   @override
   State<ModbusMasterApp> createState() => _ModbusMasterAppState();
 }
 
 class _ModbusMasterAppState extends State<ModbusMasterApp> {
-  ThemeMode _themeMode = ThemeMode.dark;
+  late ThemeMode _themeMode;
+
+  @override
+  void initState() {
+    super.initState();
+    _themeMode = widget.initialThemeMode ?? ThemeMode.dark;
+  }
 
   void _toggleTheme() {
     setState(() {
       _themeMode = (_themeMode == ThemeMode.dark) ? ThemeMode.light : ThemeMode.dark;
     });
+    AppSettingsStorage.saveThemeMode(_themeMode);
   }
 
   void _onLanguageChanged() {
     setState(() {});
+    AppSettingsStorage.saveLanguage(AppI18n.instance.currentLanguage);
   }
 
   @override

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'src/i18n/app_i18n.dart';
+import 'src/models/app_settings.dart';
 import 'src/models/connection_config.dart';
 import 'src/models/workspace_storage.dart';
 import 'src/ui/home_screen.dart';
@@ -8,30 +9,51 @@ import 'src/ui/widgets/window_title_bar.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await WindowManagerHelper.initialize();
+
+  // Load app settings (language and theme)
+  final settings = await AppSettingsStorage.load();
+  AppI18n.instance.setLanguage(settings.language);
+
   final connections = await WorkspaceStorage.loadConnections();
-  runApp(ModbusSlaveApp(initialConnections: connections));
+  runApp(ModbusSlaveApp(
+    initialConnections: connections,
+    initialThemeMode: settings.themeMode,
+  ));
 }
 
 class ModbusSlaveApp extends StatefulWidget {
   final List<ConnectionConfig> initialConnections;
+  final ThemeMode? initialThemeMode;
 
-  const ModbusSlaveApp({super.key, required this.initialConnections});
+  const ModbusSlaveApp({
+    super.key,
+    required this.initialConnections,
+    this.initialThemeMode,
+  });
 
   @override
   State<ModbusSlaveApp> createState() => _ModbusSlaveAppState();
 }
 
 class _ModbusSlaveAppState extends State<ModbusSlaveApp> {
-  ThemeMode _themeMode = ThemeMode.dark;
+  late ThemeMode _themeMode;
+
+  @override
+  void initState() {
+    super.initState();
+    _themeMode = widget.initialThemeMode ?? ThemeMode.dark;
+  }
 
   void _toggleTheme() {
     setState(() {
       _themeMode = (_themeMode == ThemeMode.dark) ? ThemeMode.light : ThemeMode.dark;
     });
+    AppSettingsStorage.saveThemeMode(_themeMode);
   }
 
   void _onLanguageChanged() {
     setState(() {});
+    AppSettingsStorage.saveLanguage(AppI18n.instance.currentLanguage);
   }
 
   @override

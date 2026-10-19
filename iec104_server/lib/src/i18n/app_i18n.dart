@@ -47,6 +47,22 @@ enum AppLanguage {
     } catch (_) {}
     return AppLanguage.enUS;
   }
+
+  static AppLanguage fromCode(String? code) {
+    if (code == null || code.isEmpty) return AppLanguage.fromSystem();
+    for (final l in AppLanguage.values) {
+      if (l.code.toLowerCase() == code.toLowerCase()) {
+        return l;
+      }
+    }
+    final prefix = code.split('-')[0].toLowerCase();
+    for (final l in AppLanguage.values) {
+      if (l.code.split('-')[0].toLowerCase() == prefix) {
+        return l;
+      }
+    }
+    return AppLanguage.fromSystem();
+  }
 }
 
 class AppI18n {

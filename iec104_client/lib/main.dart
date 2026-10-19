@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'src/client/iec104_client.dart';
 import 'src/client/workspace_storage.dart';
 import 'src/i18n/app_i18n.dart';
+import 'src/models/app_settings.dart';
 import 'src/models/connection_config.dart';
 import 'src/ui/home_screen.dart';
 import 'src/ui/widgets/window_title_bar.dart';
@@ -10,32 +11,53 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await WindowManagerHelper.initialize();
 
+  // Load app settings (language and theme)
+  final settings = await AppSettingsStorage.load();
+  AppI18n.instance.setLanguage(settings.language);
+
   final connections = await WorkspaceStorage.loadConnections();
 
-  runApp(Iec104ClientApp(connections: connections));
+  runApp(Iec104ClientApp(
+    connections: connections,
+    initialThemeMode: settings.themeMode,
+  ));
 }
 
 class Iec104ClientApp extends StatefulWidget {
   final List<Iec104ClientConnectionConfig>? connections;
   final Iec104Client? client;
+  final ThemeMode? initialThemeMode;
 
-  const Iec104ClientApp({super.key, this.connections, this.client});
+  const Iec104ClientApp({
+    super.key,
+    this.connections,
+    this.client,
+    this.initialThemeMode,
+  });
 
   @override
   State<Iec104ClientApp> createState() => _Iec104ClientAppState();
 }
 
 class _Iec104ClientAppState extends State<Iec104ClientApp> {
-  ThemeMode _themeMode = ThemeMode.dark;
+  late ThemeMode _themeMode;
+
+  @override
+  void initState() {
+    super.initState();
+    _themeMode = widget.initialThemeMode ?? ThemeMode.dark;
+  }
 
   void _toggleTheme() {
     setState(() {
       _themeMode = (_themeMode == ThemeMode.dark) ? ThemeMode.light : ThemeMode.dark;
     });
+    AppSettingsStorage.saveThemeMode(_themeMode);
   }
 
   void _onLanguageChanged() {
     setState(() {});
+    AppSettingsStorage.saveLanguage(AppI18n.instance.currentLanguage);
   }
 
   @override

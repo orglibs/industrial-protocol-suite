@@ -49,6 +49,26 @@ enum AppLanguage {
     } catch (_) {}
     return AppLanguage.enUS;
   }
+
+  static AppLanguage fromCode(String? code) {
+    if (code == null || code.trim().isEmpty) {
+      return fromSystem();
+    }
+    final normalized = code.trim().toLowerCase().replaceAll('_', '-');
+    for (final l in AppLanguage.values) {
+      if (l.code.toLowerCase() == normalized) {
+        return l;
+      }
+    }
+    // Prefix fallback, e.g. "zh" -> "zh-CN", "en" -> "en-US"
+    final prefix = normalized.split('-').first;
+    for (final l in AppLanguage.values) {
+      if (l.code.toLowerCase().split('-').first == prefix) {
+        return l;
+      }
+    }
+    return fromSystem();
+  }
 }
 
 class AppI18n {

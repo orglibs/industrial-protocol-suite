@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'src/i18n/app_i18n.dart';
+import 'src/models/app_settings.dart';
 import 'src/models/connection_config.dart';
 import 'src/server/iec104_server.dart';
 import 'src/server/workspace_storage.dart';
@@ -10,20 +11,29 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await WindowManagerHelper.initialize();
 
+  // Load app settings (language and theme)
+  final settings = await AppSettingsStorage.load();
+  AppI18n.instance.setLanguage(settings.language);
+
   // Load connections from workspace storage (with auto-migration from legacy single server)
   final connections = await WorkspaceStorage.loadConnections();
 
-  runApp(Iec104SimulatorApp(initialConnections: connections));
+  runApp(Iec104SimulatorApp(
+    initialConnections: connections,
+    initialThemeMode: settings.themeMode,
+  ));
 }
 
 class Iec104SimulatorApp extends StatefulWidget {
   final List<Iec104ConnectionConfig>? initialConnections;
   final Iec104Server? server;
+  final ThemeMode? initialThemeMode;
 
   const Iec104SimulatorApp({
     super.key,
     this.initialConnections,
     this.server,
+    this.initialThemeMode,
   });
 
   @override
@@ -31,16 +41,24 @@ class Iec104SimulatorApp extends StatefulWidget {
 }
 
 class _Iec104SimulatorAppState extends State<Iec104SimulatorApp> {
-  ThemeMode _themeMode = ThemeMode.dark;
+  late ThemeMode _themeMode;
+
+  @override
+  void initState() {
+    super.initState();
+    _themeMode = widget.initialThemeMode ?? ThemeMode.dark;
+  }
 
   void _toggleTheme() {
     setState(() {
       _themeMode = (_themeMode == ThemeMode.dark) ? ThemeMode.light : ThemeMode.dark;
     });
+    AppSettingsStorage.saveThemeMode(_themeMode);
   }
 
   void _onLanguageChanged() {
     setState(() {});
+    AppSettingsStorage.saveLanguage(AppI18n.instance.currentLanguage);
   }
 
   @override
