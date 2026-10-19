@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Industrial Protocol Suite | Modern Power Automation Protocol Simulation</title>
+  <meta name="description" content="Cross-platform industrial power automation protocol simulation suite developed purely in Flutter & Dart. Full support for IEC 60870-5-104, IEC 61850 MMS/GOOSE, and Modbus TCP/RTU.">
+  <meta name="keywords" content="IEC 104, IEC 60870-5-104, IEC 61850, MMS, GOOSE, Modbus, Modbus TCP, Modbus RTU, SCADA, Substation Automation, Protocol Simulator, Flutter, Dart">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Industrial Protocol Suite (IPS)">
+  <meta property="og:description" content="Modern cross-platform industrial power automation protocol simulation suite. IEC 104, IEC 61850 MMS/GOOSE, Modbus TCP/RTU.">
+  <meta property="og:image" content="images/screenshot_iec104_server.png">
+  <meta property="og:type" content="website">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="images/icons/iec104_server.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              400: '#2dd4bf',
+              500: '#14b8a6',
+              600: '#0d9488',
+            },
+            cyanGlow: '#06b6d4',
+            blueGlow: '#3b82f6',
+            amberGlow: '#f59e0b',
+            purpleGlow: '#a855f7',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #070a12;
+      color: #f1f5f9;
+      overflow-x: hidden;
+    }
+    .glow-bg {
+      background: radial-gradient(circle at 50% 0%, rgba(6, 182, 212, 0.15), rgba(59, 130, 246, 0.05) 45%, transparent 70%);
+    }
+    .grid-pattern {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+    }
+    .glass-card:hover {
+      border-color: rgba(6, 182, 212, 0.35);
+      box-shadow: 0 25px 50px -12px rgba(6, 182, 212, 0.12);
+    }
+    .glass-card-interactive {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-card-interactive:hover {
+      transform: translateY(-3px);
+    }
+    .text-gradient {
+      background: linear-gradient(135deg, #ffffff 10%, #cbd5e1 50%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .text-cyan-gradient {
+      background: linear-gradient(135deg, #38bdf8 0%, #06b6d4 50%, #2dd4bf 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .border-glow {
+      position: relative;
+    }
+    .border-glow::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.5), rgba(168, 85, 247, 0.2), transparent 70%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #090d16;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+  </style>
+</head>
+<body class="font-sans antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
+
+  <!-- Ambient Glow Background -->
+  <div class="fixed inset-0 glow-bg pointer-events-none z-0"></div>
+  <div class="fixed inset-0 grid-pattern pointer-events-none opacity-40 z-0"></div>
+
+  <!-- Navigation -->
+  <header class="sticky top-0 z-50 backdrop-blur-xl bg-slate-950/80 border-b border-slate-800/80 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="#" class="flex items-center space-x-3 group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 p-[2px] shadow-lg shadow-cyan-500/20 group-hover:shadow-cyan-500/40 transition">
+          <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center p-1.5">
+            <img src="images/icons/iec104_server.png" alt="IPS Logo" class="w-full h-full object-contain">
+          </div>
+        </div>
+        <div>
+          <span class="font-bold text-lg text-white tracking-tight flex items-center gap-1.5">
+            Industrial Protocol Suite
+            <span class="text-xs px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono font-medium">v1.0.0</span>
+          </span>
+          <span class="text-[11px] text-slate-400 block -mt-0.5 tracking-wide" data-i18n="nav.subtitle">IEC 104 • IEC 61850 • Modbus</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-300">
+        <a href="#features" class="hover:text-cyan-400 transition" data-i18n="nav.features">Features</a>
+        <a href="#subsystems" class="hover:text-cyan-400 transition" data-i18n="nav.subsystems">Subsystems (6-in-1)</a>
+        <a href="#architecture" class="hover:text-cyan-400 transition" data-i18n="nav.architecture">Architecture</a>
+        <a href="#downloads" class="hover:text-cyan-400 transition" data-i18n="nav.downloads">Downloads</a>
+        <a href="https://github.com/orglibs/industrial-protocol-suite" target="_blank" class="hover:text-cyan-400 transition">GitHub</a>
+      </nav>
+
+      <!-- Right Action Controls -->
+      <div class="flex items-center space-x-3">
+        <!-- Language Switcher -->
+        <button id="langToggleBtn" onclick="toggleLanguage()" class="px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition">
+          <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+          </svg>
+          <span id="langLabel">中文</span>
+        </button>
+
+        <!-- GitHub Stars Badge -->
+        <a href="https://github.com/orglibs/industrial-protocol-suite" target="_blank" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700/80 text-xs font-medium text-slate-300 hover:text-white hover:border-slate-600 transition">
+          <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+          <span>Star on GitHub</span>
+        </a>
+
+        <!-- Fast Download Button -->
+        <a href="#downloads" class="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-semibold shadow-md shadow-cyan-500/25 transition">
+          <span data-i18n="hero.downloadBtn">Download</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative pt-16 pb-20 lg:pt-24 lg:pb-32 overflow-hidden z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      
+      <!-- Top Announcement Pill -->
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-medium mb-8 backdrop-blur-md">
+        <span class="flex h-2 w-2 rounded-full bg-cyan-400 animate-pulse"></span>
+        <span data-i18n="hero.pill">v1.0.0 Released • Zero Dependency • Pure Dart & Flutter</span>
+      </div>
+
+      <!-- Main Headline -->
+      <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white max-w-5xl mx-auto leading-[1.15]">
+        <span class="text-gradient" data-i18n="hero.titlePrefix">Next-Gen Industrial & Power</span><br>
+        <span class="text-cyan-gradient" data-i18n="hero.titleAccent">Protocol Simulation Suite</span>
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="mt-6 text-base sm:text-lg lg:text-xl text-slate-300 max-w-3xl mx-auto font-normal leading-relaxed" data-i18n="hero.desc">
+        A unified, cross-platform industrial simulation platform built with pure Flutter & Dart. Full two-way client & server emulation for <span class="text-cyan-300 font-semibold">IEC 60870-5-104</span>, <span class="text-purple-300 font-semibold">IEC 61850 MMS/GOOSE</span>, and <span class="text-emerald-300 font-semibold">Modbus TCP/RTU</span> across Windows, macOS, and Linux.
+      </p>
+
+      <!-- Key Badges -->
+      <div class="mt-8 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-300">
+        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/80 border border-slate-800">
+          <svg class="w-4 h-4 text-cyan-400" viewBox="0 0 24 24" fill="currentColor"><path d="M14.314 0L2.3 12 6 15.7 21.684.013h-7.37zM6 15.7L0 21.7 3.7 24l6-6-3.7-2.3z"/></svg>
+          <span>Flutter 3.x Desktop</span>
+        </div>
+        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/80 border border-slate-800">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>17 Standard Locales & RTL</span>
+        </div>
+        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/80 border border-slate-800">
+          <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+          <span>Standalone CLI + Frameless GUI</span>
+        </div>
+        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/80 border border-slate-800">
+          <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+          <span>MIT Licensed & Open Source</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="#downloads" id="heroAutoDownloadBtn" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2.5 transition transform hover:-translate-y-0.5">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          <span id="heroDownloadText" data-i18n="hero.ctaDownload">Download for Windows (x64)</span>
+        </a>
+
+        <a href="https://github.com/orglibs/industrial-protocol-suite" target="_blank" class="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 hover:text-white font-medium border border-slate-700/80 flex items-center justify-center gap-2.5 transition">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          <span data-i18n="hero.ctaGithub">Explore on GitHub</span>
+        </a>
+      </div>
+
+      <!-- Hero Gallery Preview (Interactive Showcase) -->
+      <div class="mt-14 relative max-w-5xl mx-auto">
+        <div class="absolute -inset-1 rounded-2xl bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 blur-xl opacity-75"></div>
+        <div class="relative rounded-2xl glass-card overflow-hidden border border-slate-700/80 shadow-2xl">
+          
+          <!-- Mock Window Controls -->
+          <div class="px-4 py-3 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+              <span class="ml-3 text-xs font-mono text-slate-400" id="heroTabActiveTitle">IEC 104 Server Simulator (RTU)</span>
+            </div>
+
+            <!-- Tab Switcher for Quick Preview -->
+            <div class="flex items-center gap-1 overflow-x-auto text-xs font-medium">
+              <button onclick="switchHeroPreview(0)" class="hero-tab-btn active px-2.5 py-1 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">104 Server</button>
+              <button onclick="switchHeroPreview(1)" class="hero-tab-btn px-2.5 py-1 rounded text-slate-400 hover:text-slate-200">104 Client</button>
+              <button onclick="switchHeroPreview(2)" class="hero-tab-btn px-2.5 py-1 rounded text-slate-400 hover:text-slate-200">61850 Server</button>
+              <button onclick="switchHeroPreview(3)" class="hero-tab-btn px-2.5 py-1 rounded text-slate-400 hover:text-slate-200">61850 Client</button>
+              <button onclick="switchHeroPreview(4)" class="hero-tab-btn px-2.5 py-1 rounded text-slate-400 hover:text-slate-200">Modbus Slave</button>
+              <button onclick="switchHeroPreview(5)" class="hero-tab-btn px-2.5 py-1 rounded text-slate-400 hover:text-slate-200">Modbus Master</button>
+            </div>
+          </div>
+
+          <!-- Preview Screenshot Display with Lightbox Trigger -->
+          <div class="relative group cursor-pointer aspect-[16/10] bg-slate-950 flex items-center justify-center overflow-hidden" onclick="openLightbox()">
+            <img id="heroPreviewImg" src="images/screenshot_iec104_server.png" alt="Simulator Screenshot" class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-[1.01]">
+            <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2 text-white text-sm font-medium backdrop-blur-[2px]">
+              <svg class="w-5 h-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+              </svg>
+              <span data-i18n="hero.clickZoom">Click to expand high-res screenshot</span>
+            </div>
+          </div>
+
+          <!-- Hero App Description Bar -->
+          <div class="px-6 py-4 bg-slate-900/60 border-t border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between text-left gap-3">
+            <div>
+              <h4 id="heroAppSubtitle" class="font-bold text-white text-sm">IEC 60870-5-104 RTU Server Simulator</h4>
+              <p id="heroAppDesc" class="text-xs text-slate-400 mt-0.5">APCI sliding window management, ASDU tele-signalling, tele-metering, mathematical simulation curves, and packet analyzer.</p>
+            </div>
+            <a id="heroAppDirectDownload" href="#downloads" class="inline-flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300 font-semibold whitespace-nowrap">
+              <span data-i18n="hero.viewInstaller">View Download Links</span> &rarr;
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Key Metrics / Numbers -->
+  <section class="border-y border-slate-800/80 bg-slate-950/60 py-12 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+      <div>
+        <div class="text-3xl sm:text-4xl font-extrabold text-cyan-400 font-mono">6</div>
+        <div class="mt-1 text-xs sm:text-sm text-slate-400 font-medium" data-i18n="stats.apps">Full-Featured Desktop Apps</div>
+      </div>
+      <div>
+        <div class="text-3xl sm:text-4xl font-extrabold text-blue-400 font-mono">3</div>
+        <div class="mt-1 text-xs sm:text-sm text-slate-400 font-medium" data-i18n="stats.protocols">Core Industry Standards</div>
+      </div>
+      <div>
+        <div class="text-3xl sm:text-4xl font-extrabold text-purple-400 font-mono">17</div>
+        <div class="mt-1 text-xs sm:text-sm text-slate-400 font-medium" data-i18n="stats.languages">Supported Locales (i18n)</div>
+      </div>
+      <div>
+        <div class="text-3xl sm:text-4xl font-extrabold text-emerald-400 font-mono">100%</div>
+        <div class="mt-1 text-xs sm:text-sm text-slate-400 font-medium" data-i18n="stats.pureDart">Pure Dart / Zero C++ Dependencies</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Features Section -->
+  <section id="features" class="py-20 lg:py-28 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto">
+        <h2 class="text-xs font-semibold text-cyan-400 uppercase tracking-widest font-mono" data-i18n="features.tag">Engineered for Industry</h2>
+        <p class="mt-2 text-3xl sm:text-4xl font-extrabold text-white tracking-tight" data-i18n="features.title">Comprehensive, Industrial-Grade Capabilities</p>
+        <p class="mt-4 text-slate-400 text-sm sm:text-base" data-i18n="features.subtitle">Designed from ground up to replace clunky, legacy commercial simulators with modern, reactive, cross-platform engineering toolchains.</p>
+      </div>
+
+      <div class="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Feature 1 -->
+        <div class="glass-card glass-card-interactive rounded-2xl p-6">
+          <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center mb-5">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-white" data-i18n="feat1.title">Pure Dart & Zero Native Overhead</h3>
+          <p class="mt-2 text-sm text-slate-400 leading-relaxed" data-i18n="feat1.desc">Both the protocol parsing engines and CLI engines are developed in 100% standard Dart. No cumbersome external C++ DLLs or libpcap installation required.</p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="glass-card glass-card-interactive rounded-2xl p-6">
+          <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center mb-5">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-white" data-i18n="feat2.title">Real-Time Waveform Math Engine</h3>
+          <p class="mt-2 text-sm text-slate-400 leading-relaxed" data-i18n="feat2.desc">Built-in mathematical curves (Sine, Square, Triangle, Random walk, Noise). Dynamically simulates telemetry data without physical hardware sensors.</p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="glass-card glass-card-interactive rounded-2xl p-6">
+          <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center mb-5">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-white" data-i18n="feat3.title">Modern Material 3 Industrial UI</h3>
+          <p class="mt-2 text-sm text-slate-400 leading-relaxed" data-i18n="feat3.desc">Custom frameless window, integrated window controls, draggable headers, and high-contrast Dark & Light mode persistence for field operations.</p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="glass-card glass-card-interactive rounded-2xl p-6">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-5">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-white" data-i18n="feat4.title">17-Language Runtime i18n & RTL</h3>
+          <p class="mt-2 text-sm text-slate-400 leading-relaxed" data-i18n="feat4.desc">Instant multi-language switching with professional power engineering terms. Full bidirectional RTL layout support for Arabic.</p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="glass-card glass-card-interactive rounded-2xl p-6">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mb-5">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-white" data-i18n="feat5.title">Packet Dissector & Hex Stream</h3>
+          <p class="mt-2 text-sm text-slate-400 leading-relaxed" data-i18n="feat5.desc">Real-time APCI, ASDU, MMS, GOOSE, and Modbus frame decoding with field-by-field dissection, timestamp recording, and filterable log streams.</p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="glass-card glass-card-interactive rounded-2xl p-6">
+          <div class="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center mb-5">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-white" data-i18n="feat6.title">Loopback Test & Automated CI</h3>
+          <p class="mt-2 text-sm text-slate-400 leading-relaxed" data-i18n="feat6.desc">Integrated client-to-server loopback self-testing suites, unit test coverage, and multiplatform CI/CD release automation on GitHub Actions.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 Subsystems Showcase Grid -->
+  <section id="subsystems" class="py-20 bg-slate-950/80 border-t border-slate-800/80 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <h2 class="text-xs font-semibold text-cyan-400 uppercase tracking-widest font-mono" data-i18n="subsystems.tag">The 6 Subsystems</h2>
+        <p class="mt-2 text-3xl sm:text-4xl font-extrabold text-white tracking-tight" data-i18n="subsystems.title">Two-Way Client & Server Coverage</p>
+        <p class="mt-4 text-slate-400 text-sm sm:text-base" data-i18n="subsystems.subtitle">Complete protocol pair simulation for telecontrol, substation automation, and industrial fieldbus.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        
+        <!-- App 1: IEC 104 Server -->
+        <div class="glass-card rounded-2xl overflow-hidden border border-slate-800 flex flex-col">
+          <div class="aspect-video relative overflow-hidden bg-slate-900 cursor-pointer group" onclick="openModalImage('images/screenshot_iec104_server.png', 'IEC 104 Server Simulator')">
+            <img src="images/screenshot_iec104_server.png" alt="IEC 104 Server" class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-300">
+            <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-xs text-white">
+              🔍 Click to zoom
+            </div>
+            <div class="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-cyan-500/90 text-slate-950 font-bold text-xs">RTU / Server</div>
+          </div>
+          <div class="p-6 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-3 mb-3">
+                <img src="images/icons/iec104_server.png" class="w-8 h-8 rounded-lg shadow" alt="Icon">
+                <div>
+                  <h3 class="font-bold text-white text-base">IEC 104 Server Simulator</h3>
+                  <span class="text-xs text-cyan-400 font-mono">iec104_server</span>
+                </div>
+              </div>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                Simulates RTU/controlled station. Features APCI sliding window (k/w parameters), ASDU type 1~50, general interrogation responder, clock sync, and math curve simulation.
+              </p>
+            </div>
+            <div class="pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs">
+              <span class="text-slate-500 font-mono">TCP Port 2404</span>
+              <a href="#downloads" class="text-cyan-400 hover:text-cyan-300 font-semibold">Download &rarr;</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- App 2: IEC 104 Client -->
+        <div class="glass-card rounded-2xl overflow-hidden border border-slate-800 flex flex-col">
+          <div class="aspect-video relative overflow-hidden bg-slate-900 cursor-pointer group" onclick="openModalImage('images/screenshot_iec104_client.png', 'IEC 104 Client Simulator')">
+            <img src="images/screenshot_iec104_client.png" alt="IEC 104 Client" class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-300">
+            <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-xs text-white">
+              🔍 Click to zoom
+            </div>
+            <div class="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-blue-500/90 text-slate-950 font-bold text-xs">Master / Client</div>
+          </div>
+          <div class="p-6 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-3 mb-3">
+                <img src="images/icons/iec104_client.png" class="w-8 h-8 rounded-lg shadow" alt="Icon">
+                <div>
+                  <h3 class="font-bold text-white text-base">IEC 104 Client Simulator</h3>
+                  <span class="text-xs text-blue-400 font-mono">iec104_client</span>
+                </div>
+              </div>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                Simulates master/dispatch station. Real-time telemetry monitoring table, general interrogation initiator, tele-control select & execute, parameter regulation, and packet logging.
+              </p>
+            </div>
+            <div class="pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs">
+              <span class="text-slate-500 font-mono">TCP 2404 Master</span>
+              <a href="#downloads" class="text-blue-400 hover:text-blue-300 font-semibold">Download &rarr;</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- App 3: IEC 61850 Server -->
+        <div class="glass-card rounded-2xl overflow-hidden border border-slate-800 flex flex-col">
+          <div class="aspect-video relative overflow-hidden bg-slate-900 cursor-pointer group" onclick="openModalImage('images/screenshot_iec61850_server.png', 'IEC 61850 Server Simulator')">
+            <img src="images/screenshot_iec61850_server.png" alt="IEC 61850 Server" class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-300">
+            <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-xs text-white">
+              🔍 Click to zoom
+            </div>
+            <div class="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-purple-500/90 text-slate-950 font-bold text-xs">MMS & GOOSE IED</div>
+          </div>
+          <div class="p-6 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-3 mb-3">
+                <img src="images/icons/iec61850_server.png" class="w-8 h-8 rounded-lg shadow" alt="Icon">
+                <div>
+                  <h3 class="font-bold text-white text-base">IEC 61850 Server Simulator</h3>
+                  <span class="text-xs text-purple-400 font-mono">iec61850_server</span>
+                </div>
+              </div>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                Full SCL (ICD/CID/SCD) model parsing, ISO COTP & ACSE stack, RFC1006 MMS server, GOOSE 8-1 multicast state machine, and data attribute curve synthesis.
+              </p>
+            </div>
+            <div class="pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs">
+              <span class="text-slate-500 font-mono">MMS Port 102 / GOOSE</span>
+              <a href="#downloads" class="text-purple-400 hover:text-purple-300 font-semibold">Download &rarr;</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- App 4: IEC 61850 Client -->
+        <div class="glass-card rounded-2xl overflow-hidden border border-slate-800 flex flex-col">
+          <div class="aspect-video relative overflow-hidden bg-slate-900 cursor-pointer group" onclick="openModalImage('images/screenshot_iec61850_client.png', 'IEC 61850 Client Simulator')">
+            <img src="images/screenshot_iec61850_client.png" alt="IEC 61850 Client" class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-300">
+            <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-xs text-white">
+              🔍 Click to zoom
+            </div>
+            <div class="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-indigo-500/90 text-white font-bold text-xs">Online Discovery</div>
+          </div>
+          <div class="p-6 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-3 mb-3">
+                <img src="images/icons/iec61850_client.png" class="w-8 h-8 rounded-lg shadow" alt="Icon">
+                <div>
+                  <h3 class="font-bold text-white text-base">IEC 61850 Client Simulator</h3>
+                  <span class="text-xs text-indigo-400 font-mono">iec61850_client</span>
+                </div>
+              </div>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                Dynamic online IED model auto-discovery via MMS services (GetNameList, GetVariableAccessAttributes). BRCB/URCB reporting, GOOSE subscriber listener, and point monitoring.
+              </p>
+            </div>
+            <div class="pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs">
+              <span class="text-slate-500 font-mono">MMS Client / SCADA</span>
+              <a href="#downloads" class="text-indigo-400 hover:text-indigo-300 font-semibold">Download &rarr;</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- App 5: Modbus Slave (MSE) -->
+        <div class="glass-card rounded-2xl overflow-hidden border border-slate-800 flex flex-col">
+          <div class="aspect-video relative overflow-hidden bg-slate-900 cursor-pointer group" onclick="openModalImage('images/screenshot_modbus_slave.png', 'Modbus Slave Emulator (MSE)')">
+            <img src="images/screenshot_modbus_slave.png" alt="Modbus Slave" class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-300">
+            <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-xs text-white">
+              🔍 Click to zoom
+            </div>
+            <div class="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-emerald-500/90 text-slate-950 font-bold text-xs">MSE / Slave</div>
+          </div>
+          <div class="p-6 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-3 mb-3">
+                <img src="images/icons/modbus_slave.png" class="w-8 h-8 rounded-lg shadow" alt="Icon">
+                <div>
+                  <h3 class="font-bold text-white text-base">Modbus Slave Emulator (MSE)</h3>
+                  <span class="text-xs text-emerald-400 font-mono">modbus_slave</span>
+                </div>
+              </div>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                Supports Modbus TCP, UDP, and POSIX Serial RTU. Coils, Discrete Inputs, Input Registers, and Holding Registers. Complete FC01~FC23 support and multi-unit ID routing.
+              </p>
+            </div>
+            <div class="pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs">
+              <span class="text-slate-500 font-mono">TCP 502 / RTU / UDP</span>
+              <a href="#downloads" class="text-emerald-400 hover:text-emerald-300 font-semibold">Download &rarr;</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- App 6: Modbus Master (MME) -->
+        <div class="glass-card rounded-2xl overflow-hidden border border-slate-800 flex flex-col">
+          <div class="aspect-video relative overflow-hidden bg-slate-900 cursor-pointer group" onclick="openModalImage('images/screenshot_modbus_master.png', 'Modbus Master Emulator (MME)')">
+            <img src="images/screenshot_modbus_master.png" alt="Modbus Master" class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-300">
+            <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-xs text-white">
+              🔍 Click to zoom
+            </div>
+            <div class="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-teal-500/90 text-slate-950 font-bold text-xs">MME / Master</div>
+          </div>
+          <div class="p-6 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-3 mb-3">
+                <img src="images/icons/modbus_master.png" class="w-8 h-8 rounded-lg shadow" alt="Icon">
+                <div>
+                  <h3 class="font-bold text-white text-base">Modbus Master Emulator (MME)</h3>
+                  <span class="text-xs text-teal-400 font-mono">modbus_master</span>
+                </div>
+              </div>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                Multi-slave, multi-task polling scheduler. 4 byte orders (ABCD/CDAB/BADC/DCBA), built-in hardware-free virtual slave engine, and CRC16/LRC verification toolkit.
+              </p>
+            </div>
+            <div class="pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs">
+              <span class="text-slate-500 font-mono">Master Polling Engine</span>
+              <a href="#downloads" class="text-teal-400 hover:text-teal-300 font-semibold">Download &rarr;</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture Overview Section -->
+  <section id="architecture" class="py-20 lg:py-28 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <h2 class="text-xs font-semibold text-cyan-400 uppercase tracking-widest font-mono" data-i18n="arch.tag">Architecture & Stack</h2>
+        <p class="mt-2 text-3xl sm:text-4xl font-extrabold text-white tracking-tight" data-i18n="arch.title">Hierarchical Industrial Network Topology</p>
+        <p class="mt-4 text-slate-400 text-sm sm:text-base" data-i18n="arch.subtitle">How the 6 applications map across standard substation and industrial automation layers.</p>
+      </div>
+
+      <div class="glass-card rounded-2xl p-6 sm:p-10 border border-slate-800">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+          
+          <!-- Layer 1 -->
+          <div class="rounded-xl p-5 bg-slate-900/90 border border-purple-500/30 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-mono font-bold text-purple-400 px-2 py-0.5 rounded bg-purple-500/10 border border-purple-500/20">Station & Bay Layer</span>
+                <span class="text-xs text-slate-400">IEC 61850</span>
+              </div>
+              <h4 class="text-base font-bold text-white mb-2">Substation Automation</h4>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                MMS client online discovery, SCL CID/ICD schema validation, GOOSE 8-1 high-speed multicast tripping, and Report control blocks (BRCB/URCB).
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-800 text-xs font-mono text-purple-300">
+              iec61850_client &harr; iec61850_server
+            </div>
+          </div>
+
+          <!-- Layer 2 -->
+          <div class="rounded-xl p-5 bg-slate-900/90 border border-cyan-500/30 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-mono font-bold text-cyan-400 px-2 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/20">Telecontrol Layer</span>
+                <span class="text-xs text-slate-400">IEC 60870-5-104</span>
+              </div>
+              <h4 class="text-base font-bold text-white mb-2">Dispatch & Telemetry</h4>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                APCI sliding-window transmission control (I/S/U frames), ASDU telemetry, remote signaling, remote control, and clock synchronization.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-800 text-xs font-mono text-cyan-300">
+              iec104_client &harr; iec104_server
+            </div>
+          </div>
+
+          <!-- Layer 3 -->
+          <div class="rounded-xl p-5 bg-slate-900/90 border border-emerald-500/30 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-mono font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">Fieldbus Layer</span>
+                <span class="text-xs text-slate-400">Modbus TCP/RTU</span>
+              </div>
+              <h4 class="text-base font-bold text-white mb-2">Sensors & Instruments</h4>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Modbus TCP, UDP, and POSIX Serial RTU (RS-485). Discrete Inputs, Coils, Holding Registers, multi-task polling, and multi-format endian conversion.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-800 text-xs font-mono text-emerald-300">
+              modbus_master &harr; modbus_slave
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Direct Downloads Section -->
+  <section id="downloads" class="py-20 lg:py-28 bg-slate-950 border-t border-slate-800/80 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <h2 class="text-xs font-semibold text-cyan-400 uppercase tracking-widest font-mono" data-i18n="downloads.tag">Releases & Binaries</h2>
+        <p class="mt-2 text-3xl sm:text-4xl font-extrabold text-white tracking-tight" data-i18n="downloads.title">Direct Download Center</p>
+        <p class="mt-4 text-slate-400 text-sm sm:text-base" data-i18n="downloads.subtitle">
+          Select your platform to download installers or standalone portable packages. All binaries are built and signed automatically via GitHub Actions CI/CD.
+        </p>
+
+        <!-- OS Platform Selector Tabs -->
+        <div class="mt-8 inline-flex p-1 rounded-xl bg-slate-900 border border-slate-800">
+          <button onclick="setDownloadOS('windows')" id="tabBtnWindows" class="download-os-tab px-5 py-2 rounded-lg text-xs font-semibold transition active bg-cyan-500 text-slate-950 shadow-md">
+            🪟 Windows (x64)
+          </button>
+          <button onclick="setDownloadOS('macos')" id="tabBtnMacos" class="download-os-tab px-5 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">
+            🍎 macOS (DMG)
+          </button>
+          <button onclick="setDownloadOS('linux')" id="tabBtnLinux" class="download-os-tab px-5 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">
+            🐧 Linux (DEB & Tar)
+          </button>
+        </div>
+      </div>
+
+      <!-- Downloads Matrix Table Container -->
+      <div class="glass-card rounded-2xl overflow-hidden border border-slate-800">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="bg-slate-900/90 text-xs uppercase font-mono text-slate-400 border-b border-slate-800">
+              <tr>
+                <th scope="col" class="py-4 px-6" data-i18n="table.app">Application</th>
+                <th scope="col" class="py-4 px-6" data-i18n="table.protocol">Protocol & Role</th>
+                <th scope="col" class="py-4 px-6 text-center" id="colHeaderPrimary">Primary Installer</th>
+                <th scope="col" class="py-4 px-6 text-center" id="colHeaderSecondary">Portable Archive</th>
+                <th scope="col" class="py-4 px-6 text-right" data-i18n="table.actions">Action</th>
+              </tr>
+            </thead>
+            <tbody id="downloadTableBody" class="divide-y divide-slate-800/60 font-sans">
+              <!-- Populated dynamically by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Release Notes & SHA256 Checksum Bar -->
+        <div class="px-6 py-4 bg-slate-900/80 border-t border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-400 gap-3">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>All binaries contain SHA-256 integrity checksums verified by GitHub Actions.</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <a href="https://github.com/orglibs/industrial-protocol-suite/releases/tag/v1.0.0" target="_blank" class="text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1">
+              <span>View v1.0.0 GitHub Release</span> &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Lightbox Modal -->
+  <div id="imageLightbox" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden items-center justify-center p-4" onclick="closeLightbox()">
+    <div class="relative max-w-6xl w-full max-h-[92vh] flex flex-col items-center" onclick="event.stopPropagation()">
+      <button onclick="closeLightbox()" class="absolute -top-12 right-0 text-slate-400 hover:text-white p-2 rounded-lg bg-slate-800 text-sm flex items-center gap-1">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        <span>Close (Esc)</span>
+      </button>
+      <img id="lightboxImg" src="" alt="High-Res Screenshot" class="max-w-full max-h-[85vh] object-contain rounded-xl border border-slate-700 shadow-2xl">
+      <div id="lightboxCaption" class="mt-3 text-sm text-slate-300 font-medium"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/80 bg-slate-950 py-12 text-slate-400 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="flex items-center space-x-3">
+        <img src="images/icons/iec104_server.png" alt="IPS" class="w-6 h-6 object-contain">
+        <span class="font-bold text-white text-sm">Industrial Protocol Suite</span>
+        <span>• MIT Licensed</span>
+      </div>
+
+      <div class="flex items-center space-x-6 text-slate-400">
+        <a href="https://github.com/orglibs/industrial-protocol-suite" target="_blank" class="hover:text-white transition">GitHub Repository</a>
+        <a href="https://github.com/orglibs/industrial-protocol-suite/issues" target="_blank" class="hover:text-white transition">Issue Tracker</a>
+        <a href="https://github.com/orglibs/industrial-protocol-suite/releases" target="_blank" class="hover:text-white transition">Releases</a>
+      </div>
+
+      <div>
+        <span>Built purely with <span class="text-cyan-400 font-semibold">Flutter & Dart</span>.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Script: Interactivity, i18n & Dynamic Downloads -->
+  <script>
+    // Subsystem Metadata
+    const subsystems = [
+      {
+        id: "iec104_server",
+        name: "IEC 104 Server Simulator",
+        nameZh: "IEC 104 服务端仿真器",
+        role: "RTU / Controlled Station",
+        roleZh: "从站 / 远动终端 (RTU)",
+        icon: "images/icons/iec104_server.png",
+        screenshot: "images/screenshot_iec104_server.png",
+        desc: "APCI sliding window management, ASDU tele-signalling, tele-metering, mathematical simulation curves, and packet analyzer.",
+        descZh: "APCI 滑动窗口管理、遥信/遥测/遥控/时钟同步、6种动态波形数学仿真、离线报文深度分析。",
+        port: "TCP 2404",
+      },
+      {
+        id: "iec104_client",
+        name: "IEC 104 Client Simulator",
+        nameZh: "IEC 104 客户端模拟器",
+        role: "Master / Controlling Station",
+        roleZh: "主站 / 调度中心监控",
+        icon: "images/icons/iec104_client.png",
+        screenshot: "images/screenshot_iec104_client.png",
+        desc: "Point table monitor, General Interrogation, control preset/execution, parameter regulation, and filtered raw traffic logs.",
+        descZh: "测点底账监视库、总召唤触发、遥控预置执行、设定值调节、时钟同步与实时报文流水过滤。",
+        port: "TCP 2404",
+      },
+      {
+        id: "iec61850_server",
+        name: "IEC 61850 Server Simulator",
+        nameZh: "IEC 61850 服务端仿真器",
+        role: "MMS & GOOSE Server / IED",
+        roleZh: "MMS & GOOSE 智能电子设备 (IED)",
+        icon: "images/icons/iec61850_server.png",
+        screenshot: "images/screenshot_iec61850_server.png",
+        desc: "SCL (ICD/CID/SCD) parser, RFC1006 MMS server, GOOSE 8-1 multicast publisher state machine, and data simulation.",
+        descZh: "SCL 模型文件解析、MMS 服务器 (RFC1006/COTP/ACSE)、GOOSE 8-1 组播发布状态机与测点仿真。",
+        port: "MMS 102 / GOOSE",
+      },
+      {
+        id: "iec61850_client",
+        name: "IEC 61850 Client Simulator",
+        nameZh: "IEC 61850 客户端监控站",
+        role: "MMS & GOOSE Client / SCADA",
+        roleZh: "在线自发现与 GOOSE 监听主站",
+        icon: "images/icons/iec61850_client.png",
+        screenshot: "images/screenshot_iec61850_client.png",
+        desc: "Online dynamic model discovery, data attribute tree, BRCB/URCB reporting, and GOOSE packet listener.",
+        descZh: "MMS 在线动态模型自发现、测点树与实时监控表、BRCB/URCB 报告使能与 GOOSE 报文监听解析。",
+        port: "MMS Client",
+      },
+      {
+        id: "modbus_slave",
+        name: "Modbus Slave Emulator (MSE)",
+        nameZh: "Modbus 从站仿真器 (MSE)",
+        role: "Slave / Server (TCP / RTU / UDP)",
+        roleZh: "从站 (TCP / 纯串口 RTU / UDP)",
+        icon: "images/icons/modbus_slave.png",
+        screenshot: "images/screenshot_modbus_slave.png",
+        desc: "Multi-client isolated slave instances, POSIX Serial RTU, FC01~FC23 support, and EaseFunction dynamic curves.",
+        descZh: "多连接独立从机架构、纯POSIX串口RTU、FC01~FC23全功能码支持、EaseFunction动态波形仿真。",
+        port: "TCP 502 / RTU",
+      },
+      {
+        id: "modbus_master",
+        name: "Modbus Master Emulator (MME)",
+        nameZh: "Modbus 主站模拟器 (MME)",
+        role: "Master / Client (TCP / RTU / UDP)",
+        roleZh: "主站 (多从机 / 多任务轮询)",
+        icon: "images/icons/modbus_master.png",
+        screenshot: "images/screenshot_modbus_master.png",
+        desc: "Multi-slave polling engine, built-in virtual slave, 4 byte orders (ABCD/CDAB/BADC/DCBA), and CRC16/LRC verification.",
+        descZh: "多从机多任务组轮询调度、内置免硬件虚拟从站、4种字节序转换、CRC16与LRC校验工具箱。",
+        port: "TCP / RTU / UDP",
+      }
+    ];
+
+    // Download URL builder
+    const RELEASE_TAG = "v1.0.0";
+    const BASE_RELEASE_URL = `https://github.com/orglibs/industrial-protocol-suite/releases/download/${RELEASE_TAG}`;
+
+    let currentOS = "windows";
+    let currentLang = "en";
+
+    // Detect user OS
+    function detectOS() {
+      const ua = navigator.userAgent.toLowerCase();
+      if (ua.includes("win")) return "windows";
+      if (ua.includes("mac")) return "macos";
+      if (ua.includes("linux")) return "linux";
+      return "windows";
+    }
+
+    // Switch Hero Preview Tab
+    function switchHeroPreview(index) {
+      const item = subsystems[index];
+      const previewImg = document.getElementById("heroPreviewImg");
+      const title = document.getElementById("heroTabActiveTitle");
+      const subtitle = document.getElementById("heroAppSubtitle");
+      const desc = document.getElementById("heroAppDesc");
+
+      previewImg.src = item.screenshot;
+      title.innerText = item.name;
+      subtitle.innerText = currentLang === 'zh' ? item.nameZh : item.name;
+      desc.innerText = currentLang === 'zh' ? item.descZh : item.desc;
+
+      // Update active tab buttons
+      const btns = document.querySelectorAll(".hero-tab-btn");
+      btns.forEach((btn, idx) => {
+        if (idx === index) {
+          btn.className = "hero-tab-btn active px-2.5 py-1 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30";
+        } else {
+          btn.className = "hero-tab-btn px-2.5 py-1 rounded text-slate-400 hover:text-slate-200";
+        }
+      });
+    }
+
+    // Lightbox Modal functions
+    function openLightbox() {
+      const currentImg = document.getElementById("heroPreviewImg").src;
+      const currentTitle = document.getElementById("heroAppSubtitle").innerText;
+      openModalImage(currentImg, currentTitle);
+    }
+
+    function openModalImage(src, caption) {
+      const modal = document.getElementById("imageLightbox");
+      const img = document.getElementById("lightboxImg");
+      const cap = document.getElementById("lightboxCaption");
+      img.src = src;
+      cap.innerText = caption;
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+
+    function closeLightbox() {
+      const modal = document.getElementById("imageLightbox");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeLightbox();
+    });
+
+    // OS Tab selector for downloads table
+    function setDownloadOS(os) {
+      currentOS = os;
+
+      // Update button styles
+      const tabBtns = {
+        windows: document.getElementById("tabBtnWindows"),
+        macos: document.getElementById("tabBtnMacos"),
+        linux: document.getElementById("tabBtnLinux"),
+      };
+
+      Object.keys(tabBtns).forEach(key => {
+        if (key === os) {
+          tabBtns[key].className = "download-os-tab px-5 py-2 rounded-lg text-xs font-semibold transition active bg-cyan-500 text-slate-950 shadow-md";
+        } else {
+          tabBtns[key].className = "download-os-tab px-5 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition";
+        }
+      });
+
+      renderDownloadTable();
+    }
+
+    // Render downloads matrix table
+    function renderDownloadTable() {
+      const tbody = document.getElementById("downloadTableBody");
+      const colPrimary = document.getElementById("colHeaderPrimary");
+      const colSecondary = document.getElementById("colHeaderSecondary");
+
+      let primaryHeader = "Installer";
+      let secondaryHeader = "Portable Package";
+
+      if (currentOS === "windows") {
+        primaryHeader = "Setup Wizard (.exe)";
+        secondaryHeader = "Portable Archive (.zip)";
+      } else if (currentOS === "macos") {
+        primaryHeader = "macOS Image (.dmg)";
+        secondaryHeader = "Architecture / Notes";
+      } else if (currentOS === "linux") {
+        primaryHeader = "DEB Package (x64 / ARM64)";
+        secondaryHeader = "Standalone (.tar.gz)";
+      }
+
+      colPrimary.innerText = primaryHeader;
+      colSecondary.innerText = secondaryHeader;
+
+      tbody.innerHTML = "";
+
+      subsystems.forEach(app => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-900/50 transition";
+
+        const title = currentLang === 'zh' ? app.nameZh : app.name;
+        const role = currentLang === 'zh' ? app.roleZh : app.role;
+
+        let primaryBtn = "";
+        let secondaryBtn = "";
+        let directDownloadUrl = "";
+
+        if (currentOS === "windows") {
+          const exeUrl = `${BASE_RELEASE_URL}/${app.id}-1.0.0-windows-x64-setup.exe`;
+          const zipUrl = `${BASE_RELEASE_URL}/${app.id}-1.0.0-windows-x64.zip`;
+          directDownloadUrl = exeUrl;
+
+          primaryBtn = `<a href="${exeUrl}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-medium font-mono transition">
+            <span>💾 .exe Installer</span>
+          </a>`;
+          secondaryBtn = `<a href="${zipUrl}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono transition">
+            <span>📦 .zip Portable</span>
+          </a>`;
+        } else if (currentOS === "macos") {
+          const dmgUrl = `${BASE_RELEASE_URL}/${app.id}-1.0.0-macos.dmg`;
+          directDownloadUrl = dmgUrl;
+
+          primaryBtn = `<a href="${dmgUrl}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-medium font-mono transition">
+            <span>🍏 .dmg Image</span>
+          </a>`;
+          secondaryBtn = `<span class="text-xs text-slate-400 font-mono">Universal / Apple Silicon & Intel</span>`;
+        } else if (currentOS === "linux") {
+          const debAmd64 = `${BASE_RELEASE_URL}/${app.id}_1.0.0_linux_amd64.deb`;
+          const debArm64 = `${BASE_RELEASE_URL}/${app.id}_1.0.0_linux_arm64.deb`;
+          const tarAmd64 = `${BASE_RELEASE_URL}/${app.id}-1.0.0-linux-x64.tar.gz`;
+          directDownloadUrl = debAmd64;
+
+          primaryBtn = `<div class="flex items-center justify-center gap-1.5">
+            <a href="${debAmd64}" class="px-2.5 py-1 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 text-xs font-mono hover:bg-cyan-500/20">x64 .deb</a>
+            <a href="${debArm64}" class="px-2.5 py-1 rounded bg-slate-800 text-slate-300 border border-slate-700 text-xs font-mono hover:bg-slate-700">ARM64 .deb</a>
+          </div>`;
+          secondaryBtn = `<a href="${tarAmd64}" class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-800 text-slate-300 text-xs font-mono hover:bg-slate-700">
+            <span>📦 .tar.gz (x64)</span>
+          </a>`;
+        }
+
+        tr.innerHTML = `
+          <td class="py-4 px-6 flex items-center gap-3">
+            <img src="${app.icon}" class="w-8 h-8 rounded-lg shadow" alt="${app.name}">
+            <div>
+              <div class="font-bold text-white">${title}</div>
+              <div class="text-xs text-slate-400 font-mono">${app.id}</div>
+            </div>
+          </td>
+          <td class="py-4 px-6">
+            <span class="px-2 py-0.5 rounded text-xs bg-slate-800 text-slate-300 border border-slate-700">${role}</span>
+          </td>
+          <td class="py-4 px-6 text-center">
+            ${primaryBtn}
+          </td>
+          <td class="py-4 px-6 text-center">
+            ${secondaryBtn}
+          </td>
+          <td class="py-4 px-6 text-right">
+            <a href="${directDownloadUrl}" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-xs shadow-sm transition">
+              <span>⬇️ Download</span>
+            </a>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Internationalization (i18n) Data
+    const i18nData = {
+      en: {
+        "nav.subtitle": "IEC 104 • IEC 61850 • Modbus",
+        "nav.features": "Features",
+        "nav.subsystems": "Subsystems (6-in-1)",
+        "nav.architecture": "Architecture",
+        "nav.downloads": "Downloads",
+        "hero.pill": "v1.0.0 Released • Zero Dependency • Pure Dart & Flutter",
+        "hero.titlePrefix": "Next-Gen Industrial & Power",
+        "hero.titleAccent": "Protocol Simulation Suite",
+        "hero.desc": "A unified, cross-platform industrial simulation platform built with pure Flutter & Dart. Full two-way client & server emulation for IEC 60870-5-104, IEC 61850 MMS/GOOSE, and Modbus TCP/RTU across Windows, macOS, and Linux.",
+        "hero.downloadBtn": "Download",
+        "hero.ctaDownload": "Download for Windows (x64)",
+        "hero.ctaGithub": "Explore on GitHub",
+        "hero.clickZoom": "Click to expand high-res screenshot",
+        "hero.viewInstaller": "View Download Links",
+        "stats.apps": "Full-Featured Desktop Apps",
+        "stats.protocols": "Core Industry Standards",
+        "stats.languages": "Supported Locales (i18n)",
+        "stats.pureDart": "Pure Dart / Zero C++ Dependencies",
+        "features.tag": "Engineered for Industry",
+        "features.title": "Comprehensive, Industrial-Grade Capabilities",
+        "features.subtitle": "Designed from ground up to replace clunky, legacy commercial simulators with modern, reactive, cross-platform engineering toolchains.",
+        "feat1.title": "Pure Dart & Zero Native Overhead",
+        "feat1.desc": "Both the protocol parsing engines and CLI engines are developed in 100% standard Dart. No cumbersome external C++ DLLs or libpcap installation required.",
+        "feat2.title": "Real-Time Waveform Math Engine",
+        "feat2.desc": "Built-in mathematical curves (Sine, Square, Triangle, Random walk, Noise). Dynamically simulates telemetry data without physical hardware sensors.",
+        "feat3.title": "Modern Material 3 Industrial UI",
+        "feat3.desc": "Custom frameless window, integrated window controls, draggable headers, and high-contrast Dark & Light mode persistence for field operations.",
+        "feat4.title": "17-Language Runtime i18n & RTL",
+        "feat4.desc": "Instant multi-language switching with professional power engineering terms. Full bidirectional RTL layout support for Arabic.",
+        "feat5.title": "Packet Dissector & Hex Stream",
+        "feat5.desc": "Real-time APCI, ASDU, MMS, GOOSE, and Modbus frame decoding with field-by-field dissection, timestamp recording, and filterable log streams.",
+        "feat6.title": "Loopback Test & Automated CI",
+        "feat6.desc": "Integrated client-to-server loopback self-testing suites, unit test coverage, and multiplatform CI/CD release automation on GitHub Actions.",
+        "subsystems.tag": "The 6 Subsystems",
+        "subsystems.title": "Two-Way Client & Server Coverage",
+        "subsystems.subtitle": "Complete protocol pair simulation for telecontrol, substation automation, and industrial fieldbus.",
+        "arch.tag": "Architecture & Stack",
+        "arch.title": "Hierarchical Industrial Network Topology",
+        "arch.subtitle": "How the 6 applications map across standard substation and industrial automation layers.",
+        "downloads.tag": "Releases & Binaries",
+        "downloads.title": "Direct Download Center",
+        "downloads.subtitle": "Select your platform to download installers or standalone portable packages. All binaries are built and signed automatically via GitHub Actions CI/CD.",
+        "table.app": "Application",
+        "table.protocol": "Protocol & Role",
+        "table.actions": "Action",
+      },
+      zh: {
+        "nav.subtitle": "IEC 104 • IEC 61850 • Modbus",
+        "nav.features": "核心特性",
+        "nav.subsystems": "6大子系统",
+        "nav.architecture": "拓扑架构",
+        "nav.downloads": "产物下载",
+        "hero.pill": "v1.0.0 正式发布 • 零依赖无驱动 • 纯 Dart & Flutter",
+        "hero.titlePrefix": "跨平台现代化工业电力自动化",
+        "hero.titleAccent": "规约仿真系统套件",
+        "hero.desc": "基于 Flutter & 纯 Dart 自主研发的工业电力自动化仿真平台。完整覆盖 IEC 60870-5-104 电力远动、IEC 61850 变电站自动化（MMS/GOOSE）以及 Modbus TCP/RTU 现场总线三大核心通信规约，提供 6 款全功能客户端与服务端桌面软件与命令行引擎。",
+        "hero.downloadBtn": "立即下载",
+        "hero.ctaDownload": "下载 Windows (x64) 安装包",
+        "hero.ctaGithub": "查看 GitHub 源码",
+        "hero.clickZoom": "点击放大查看超清界面原图",
+        "hero.viewInstaller": "前往下载中心",
+        "stats.apps": "6款全功能工业仿真桌面软件",
+        "stats.protocols": "覆盖3大核心行业规约",
+        "stats.languages": "支持17种国际语言 (i18n)",
+        "stats.pureDart": "纯 Dart 开发 / 零驱动依赖",
+        "features.tag": "专为工业工程打造",
+        "features.title": "高可用工业级特性矩阵",
+        "features.subtitle": "全面重构商业仿真软件落后的技术栈，带来现代化的响应式界面、极速启动与高度可控的仿真能力。",
+        "feat1.title": "纯 Dart 自主规约引擎",
+        "feat1.desc": "所有通信协议拆解与状态机均采用纯 Dart 编写，无第三方粗糙 C++ 驱动或 WinPcap 捆绑，真正做到开箱即用。",
+        "feat2.title": "实时数学波形仿真引擎",
+        "feat2.desc": "内置正弦波、方波、三角波、随机游走等高精度数学曲线，无需外接物理传感器即可动态生成真实的遥测遥信信号。",
+        "feat3.title": "Material 3 无边框工业质感 UI",
+        "feat3.desc": "全贴合无缝窗口控制区、全局窗口平滑拖拽、高对比度深色工业模式与浅色办公模式持久化切换。",
+        "feat4.title": "17 种专业语言与 RTL 镜像排版",
+        "feat4.desc": "运行时无缝秒级切换，涵盖阿拉伯语（含双向镜像）、中文、英语、德语、日语等 17 种语言工业标准术语。",
+        "feat5.title": "报文深度剖析与十六进制流水",
+        "feat5.desc": "实时逐字段剖析 APCI、ASDU、MMS、GOOSE、Modbus 报文结构，配备多条件过滤与离线报文深度分析。",
+        "feat6.title": "闭环自测与自动化 CI/CD",
+        "feat6.desc": "各子工程内置端到端主从闭环自测套件，GitHub Actions 全流程自动化构建多平台桌面产物并发布 Release。",
+        "subsystems.tag": "6 大核心子系统",
+        "subsystems.title": "主站与从站双向闭环覆盖",
+        "subsystems.subtitle": "变电站自动化、配电远动与现场总线三大领域均提供对应的全功能客户端与服务端模拟器。",
+        "arch.tag": "规约与网络分层",
+        "arch.title": "分层工业自动化网络拓扑",
+        "arch.subtitle": "清晰对应变电站站控层、过程层与现场总线仪表的实际应用场景。",
+        "downloads.tag": "发布与安装包",
+        "downloads.title": "跨平台产物下载中心",
+        "downloads.subtitle": "支持 Windows、macOS 以及 Linux (x64 / ARM64)，全部产物经 GitHub Actions 原生构建并附带 SHA-256 校验。",
+        "table.app": "子系统名称",
+        "table.protocol": "协议规约角色",
+        "table.actions": "下载操作",
+      }
+    };
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'en' ? 'zh' : 'en';
+      document.getElementById("langLabel").innerText = currentLang === 'en' ? '中文' : 'English';
+      applyTranslations();
+      renderDownloadTable();
+      switchHeroPreview(0);
+    }
+
+    function applyTranslations() {
+      const data = i18nData[currentLang];
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (data[key]) {
+          el.innerText = data[key];
+        }
+      });
+
+      // Update hero CTA button text based on OS
+      const osLabel = currentOS === 'windows' ? 'Windows (x64)' : (currentOS === 'macos' ? 'macOS (DMG)' : 'Linux (DEB)');
+      const ctaText = currentLang === 'zh' ? `下载 ${osLabel} 安装包` : `Download for ${osLabel}`;
+      document.getElementById("heroDownloadText").innerText = ctaText;
+    }
+
+    // Initialize on load
+    window.addEventListener("DOMContentLoaded", () => {
+      const detected = detectOS();
+      currentOS = detected;
+      setDownloadOS(detected);
+      applyTranslations();
+    });
+  </script>
+</body>
+</html>
