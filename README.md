@@ -60,6 +60,19 @@ Supported Locales:
 
 ---
 
+## 🖥️ 6-Application Visual Showcase (UI Gallery)
+
+| Subsystem | Protocol Role | UI Screenshot Preview |
+| :--- | :--- | :--- |
+| **[IEC 104 Server](iec104_server)** | IEC 60870-5-104 Server / RTU | [![IEC 104 Server](docs/images/screenshot_iec104_server.png)](iec104_server) |
+| **[IEC 104 Client](iec104_client)** | IEC 60870-5-104 Master / SCADA | [![IEC 104 Client](docs/images/screenshot_iec104_client.png)](iec104_client) |
+| **[Modbus Slave Simulator](modbus_slave)** | Modbus TCP / RTU / UDP Slave (MSE) | [![Modbus Slave](docs/images/screenshot_modbus_slave.png)](modbus_slave) |
+| **[Modbus Master Simulator](modbus_master)** | Modbus TCP / RTU / UDP Master (MME) | [![Modbus Master](docs/images/screenshot_modbus_master.png)](modbus_master) |
+| **[IEC 61850 Server](iec61850_server)** | IEC 61850 MMS / GOOSE / SCL Server | [![IEC 61850 Server](docs/images/screenshot_iec61850_server.png)](iec61850_server) |
+| **[IEC 61850 Client](iec61850_client)** | IEC 61850 Dynamic Discovery & Control | [![IEC 61850 Client](docs/images/screenshot_iec61850_client.png)](iec61850_client) |
+
+---
+
 ## 🏗️ Architecture & Communication Overview
 
 ```mermaid
@@ -96,6 +109,17 @@ Comprehensive reverse engineering and modern reconstruction of `IEC104ServerSimu
 - **Project Paths**:
   - Server: [iec104_server](iec104_server)
   - Client: [iec104_client](iec104_client)
+
+#### 📸 Graphical Interface Showcase
+
+##### IEC 104 Server (RTU / Controlled Station Simulator)
+![IEC 104 Server Simulator](docs/images/screenshot_iec104_server.png)
+> **UI Overview**: Manages multiple listener socket endpoints (e.g. primary/standby port 2404) and station Common Addresses (COA); live APCI parameter tuning ($t_0..t_3$ timers and $k, w$ sliding window acknowledgment); built-in simulation self-test and active client session monitor.
+
+##### IEC 104 Client (Master / Controlling Station Simulator)
+![IEC 104 Client Simulator](docs/images/screenshot_iec104_client.png)
+> **UI Overview**: Connection alias management and live link telemetry; direct execution of General Interrogation (`C_IC_NA_1`), Clock Synchronization (`C_CS_NA_1`), and Pulse Counter Interrogation; sequence counters and configurable connect-time auto-handshake policies.
+
 - **Protocol Coverage**:
   - **APCI Link Control**: I-Format (Sliding sequence numbers $N(S), N(R)$), S-Format (Supervisory acknowledgment), U-Format (`STARTDT`, `STOPDT`, `TESTFR` link handshakes with configurable parameters $k, w, t_0..t_3$).
   - **Monitoring ASDUs**: Single/Double Point Teleindication (Types 1, 3, 30, 31), Step Position (Types 5, 32), 32-bit Bitstring (Types 7, 33), Normalized/Scaled/Short Floating Point Telemetry (Types 9, 11, 13, 34, 35, 36), Integrated Totals / Pulse Counters (Types 15, 37), End of Initialization (Type 70).
@@ -113,6 +137,17 @@ Re-engineered from commercial `ModbusSlaveEmulator (MSE)` and `ModbusMasterEmula
 - **Project Paths**:
   - Slave (MSE): [modbus_slave](modbus_slave)
   - Master (MME): [modbus_master](modbus_master)
+
+#### 📸 Graphical Interface Showcase
+
+##### Modbus Slave Simulator (Modbus Slave Emulator - MSE)
+![Modbus Slave Simulator](docs/images/screenshot_modbus_slave.png)
+> **UI Overview**: Intuitive data monitor table for coils, discrete inputs, input registers, and holding registers; 16-bit / 32-bit composite data decoding with batch fill dialog; autonomous waveform simulation (Sine, Triangle, Linear Ramp, Random Walk) without external hardware.
+
+##### Modbus Master Simulator (Modbus Master Emulator - MME)
+![Modbus Master Simulator](docs/images/screenshot_modbus_master.png)
+> **UI Overview**: Multi-slave and task-group polling console with single-scan and continuous polling modes; 16-bit binary bitfield expansion for bitwise diagnostics; one-click switching across 4 industrial byte orders: `ABCD`, `CDAB`, `BADC`, and `DCBA`.
+
 - **Multi-Connection & Hierarchical Architecture**:
   - **Strict connection-scoped slaves** (`Connection -> Slaves -> Groups`), ensuring isolated address spaces across independent serial ports and TCP endpoints.
   - **Supported Transports**:
@@ -136,6 +171,12 @@ Re-engineered from commercial `ModbusSlaveEmulator (MSE)` and `ModbusMasterEmula
 Pure Dart implementation modeled after commercial `IEC61850ServerSimulator`, running natively across desktop and server environments without compiling native C libraries.
 
 - **Project Path**: [iec61850_server](iec61850_server)
+
+#### 📸 Graphical Interface Showcase
+
+![IEC 61850 Server Simulator](docs/images/screenshot_iec61850_server.png)
+> **UI Overview**: SCL data model tree and rapid search bar; centralized DO/DA live value monitor with Quality bits, timestamp, and mathematical waveform generator; integrated substation SCL hierarchy view and Common Data Class (CDC) metadata dictionary.
+
 - **Protocol Stack Implementation**:
   - **Layers 4-7**: RFC 1006 TPKT, ISO 8073 COTP (Class 0 CR/CC/DT), ISO 8650 ACSE (AARQ/AARE), ISO 9506 MMS (ASN.1 BER TLV codec).
   - **MMS Services**: `GetNameList`, `Read`, `Write`, `InformationReport`, `MMS File Services` (`FileDirectory`, `FileOpen`, `FileRead`, `FileClose`, `FileDelete` for COMTRADE fault recorder retrieval).
@@ -154,6 +195,12 @@ Pure Dart implementation modeled after commercial `IEC61850ServerSimulator`, run
 Pure Dart MMS & GOOSE engineering client modeled after `IEC61850ClientSimulator`.
 
 - **Project Path**: [iec61850_client](iec61850_client)
+
+#### 📸 Graphical Interface Showcase
+
+![IEC 61850 Client Simulator](docs/images/screenshot_iec61850_client.png)
+> **UI Overview**: Substation model Online Discovery; hierarchical IED model tree and FC functional constraints; real-time point polling and SBO control panel with timeout safety locks; BRCB/URCB report management and LAN GOOSE sniffer.
+
 - **7 Core Application Views**:
   1. 🌲 **Model Explorer**: Hierarchical IED/LD/LN/DO/DA tree inspection, value mutation, and SBO control panel.
   2. 📊 **Data Monitor**: Periodic polling table with IEC 61850 quality flag inspection and value change highlighting.

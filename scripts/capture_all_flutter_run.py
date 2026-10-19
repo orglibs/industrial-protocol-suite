@@ -37,6 +37,13 @@ APPS = [
         "click": (300, 220),
     },
     {
+        "name": "iec61850_server",
+        "cwd": f"{BASE_DIR}/iec61850_server",
+        "out": f"{BASE_DIR}/docs/images/screenshot_iec61850_server.png",
+        "match": "iec61850_server",
+        "click": (300, 220),
+    },
+    {
         "name": "iec61850_client",
         "cwd": f"{BASE_DIR}/iec61850_client",
         "out": f"{BASE_DIR}/docs/images/screenshot_iec61850_client.png",
