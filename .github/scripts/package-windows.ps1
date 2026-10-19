@@ -42,6 +42,38 @@ if (-not (Get-Command "iscc" -ErrorAction SilentlyContinue)) {
     }
 }
 
+# Locate and prepare ChineseSimplified.isl for Inno Setup
+$LocalChineseIsl = Join-Path $PSScriptRoot "ChineseSimplified.isl"
+$ResolvedChineseIsl = $null
+if (Test-Path $LocalChineseIsl) {
+    $ResolvedChineseIsl = (Resolve-Path $LocalChineseIsl).Path
+    Write-Host "Found local ChineseSimplified.isl at: $ResolvedChineseIsl"
+
+    # Install to Inno Setup Languages directory if accessible
+    $PossibleLangDirs = @(
+        "C:\Program Files (x86)\Inno Setup 6\Languages",
+        "C:\Program Files\Inno Setup 6\Languages"
+    )
+    if ($Iscc) {
+        $InnoExe = (Get-Command $Iscc -ErrorAction SilentlyContinue).Source
+        if (-not $InnoExe) { $InnoExe = $Iscc }
+        if (Test-Path $InnoExe) {
+            $PossibleLangDirs += (Join-Path (Split-Path $InnoExe -Parent) "Languages")
+        }
+    }
+
+    foreach ($LangDir in $PossibleLangDirs) {
+        if (Test-Path $LangDir) {
+            try {
+                Copy-Item -Path $ResolvedChineseIsl -Destination (Join-Path $LangDir "ChineseSimplified.isl") -Force -ErrorAction SilentlyContinue
+                Write-Host "Installed ChineseSimplified.isl to: $LangDir"
+            } catch {
+                Write-Warning "Could not copy ChineseSimplified.isl to ${LangDir}: $_"
+            }
+        }
+    }
+}
+
 $Apps = @(
     @{
         Id = "iec104_server"
@@ -125,6 +157,18 @@ foreach ($App in $Apps) {
             $IconDirective = "SetupIconFile=$AbsIcon"
         }
 
+        $LanguagesSection = @"
+[Languages]
+Name: "english"; MessagesFile: "compiler:Default.isl"
+"@
+        if ($ResolvedChineseIsl -and (Test-Path $ResolvedChineseIsl)) {
+            $LanguagesSection = @"
+[Languages]
+Name: "chinesesimp"; MessagesFile: "$ResolvedChineseIsl"
+Name: "english"; MessagesFile: "compiler:Default.isl"
+"@
+        }
+
         $IssContent = @"
 #define MyAppName "$AppName"
 #define MyAppPublisher "Industrial Protocol Suite"
@@ -149,9 +193,7 @@ DisableProgramGroupPage=yes
 $IconDirective
 UninstallDisplayIcon={app}\{#MyAppExeName}
 
-[Languages]
-Name: "chinesesimp"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
-Name: "english"; MessagesFile: "compiler:Default.isl"
+$LanguagesSection
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
@@ -171,13 +213,14 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
         Set-Content -Path $IssPath -Value $IssContent -Encoding UTF8
         Write-Host "Compiling Inno Setup installer: $InstallerBaseName.exe..."
         & $Iscc $IssPath
+        $IsccExit = $LASTEXITCODE
         Remove-Item $IssPath -Force -ErrorAction SilentlyContinue
 
         $ExpectedExe = Join-Path $AbsOutputDir "$InstallerBaseName.exe"
-        if (Test-Path $ExpectedExe) {
+        if ((Test-Path $ExpectedExe) -and ($IsccExit -eq 0)) {
             Write-Host "✓ Generated Installer: $ExpectedExe"
         } else {
-            Write-Warning "Inno Setup output file not found at expected path: $ExpectedExe"
+            Write-Error "Inno Setup compilation failed for $InstallerBaseName (ISCC exit code: $IsccExit)"
         }
     }
 }
