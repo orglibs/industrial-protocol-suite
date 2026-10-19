@@ -278,41 +278,41 @@ jobs:
           cd ..
 
           cat << 'EOF' > release_body.md
-          ## 📦 工业电力自动化协议仿真系统套件发布 (${{ steps.rel_info.outputs.release_tag }})
+          ## 📦 Industrial Protocol Simulation Suite Release (${{ steps.rel_info.outputs.release_tag }})
 
-          基于 Flutter & Dart 打造的跨平台现代化工业规约仿真桌面应用。包含 IEC 104、IEC 61850、Modbus 三大体系全功能服务端与客户端。
+          A modern, cross-platform industrial and power automation protocol simulation suite developed purely in Flutter & Dart. It comprehensively covers IEC 60870-5-104, IEC 61850, and Modbus across 6 full-featured client and server desktop applications.
 
-          ### 🚀 下载与安装指南
+          ### 🚀 Download & Installation Guide
 
           #### 🪟 Windows (x64)
-          * **安装程序向导**：下载对应工程的 `*-setup.exe`，双击即可完成标准安装向导（自动创建桌面快捷方式、开始菜单及卸载项）。
-          * **免安装绿色版**：下载对应工程的 `*-windows-x64.zip` 解压直接运行。
+          * **Setup Installer**: Download the corresponding `*-setup.exe` and double-click to run the setup wizard (automatically creates desktop shortcuts, start menu entries, and uninstaller).
+          * **Portable Archive**: Download the corresponding `*-windows-x64.zip`, extract, and launch directly.
 
           #### 🍎 macOS (Apple Silicon & Intel)
-          * 下载对应工程的 `*-macos.dmg` 文件，双击打开并将应用程序拖入 `Applications` 目录即可完成安装。
+          * Download the corresponding `*-macos.dmg` image, double-click to open, and drag the application into the `Applications` folder.
 
           #### 🐧 Linux (x64 / amd64 & ARM64 / aarch64)
-          * **Debian / Ubuntu / 统信UOS / 银河麒麟**：下载对应架构的 `*.deb` 安装包，双击通过应用商店安装，或在终端执行：
+          * **Debian / Ubuntu / Linux Mint**: Download the `.deb` package matching your architecture, install via software center or run in terminal:
             ```bash
             sudo apt install ./<package_name>_<version>_linux_<arch>.deb
             ```
-            安装完成后在系统应用程序菜单中直接启动。
-          * **通用 Linux 发行版**：下载对应架构的 `*.tar.gz` 绿色压缩包解压直接运行 `bundle/<app_name>`。
+            Once installed, launch it directly from the system application launcher.
+          * **Generic Linux Distributions**: Download the standalone `*.tar.gz` archive, extract, and execute `bundle/<app_name>`.
 
           ---
 
-          ### 📋 产物对应表 (Artifacts)
+          ### 📋 Release Artifacts Matrix
 
-          | 子系统名称 | 规约角色 | Windows 安装向导 / 绿色包 | macOS 镜像 (.dmg) | Linux DEB 安装包 (x64 / ARM64) |
+          | Subsystem | Protocol Role | Windows Setup / Portable (.zip) | macOS Image (.dmg) | Linux DEB (x64 / ARM64) |
           | :--- | :--- | :--- | :--- | :--- |
-          | **IEC 104 服务端** | 从站 / RTU | `iec104_server-*-setup.exe` / `.zip` | `iec104_server-*-macos.dmg` | `iec104_server_*_amd64.deb` / `arm64.deb` |
-          | **IEC 104 客户端** | 主站 / Master | `iec104_client-*-setup.exe` / `.zip` | `iec104_client-*-macos.dmg` | `iec104_client_*_amd64.deb` / `arm64.deb` |
-          | **IEC 61850 服务端** | MMS & GOOSE 从站 | `iec61850_server-*-setup.exe` / `.zip` | `iec61850_server-*-macos.dmg` | `iec61850_server_*_amd64.deb` / `arm64.deb` |
-          | **IEC 61850 客户端** | MMS & GOOSE 主站 | `iec61850_client-*-setup.exe` / `.zip` | `iec61850_client-*-macos.dmg` | `iec61850_client_*_amd64.deb` / `arm64.deb` |
-          | **Modbus 从站** | RTU / TCP / UDP 从站 | `modbus_slave-*-setup.exe` / `.zip` | `modbus_slave-*-macos.dmg` | `modbus_slave_*_amd64.deb` / `arm64.deb` |
-          | **Modbus 主站** | RTU / TCP / UDP 主站 | `modbus_master-*-setup.exe` / `.zip` | `modbus_master-*-macos.dmg` | `modbus_master_*_amd64.deb` / `arm64.deb` |
+          | **IEC 104 Server** | Server / Controlled Station (RTU) | `iec104_server-*-setup.exe` / `.zip` | `iec104_server-*-macos.dmg` | `iec104_server_*_amd64.deb` / `arm64.deb` |
+          | **IEC 104 Client** | Client / Controlling Station (Master) | `iec104_client-*-setup.exe` / `.zip` | `iec104_client-*-macos.dmg` | `iec104_client_*_amd64.deb` / `arm64.deb` |
+          | **IEC 61850 Server** | MMS & GOOSE Server / IED | `iec61850_server-*-setup.exe` / `.zip` | `iec61850_server-*-macos.dmg` | `iec61850_server_*_amd64.deb` / `arm64.deb` |
+          | **IEC 61850 Client** | MMS & GOOSE Client / SCADA | `iec61850_client-*-setup.exe` / `.zip` | `iec61850_client-*-macos.dmg` | `iec61850_client_*_amd64.deb` / `arm64.deb` |
+          | **Modbus Slave** | Slave / Server (RTU / TCP / UDP) | `modbus_slave-*-setup.exe` / `.zip` | `modbus_slave-*-macos.dmg` | `modbus_slave_*_amd64.deb` / `arm64.deb` |
+          | **Modbus Master** | Master / Client (RTU / TCP / UDP) | `modbus_master-*-setup.exe` / `.zip` | `modbus_master-*-macos.dmg` | `modbus_master_*_amd64.deb` / `arm64.deb` |
 
-          所有发布文件的 SHA-256 完整性校验值见附件 `SHA256SUMS.txt`。
+          SHA-256 checksums for all release assets are available in the attached `SHA256SUMS.txt`.
           EOF
 
       - name: Publish GitHub Release
