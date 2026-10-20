@@ -115,8 +115,16 @@ def main():
         copy_to_clipboard(RUANYF_BODY)
         open_url(target_url)
     elif choice == "2":
-        query = urllib.parse.urlencode({"title": HELLOGITHUB_TITLE, "body": HELLOGITHUB_BODY})
-        target_url = f"https://github.com/521xueweihan/HelloGitHub/issues/new?{query}"
+        params = {
+            "template": "submit-cn.yaml",
+            "project_url": REPO_URL,
+            "category": "其它",
+            "project_title": "基于 Flutter & 纯 Dart 的跨平台工业电力规约仿真套件",
+            "project_description": "基于 Flutter & 纯 Dart 自研的现代化跨平台工业电力自动化规约仿真平台。完整覆盖 IEC 60870-5-104、IEC 61850 MMS/GOOSE 及 Modbus TCP/RTU，包含 6 款全功能客户端与服务端桌面软件及 CLI 引擎。零驱动依赖，解压即用。",
+            "project_highlights": "1. 100% 纯 Dart 协议栈：无 C++ 原生库与 WinPcap 驱动束缚，真正零依赖；\n2. Material 3 工业无边框 UI：沉浸式标题栏、高对比度深色模式、支持 17 种语言切换（含 RTL）；\n3. 动态波形数学仿真：内置正弦波、方波、随机游走等 6 种曲线发生器，免硬件模拟遥测；\n4. 自动化 CI/CD 构建：GitHub Actions 原生输出 Windows (.exe/.zip)、macOS (.dmg) 与 Linux (.deb/.tar.gz)。",
+            "project_screenshot": "https://raw.githubusercontent.com/orglibs/industrial-protocol-suite/main/docs/images/screenshot_iec104_server.png"
+        }
+        target_url = f"https://github.com/521xueweihan/HelloGitHub/issues/new?{urllib.parse.urlencode(params)}"
         copy_to_clipboard(HELLOGITHUB_BODY)
         open_url(target_url)
     elif choice == "3":
