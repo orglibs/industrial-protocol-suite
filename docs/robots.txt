@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://orglibs.github.io/industrial-protocol-suite/sitemap.xml
